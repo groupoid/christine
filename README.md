@@ -1,5 +1,5 @@
-Christine Paulin-Mohring: Calculus of Inductive Constructions
-=============================================================
+Christine: Calculus of Inductive Constructions
+==============================================
 
 <img src="https://christine.groupoid.space/img/christine.jpg" height=400>
 
