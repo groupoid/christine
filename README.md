@@ -267,7 +267,7 @@ Every well-typed term in the system has a ormal form under β- and ι-reductions
 Per’s elegance rests on firm theoretical ground. Here, we reflect on key meta-theorems for Classical MLTT with General Inductive Types, drawing from CIC’s lineage:
 
 * **Soundness and Completeness**: Per’s type checker is sound—every term it accepts has a type under MLTT’s rules [Paulin-Mohring, 1996].
-  This ensures that every term accepted by Per is typable in the underlying theory.
+  This ensures that every term accepted by Christineis typable in the underlying theory.
   Relative to the bidirectional type checking algorithm, context is appropriately managed [Harper & Licata, 2007].
   The interplay of inference and checking modes guarantees this property.
 * **Canonicity, Normalization, and Totality**: Canonicity guarantees that every closed term of type `Nat` normalizes
@@ -277,7 +277,7 @@ Per’s elegance rests on firm theoretical ground. Here, we reflect on key meta-
 * **Consistency and Decidability**: Consistency ensures no proof of ⊥ exists, upheld by normalization and the
   absence of paradoxes like Girard’s [Girard, 1972]. Type checking is decidable in Per, as our algorithm
   terminates for well-formed inputs, leveraging CIC’s decidable equality [Asperti et al., 2009].
-* **Conservativity and Initiality**: Per is conservative over simpler systems like System F, adding dependent
+* **Conservativity and Initiality**: Christineis conservative over simpler systems like System F, adding dependent
   types without altering propositional truths [Pfenning & Paulin-Mohring, 1989]. Inductive types like Nat satisfy
   initiality—every algebra morphism from Nat to another structure is uniquely defined—ensuring categorical universality [Dybjer, 1997].
 
