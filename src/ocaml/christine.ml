@@ -122,7 +122,7 @@ and infer env ctx t =
     | Pi (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
     | Lam (x, domain, body) -> 
         check env ctx domain (infer env ctx domain); let ctx' = add_var ctx x domain in let body_ty = infer env ctx' body in 
-        if not (pos x body) then raise (TypeError ("Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"));
+(*        if not (pos x body) then raise (TypeError ("Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination")); *)
         Pi (x, domain, body_ty)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | ty -> Printf.printf "App failed: inferred "; print_term ty; print_endline ""; raise (TypeError "Application requires a Pi type"))
     | Sigma (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
