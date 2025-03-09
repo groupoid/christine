@@ -9,11 +9,11 @@ type level = int
 type name = string
 
 type term =
-  | Var of name | Universe of level
-  | Pi of name * term * term | Lam of name * term * term | App of term * term
-  | Sigma of name * term * term | Pair of term * term | Fst of term | Snd of term
-  | Id of term * term * term | Refl of term | J of term * term * term * term * term * term  (* J A a b C d p *)
-  | Inductive of inductive | Constr of int * inductive * term list | Ind of inductive * term * term list * term
+    | Var of name | Universe of level
+    | Pi of name * term * term | Lam of name * term * term | App of term * term
+    | Sigma of name * term * term | Pair of term * term | Fst of term | Snd of term
+    | Id of term * term * term | Refl of term | J of term * term * term * term * term * term  (* J A a b C d p *)
+    | Inductive of inductive | Constr of int * inductive * term list | Ind of inductive * term * term list * term
 and inductive = { name : string; params : (name * term) list; level : level; constrs : (int * term) list }
 
 type env = (string * inductive) list
@@ -122,7 +122,7 @@ and infer env ctx t =
     | Pi (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
     | Lam (x, domain, body) -> 
         check env ctx domain (infer env ctx domain); let ctx' = add_var ctx x domain in let body_ty = infer env ctx' body in 
-(*        if not (pos x body) then raise (TypeError ("Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination")); *)
+        if not (pos x body) then raise (TypeError ("Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"));
         Pi (x, domain, body_ty)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | ty -> Printf.printf "App failed: inferred "; print_term ty; print_endline ""; raise (TypeError "Application requires a Pi type"))
     | Sigma (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
@@ -139,8 +139,7 @@ and infer env ctx t =
             match ty' with
             | Pi (x, a, b) -> 
                 (* Check that 'a' is well-typed *)
-                (try let _ = infer env ctx a in ()
-                 with TypeError msg -> raise (TypeError ("Invalid argument type in constructor " ^ string_of_int j ^ ": " ^ msg)));
+                (try let _ = infer env ctx a in () with TypeError msg -> raise (TypeError ("Invalid argument type in constructor " ^ string_of_int j ^ ": " ^ msg)));
                 if not (is_positive env ctx a ind_name) then 
                   raise (TypeError ("Negative occurrence in constructor " ^ string_of_int j));
                 check_pos b
@@ -151,7 +150,8 @@ and infer env ctx t =
       Universe d.level
     | Constr (j, d, args) -> let cj = List.assoc j d.constrs in let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in infer_ctor env ctx cj_subst args
     | Ind (d, p, cases, t') -> infer_Ind env ctx d p cases t'
-    | J (ty, a, b, c, d, p) -> infer_J env ctx ty a b c d p in normalize env ctx res
+    | J (ty, a, b, c, d, p) -> infer_J env ctx ty a b c d p
+    in normalize env ctx res
 
 and infer_ctor env ctx ty args =
     let rec check_args ty args_acc = function
@@ -241,10 +241,34 @@ and check env ctx t ty =
            in raise (TypeError error))
 
 and apply_case env ctx d p cases case ty args =
-    let rec apply ty args_acc = function
-      | Pi (x, _, b) :: arg :: rest -> apply (subst x arg b) (arg :: args_acc) rest
-      | Pi (_, _, b) :: [] -> apply b args_acc []
-      | _ -> List.fold_left (fun t a -> subst "_dummy" a t) case (List.rev args_acc)
+    if (trace) then (Printf.printf "Applying case: "; print_term case; Printf.printf " to type: "; print_term ty; Printf.printf " with args: [";
+                     List.iter (fun arg -> print_term arg; print_string "; ") args;
+                     print_endline "]");
+    let rec apply ty args_acc remaining_args =
+    match ty, remaining_args with
+    | Pi (x, a, b), arg :: rest ->
+        let b' = subst x arg b in
+        let rec_arg =
+          if equal env ctx a (Inductive d) then
+            match arg with
+            | Constr (j, d', sub_args) when d.name = d'.name ->
+                let reduced = reduce env ctx (Ind (d, p, cases, arg)) in
+                if (trace) then (Printf.printf "Recursive arg for %s: " x; print_term reduced; print_endline "");
+                Some reduced
+            | _ -> None
+          else None
+        in
+        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
+        apply b' new_args_acc rest
+    | Pi (_, _, b), [] -> apply b args_acc []  (* Handle missing args by skipping to codomain *)
+    | _, [] ->
+        let rec apply_term t args =
+          match t, args with
+          | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
+          | t, [] -> t
+          | _ -> raise (TypeError "Case application mismatch: too few arguments for lambda")
+        in apply_term case (List.rev args_acc)
+    | _ -> raise (TypeError "Constructor argument mismatch")
     in apply ty [] args
 
 and reduce env ctx t =
