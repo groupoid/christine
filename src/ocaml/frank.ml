@@ -131,7 +131,7 @@ and reduce env ctx t =
       let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in
       apply_case env ctx d p cases case cj_subst args
-    | Ind (d, p, cases, t') -> let t'' = reduce env ctx t' in (match t'' with | Constr _ -> reduce env ctx (Ind (d, p, cases, t'')) | _ -> t)
+    | Ind (d, p, cases, t') -> let t'' = reduce env ctx t' in let reduced_ind = Ind (d, p, cases, t'') in (match t'' with | Constr _ -> reduce env ctx reduced_ind | _ -> reduced_ind)
     | Constr (j, d, args) -> let args' = List.map (reduce env ctx) args in if args = args' then t else Constr (j, d, args')
     | _ -> t
 
@@ -152,10 +152,8 @@ and is_positive env ctx ty ind_name =
         let rec neg ty' =
           match ty' with
           | Inductive d when d.name = ind_name -> true
-          | Pi (x', a', b') -> 
-              (match a' with
-               | Inductive d when d.name = ind_name -> true
-               | _ -> neg a') || neg b'
+          | Pi (x', a', b') -> neg a' || neg b'
+          | App (f, arg) -> neg f || neg arg
           | _ -> false
         in not (neg a) && is_positive env (add_var ctx x a) b ind_name
     | Inductive d when d.name = ind_name -> true
