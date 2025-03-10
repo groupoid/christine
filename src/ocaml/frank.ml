@@ -111,7 +111,7 @@ and apply_case env ctx d p cases case ty args =
         in
         let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
         apply b' new_args_acc rest
-    | Pi (_, _, b), [] -> apply b args_acc []  (* Handle missing args by skipping to codomain *)
+    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArgMismatch)
     | _, [] ->
         let rec apply_term t args =
           match t, args with
