@@ -176,8 +176,8 @@ and infer env ctx t =
             match ty' with
             | Pi (x, a, b) -> 
                 (try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgumentType j)));
-                if not (is_positive env ctx a ind_name) then 
-                  raise (Error (InferCtorNegative j));
+                 if not (is_positive env ctx a ind_name) then 
+                  raise (Error (InferCtorNegative j)); 
                 check_pos b
             | Inductive d' when d'.name = ind_name -> ()
             | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
@@ -395,8 +395,8 @@ let test_positivity () =
         constrs = [(1, Pi ("x", Pi ("y", Inductive { name = "Bad"; params = []; level = 0; constrs = [] }, Universe 0), 
                        Inductive { name = "Bad"; params = []; level = 0; constrs = [] }))] } in
     let env = [("Nat", nat_def); ("List", list_def (Universe 0)); ("Bad", bad_def)] in
-    assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false);
-    assert (match infer env empty_ctx (Inductive (list_def (Universe 0))) with | Universe _ -> true | _ -> false);
+    assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false); 
+    assert (match infer env empty_ctx (Inductive (list_def (Universe 0))) with | Universe _ -> true | _ -> false); 
     try let _ = infer env empty_ctx (Inductive bad_def) in assert false with Error x -> Printf.printf "Positivity check caught: %s\n" (string_of_error x);
     print_string "Positivity Checking PASSED.\n"
 
