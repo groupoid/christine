@@ -200,14 +200,14 @@ and infer_ctor env ctx ty args =
     in check_args ty [] args
 
 and infer_Ind env ctx d p cases t' =
-    if List.length cases <> List.length d.constrs then raise (TypeError "Number of cases doesn't match constructors");
+    if List.length cases <> List.length d.constrs then raise (Error IndWrongCases);
     let t_ty = infer env ctx t' in
     let d_applied = apply_inductive d (List.map snd d.params) in
-    if not (equal env ctx t_ty d_applied) then raise (TypeError "Elimination target type mismatch");
+    if not (equal env ctx t_ty d_applied) then raise (Error IndElimTargetMismatch);
     let (x, a, b) = match p with
     | Pi (x, a, b) -> (x, a, b)
-    | _ -> raise (TypeError ("Motive must be a Pi type.")) in ignore(check_universe env ctx (infer env ctx p));
-    if not (equal env ctx t_ty a) then raise (TypeError "Target type does not match motive domain");
+    | _ -> raise (Error IndMotiveExpetsPi) in ignore(check_universe env ctx (infer env ctx p));
+    if not (equal env ctx t_ty a) then raise (Error IndMotiveDomainMismatch);
     let result_ty = subst x t' b in
     if (trace) then (print_Ind d p cases t' 0);
     List.iteri (fun j case ->
@@ -228,28 +228,28 @@ and infer_Ind env ctx d p cases t' =
     result_ty
 
 and apply_inductive d args =
-    if List.length d.params <> List.length args then raise (TypeError "Parameter mismatch in inductive type");
+    if List.length d.params <> List.length args then raise (Error IndParametersMismatch);
     let subst_param t = List.fold_left2 (fun acc (n, _) arg -> subst n arg acc) t d.params args
     in Inductive { d with constrs = List.map (fun (j, ty) -> (j, subst_param ty)) d.constrs }
 
 and check_universe env ctx t =
     match infer env ctx t with
     | Universe i -> i
-    | _ -> raise (TypeError ("Expected a universe"))
+    | _ -> raise (Error CheckUniverseExpected)
 
 and check env ctx t ty =
     match t, ty with
-    | Universe i, Universe j -> if i < 0 then raise (TypeError "Negative universe level"); if i > j then raise (TypeError (Printf.sprintf "Universe level mismatch: %d > %d" i j));
-    | Pi (x, a, b), Pi (y, a', b') -> if not (equal env ctx a a') then raise (TypeError "Pi domain mismatch"); let ctx' = add_var ctx x a in check env ctx' b (subst y (Var x) b')
+    | Universe i, Universe j -> if i < 0 then raise (Error (InferNegativeUniverse i)); if i > j then raise (Error (CheckUniverseLevelMismatch (i,j)));
+    | Pi (x, a, b), Pi (y, a', b') -> if not (equal env ctx a a') then raise (Error CheckPiDomainMismatch); let ctx' = add_var ctx x a in check env ctx' b (subst y (Var x) b')
     | Lam (x, domain, body), Pi (y, a, b) -> check env ctx domain (infer env ctx domain); let b_subst = subst y (Var x) b in check env (add_var ctx x domain) body b_subst
-    | Constr (j, d, args), Inductive d' when d.name = d'.name -> let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (TypeError "Constructor type mismatch")
-    | Ind (d, p, cases, t'), ty -> let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (TypeError "Elimination type mismatch")
+    | Constr (j, d, args), Inductive d' when d.name = d'.name -> let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error CheckCtorTypeMismatch)
+    | Ind (d, p, cases, t'), ty -> let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error CheckElimTypeMismatch)
     | _, _ ->
         let inferred = infer env ctx t in
         let ty' = normalize env ctx ty in
         match inferred, ty' with
         | Universe i, Universe j when i >= j -> ()
-        | _ -> if not (equal env ctx inferred ty') then raise (TypeError "Type Mismatch Error")
+        | _ -> if not (equal env ctx inferred ty') then raise (Error CheckTypeError)
 
 and print_Ind d p cases t' depth =
     print_string (d.name ^ ".Ind "); print_term_depth (depth + 1) p;
