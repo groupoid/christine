@@ -329,7 +329,6 @@ let tree_ind = Inductive (tree_def (Inductive nat_def))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
-let leaf = Constr (1, tree_def (Universe 0), [])
 let sample_tree = node (Constr (1, nat_def, [])) leaf leaf
 
 let env = [("Empty", empty_def);
