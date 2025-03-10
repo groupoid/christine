@@ -414,6 +414,8 @@ let test_lambda_totality () =
     assert (match infer env ctx valid with | Pi (_, _, _) -> true | _ -> false);
     try let _ = infer env ctx (Lam ("x", Inductive nat_def, App (Var "x", Constr (1, nat_def, [])))) in assert false
     with Error x -> Printf.printf "Caught non-total lambda: %s\n" (string_of_error x);
+    let x = infer env ctx (Lam ("x", Pi ("y", Inductive nat_def, Inductive nat_def),
+                           App (Var "x", Constr (1, nat_def, [])))) in print_term x; print_endline "";
     print_string "Lambda Totality PASSED.\n"
 
 let test_basic_setup () =
