@@ -1,30 +1,60 @@
-(* Fr*)
+(* 1989 Frank Pfenning and Christine Paulin-Mohring: CoC + CIC
+   Copyright (c) Groupoїd la Infini
+ *)
 
 let trace: bool = false
-let tests: bool = true
-
-type level = int
-type name = string
 
 type term =
-    | Var of name | Universe of level
-    | Pi of name * term * term
-    | Lam of name * term * term
+    | Var of string
+    | Universe of int
+    | Pi of string * term * term
+    | Lam of string * term * term
     | App of term * term
     | Inductive of inductive
     | Constr of int * inductive * term list
     | Ind of inductive * term * term list * term
-and inductive = { name : string; params : (name * term) list; level : level; constrs : (int * term) list }
+
+and inductive = {
+    name : string;
+    params : (string * term) list;
+    level : int;
+    constrs : (int * term) list
+}
+
+exception TypeError of string
+
+type error =
+    | ApplyCaseTermMismatch
+    | ApplyCaseCtorArgMismatch
+    | InferUnboundVariable of string
+    | InferNegativeUniverse of int
+    | InferBoundVariableNoPositive of string
+    | InferApplicationRequiresPi
+    | InferCtorNegative of int
+    | InferCtorInvalidArgumentType of int
+    | InferCtorInvalidType of int * string
+    | InferCtorTooManyArgs
+    | IndWrongCases
+    | IndElimTargetMismatch
+    | IndMotiveExpetsPi
+    | IndMotiveDomainMismatch
+    | IndParametersMismatch
+    | CheckUniverseExpected
+    | CheckPiDomainMismatch
+    | CheckUniverseLevelMismatch of int * int
+    | CheckCtorTypeMismatch
+    | CheckElimTypeMismatch
+    | CheckTypeError
+
+exception Error of error
 
 type env = (string * inductive) list
-type context = (name * term) list
-type subst_map = (name * term) list
+type context = (string * term) list
+type subst_map = (string * term) list
 
 let empty_env : env = []
 let empty_ctx : context = []
 let add_var ctx x ty = (x, ty) :: ctx
-
-exception TypeError of string
 
 let rec is_lam = function | Lam _ -> true | _ -> false
 
@@ -68,9 +98,6 @@ and normalize env ctx t =
     if equal' env ctx t t' then t else normalize env ctx t'
 
 and apply_case env ctx d p cases case ty args =
-    if (trace) then (Printf.printf "Applying case: "; print_term case; Printf.printf " to type: "; print_term ty; Printf.printf " with args: [";
-                     List.iter (fun arg -> print_term arg; print_string "; ") args;
-                     print_endline "]");
     let rec apply ty args_acc remaining_args =
     match ty, remaining_args with
     | Pi (x, a, b), arg :: rest ->
@@ -78,10 +105,7 @@ and apply_case env ctx d p cases case ty args =
         let rec_arg =
           if equal env ctx a (Inductive d) then
             match arg with
-            | Constr (j, d', sub_args) when d.name = d'.name ->
-                let reduced = reduce env ctx (Ind (d, p, cases, arg)) in
-                if (trace) then (Printf.printf "Recursive arg for %s: " x; print_term reduced; print_endline "");
-                Some reduced
+            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
             | _ -> None
           else None
         in
@@ -93,9 +117,9 @@ and apply_case env ctx d p cases case ty args =
           match t, args with
           | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
           | t, [] -> t
-          | _ -> raise (TypeError "Case application mismatch: too few arguments for lambda")
+          | _ -> raise (Error ApplyCaseTermMismatch)
         in apply_term case (List.rev args_acc)
-    | _ -> raise (TypeError "Constructor argument mismatch")
+    | _ -> raise (Error ApplyCaseCtorArgMismatch)
     in apply ty [] args
 
 and reduce env ctx t =
@@ -139,28 +163,26 @@ and is_positive env ctx ty ind_name =
 
 and infer env ctx t =
     let res = match t with
-    | Var x -> (match lookup_var ctx x with | Some ty -> ty | None -> raise (TypeError ("Unbound variable: " ^ x)))
-    | Universe i -> if i < 0 then raise (TypeError "Negative universe level"); Universe (i + 1)
+    | Var x -> (match lookup_var ctx x with | Some ty -> ty | None -> raise (Error (InferUnboundVariable x)))
+    | Universe i -> if i < 0 then raise (Error (InferNegativeUniverse i)); Universe (i + 1)
     | Pi (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
     | Lam (x, domain, body) -> 
-        check env ctx domain (infer env ctx domain); let ctx' = add_var ctx x domain in let body_ty = infer env ctx' body in 
-        if not (pos x body) then raise (TypeError ("Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"));
-        Pi (x, domain, body_ty)
-    | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | ty -> Printf.printf "App failed: inferred "; print_term ty; print_endline ""; raise (TypeError "Application requires a Pi type"))
+        check env ctx domain (infer env ctx domain); 
+        if not (pos x body) then raise (Error (InferBoundVariableNoPositive x));
+        Pi (x, domain, infer env (add_var ctx x domain) body)
+    | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
     | Inductive d -> 
-      List.iter (fun (_, ty) -> match infer env ctx ty with | Universe _ -> () | _ -> raise (TypeError "Inductive parameters must be types")) d.params;
       let ind_name = d.name in
       List.iter (fun (j, ty) -> 
         let rec check_pos ty' =
             match ty' with
             | Pi (x, a, b) -> 
-                (try let _ = infer env ctx a in ()
-                 with TypeError msg -> raise (TypeError ("Invalid argument type in constructor " ^ string_of_int j ^ ": " ^ msg)));
+                (try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgumentType j)));
                 if not (is_positive env ctx a ind_name) then 
-                  raise (TypeError ("Negative occurrence in constructor " ^ string_of_int j));
+                  raise (Error (InferCtorNegative j));
                 check_pos b
             | Inductive d' when d'.name = ind_name -> ()
-            | _ -> raise (TypeError ("Constructor " ^ string_of_int j ^ " must return " ^ d.name))
+            | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
         in check_pos ty
       ) d.constrs;
       Universe d.level
@@ -174,7 +196,7 @@ and infer_ctor env ctx ty args =
     | arg :: rest ->
         (match ty with
          | Pi (x, a, b) -> check env ctx arg a; check_args (subst x arg b) (arg :: args_acc) rest
-         | _ -> raise (TypeError "Too many arguments to constructor"))
+         | _ -> raise (Error InferCtorTooManyArgs))
     in check_args ty [] args
 
 and infer_Ind env ctx d p cases t' =
@@ -184,8 +206,7 @@ and infer_Ind env ctx d p cases t' =
     if not (equal env ctx t_ty d_applied) then raise (TypeError "Elimination target type mismatch");
     let (x, a, b) = match p with
     | Pi (x, a, b) -> (x, a, b)
-    | _ -> raise (TypeError ("Motive must be a Pi type, got: " ^ (let s = ref "" in print_term_depth 0 p; !s))) in
-    let p_ty = infer env ctx p in (match p_ty with | Universe _ -> () | _ -> raise (TypeError "Motive must be a type (Universe)"));
+    | _ -> raise (TypeError ("Motive must be a Pi type.")) in ignore(check_universe env ctx (infer env ctx p));
     if not (equal env ctx t_ty a) then raise (TypeError "Target type does not match motive domain");
     let result_ty = subst x t' b in
     if (trace) then (print_Ind d p cases t' 0);
@@ -199,7 +220,7 @@ and infer_Ind env ctx d p cases t' =
             let var = Var x in let ctx' = add_var ctx_acc x a in let b_ty = compute_case_type b ctx' in
             if equal env ctx a d_applied then Pi (x, a, Pi ("ih", App (p, var), b_ty)) else Pi (x, a, b_ty)
         | Inductive d' when d'.name = d.name -> b
-        | _ -> raise (TypeError "Invalid constructor return type")
+        | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
       in
       let expected_ty = compute_case_type cj_subst ctx in
       check env ctx case expected_ty
@@ -244,10 +265,33 @@ and print_term_depth depth t =
     | Lam (x, _, body) -> print_string ("λ (" ^ x ^ "), "); print_term_depth (depth + 1) body
     | App (f, arg) -> print_string "("; print_term_depth (depth + 1) f; print_string " "; print_term_depth (depth + 1) arg; print_string ")"
     | Inductive d -> print_string d.name
-    | Constr (i, d, args) -> print_string d.name; print_string "."; print_string (string_of_int i); List.iteri (fun j c -> if j > 0 then print_string "; "; print_term_depth (depth + 1) c) args
+    | Constr (i, d, args) -> print_string d.name; print_string ("." ^ (string_of_int i) ^ " "); List.iteri (fun j c -> if j > 0 then print_string "; "; print_term_depth (depth + 1) c) args
     | Ind (d, p, cases, t') -> print_Ind d p cases t' depth
 
 and print_term t = print_term_depth 0 t
+
+let string_of_error = function
+    | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
+    | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
+    | InferUnboundVariable x -> "Unbound variable " ^ x
+    | InferNegativeUniverse i -> "Negative Universe level " ^ (string_of_int i)
+    | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
+    | InferApplicationRequiresPi -> "Application requires a Pi type"
+    | InferCtorNegative i -> "Negative occurrence in constructor " ^ string_of_int i
+    | InferCtorInvalidArgumentType i -> "Invalid argument type in constructor " ^ string_of_int i
+    | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
+    | InferCtorTooManyArgs -> "Too many arguments to constructor"
+    | IndWrongCases -> "Number of cases doesn't match constructors"
+    | IndElimTargetMismatch -> "Elimination target type mismatch"
+    | IndMotiveExpetsPi -> "Motive must be a Pi type"
+    | IndMotiveDomainMismatch -> "Target type does not match motive domain"
+    | IndParametersMismatch -> "Parameter mismatch in inductive type"
+    | CheckUniverseExpected -> "Expected a universe"
+    | CheckPiDomainMismatch -> "Pi domain mismatch"
+    | CheckUniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
+    | CheckCtorTypeMismatch -> "Constructor type mismatch"
+    | CheckElimTypeMismatch -> "Elimination type mismatch"
+    | CheckTypeError ->  "Type Mismatch Error"
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
@@ -343,8 +387,8 @@ let test_universe () =
     assert (equal empty_env ctx (infer empty_env ctx t1) (Universe 1));
     check empty_env ctx (Universe 0) (Universe 1);
     check empty_env ctx (Universe 0) (Universe 0);
-    begin try let _ = check env ctx (Universe 1) (Universe 0) in assert false with TypeError _ -> () end;
-    begin try let _ = infer empty_env ctx (Universe (-1)) in assert false with TypeError "Negative universe level" -> () end;
+    begin try let _ = check env ctx (Universe 1) (Universe 0) in assert false with _ -> () end;
+    begin try let _ = infer empty_env ctx (Universe (-1)) in assert false with _ -> () end;
     if trace then (Printf.printf "Universe test: Type0 : Type1 (passed)\n");
     Printf.printf "Universe Consistency PASSED\n"
 
@@ -356,14 +400,14 @@ let test_positivity () =
     let env = [("Nat", nat_def); ("List", list_def (Universe 0)); ("Bad", bad_def)] in
     assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false);
     assert (match infer env empty_ctx (Inductive (list_def (Universe 0))) with | Universe _ -> true | _ -> false);
-    try let _ = infer env empty_ctx (Inductive bad_def) in assert false with TypeError msg -> Printf.printf "Positivity check caught: %s\n" msg;
+    try let _ = infer env empty_ctx (Inductive bad_def) in assert false with Error x -> Printf.printf "Positivity check caught: %s\n" (string_of_error x);
     print_string "Positivity Checking PASSED.\n"
 
 let test_edge_cases () =
     let env = [("Nat", nat_def)] in
     try let _ = infer env empty_ctx (Inductive { name = "X"; params = []; level = 0;
                    constrs = [(1, Pi ("x", Var "Y", Inductive { name = "X"; params = []; level = 0; constrs = [] }))] }) in
-        assert false with TypeError msg ->  Printf.printf "Caught unbound type: %s\n" msg;
+        assert false with Error x ->  Printf.printf "Caught unbound type: %s\n" (string_of_error x);
     print_string "Unboundness Checking PASSED.\n"
 
 let test_lambda_totality () =
@@ -372,7 +416,7 @@ let test_lambda_totality () =
     let valid = Lam ("x", Inductive nat_def, Var "x") in
     assert (match infer env ctx valid with | Pi (_, _, _) -> true | _ -> false);
     try let _ = infer env ctx (Lam ("x", Inductive nat_def, App (Var "x", Constr (1, nat_def, [])))) in assert false
-    with TypeError msg -> Printf.printf "Caught non-total lambda: %s\n" msg;
+    with Error x -> Printf.printf "Caught non-total lambda: %s\n" (string_of_error x);
     print_string "Lambda Totality PASSED.\n"
 
 let test_basic_setup () =
@@ -399,11 +443,8 @@ let test () =
     test_universe ();
     test_eta ();
     test_positivity ();
-    test_edge_cases ();
+    test_edge_cases ();  
     test_lambda_totality ();
     test_basic_setup ()
 
 let () = test ()
-
-
-
