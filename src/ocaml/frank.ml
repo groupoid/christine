@@ -119,43 +119,16 @@ and apply_case env ctx d p cases case ty args =
           | t, [] -> t
           | _ -> raise (Error ApplyCaseTermMismatch)
         in
-        (* Ensure recursive args are fully applied *)
         let applied = apply_term case (List.rev args_acc) in
         (match applied with
          | Lam (x, _, _) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
-             (* If expecting an ih and a recursive arg was provided, apply it *)
              let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
              let ih = reduce env ctx (Ind (d, p, cases, rec_arg)) in
              apply_term applied [ih]
          | _ -> applied)
     | _ -> raise (Error ApplyCaseCtorArgMismatch)
     in apply ty [] args
-(*
-and apply_case env ctx d p cases case ty args =
-    let rec apply ty args_acc remaining_args =
-    match ty, remaining_args with
-    | Pi (x, a, b), arg :: rest ->
-        let b' = subst x arg b in
-        let rec_arg =
-          if equal env ctx a (Inductive d) then
-            match arg with
-            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
-            | _ -> None
-          else None
-        in
-        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
-        apply b' new_args_acc rest
-    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArgMismatch)
-    | _, [] ->
-        let rec apply_term t args =
-          match t, args with
-          | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
-          | t, [] -> t
-          | _ -> raise (Error ApplyCaseTermMismatch)
-        in apply_term case (List.rev args_acc)
-    | _ -> raise (Error ApplyCaseCtorArgMismatch)
-    in apply ty [] args
-*)
+
 and reduce env ctx t =
     match t with
     | App (Lam (x, domain, body), arg) -> subst x arg body
