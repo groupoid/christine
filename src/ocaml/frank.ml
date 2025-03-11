@@ -373,7 +373,7 @@ let plus =
          [Var "m"; Lam ("k", nat_ind, Lam ("ih", nat_ind, Constr (2, nat_def, [Var "ih"])))],
          Var "n")))
 
-let plus_w0 =
+let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
@@ -382,7 +382,7 @@ let plus_w0 =
            Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
            Ind (bool_def, Var "a",
                 [Var "m";  (* zero_w case *)
-                 Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "y")])],  (* succ_w case *)
+                 Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, succ_w (Var "y"))])],  (* succ_w case *)
                 Inductive w_nat)))],
          Var "n")))
 
@@ -394,7 +394,7 @@ let plus_w1 =
          [Var "m"; Lam ("k", Inductive w_nat, Lam ("ih", Inductive w_nat, Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, (Var "ih"))]) ))],
           Var "n")))
 
-let plus_w =
+let plus_w2 =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
