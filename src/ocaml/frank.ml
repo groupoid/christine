@@ -377,32 +377,11 @@ let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Inductive w_nat,  (* Motive: result is w_nat *)
-         [Lam ("a", Inductive bool_def,
-           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-           Ind (bool_def, Var "a",
-                [Var "m";  (* zero_w case *)
-                 Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, succ_w (Var "y"))])],  (* succ_w case *)
-                Inductive w_nat)))],
-         Var "n")))
-
-let plus_w1 =
-    Lam ("n", Inductive w_nat,
-    Lam ("m", Inductive w_nat,
-    Ind (w_nat,
-         Pi ("_", Inductive w_nat, Inductive w_nat),
-         [Var "m"; Lam ("k", Inductive w_nat, Lam ("ih", Inductive w_nat, Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, (Var "ih"))]) ))],
-          Var "n")))
-
-let plus_w2 =
-    Lam ("n", Inductive w_nat,
-    Lam ("m", Inductive w_nat,
-    Ind (w_nat,
-         Pi ("_", nat_ind, nat_ind),
+         Var "n",
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Ind (bool_def, Var "a", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
-          Var "n")))
+          Ind (bool_def, Var "xx", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
+          Inductive w_nat)))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
