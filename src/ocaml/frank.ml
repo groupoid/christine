@@ -359,8 +359,8 @@ let tree_ind = Inductive (tree_def (Inductive nat_def))
 let false_val = Constr (1, bool_def, [])
 let true_val = Constr (2, bool_def, [])
 let tt = Constr (1, unit_def, [])
-let zero_w = Constr (1, w_nat, [true_val; Lam ("y", Inductive empty_def, Var "y")])
-let succ_w n = Constr (1, w_nat, [false_val; Lam ("y", Inductive unit_def, n)])
+let zero_w = Constr (1, w_nat, [false_val; Lam ("y", Inductive empty_def, Var "y")])
+let succ_w n = Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, n)])
 let one_w = succ_w zero_w
 let two_w = succ_w one_w
 let four_w = succ_w (succ_w two_w)
@@ -377,24 +377,32 @@ let plus_w0 =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Pi ("_", nat_ind, nat_ind),
+         Inductive w_nat,  (* Motive: result is w_nat *)
          [Lam ("a", Inductive bool_def,
-          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Ind (bool_def, Var "a", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
+           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+           Ind (bool_def, Var "a",
+                [Var "m";  (* zero_w case *)
+                 Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "y")])],  (* succ_w case *)
+                Inductive w_nat)))],
+         Var "n")))
+
+let plus_w1 =
+    Lam ("n", Inductive w_nat,
+    Lam ("m", Inductive w_nat,
+    Ind (w_nat,
+         Pi ("_", Inductive w_nat, Inductive w_nat),
+         [Var "m"; Lam ("k", Inductive w_nat, Lam ("ih", Inductive w_nat, Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, (Var "ih"))]) ))],
           Var "n")))
 
 let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Inductive w_nat,  (* Motive: return W-type directly *)
+         Pi ("_", nat_ind, nat_ind),
          [Lam ("a", Inductive bool_def,
-           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-           Ind (bool_def, Var "a",
-                [Var "m";  (* Base case: m *)
-                 Constr (1, w_nat, [false_val; Lam ("y", Inductive unit_def, App (Var "f", tt))])],  (* Successor *)
-                Inductive w_nat)))],
-         Var "n")))
+          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+          Ind (bool_def, Var "a", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
+          Var "n")))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
