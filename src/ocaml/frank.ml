@@ -128,7 +128,7 @@ and reduce env ctx t =
     | App (Pi (x, a, b), arg) -> subst x arg b
     | App (f, a) -> App (reduce env ctx f, reduce env ctx a)
     | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
-      let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
+      let case = List.nth cases j in let cj = List.assoc j d.constrs in  (* Change j - 1 to j *)
       let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in
       apply_case env ctx d p cases case cj_subst args
     | Ind (d, p, cases, t') ->
