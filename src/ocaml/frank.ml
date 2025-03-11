@@ -126,13 +126,16 @@ and reduce env ctx t =
     match t with
     | App (Lam (x, domain, body), arg) -> subst x arg body
     | App (Pi (x, a, b), arg) -> subst x arg b
-    | App (f, arg) -> let f' = reduce env ctx f in let arg' = reduce env ctx arg in App (f', arg')
+    | App (f, a) -> App (reduce env ctx f, reduce env ctx a)
     | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
       let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in
       apply_case env ctx d p cases case cj_subst args
-    | Ind (d, p, cases, t') -> let t'' = reduce env ctx t' in let reduced_ind = Ind (d, p, cases, t'') in (match t'' with | Constr _ -> reduce env ctx reduced_ind | _ -> reduced_ind)
-    | Constr (j, d, args) -> let args' = List.map (reduce env ctx) args in if args = args' then t else Constr (j, d, args')
+    | Ind (d, p, cases, t') ->
+      let t'' = reduce env ctx t' in
+      let reduced_ind = Ind (d, p, cases, t'')
+      in (match t'' with | Constr _ -> reduce env ctx reduced_ind | _ -> reduced_ind)
+    | Constr (i, ind, args) -> Constr (i, ind, List.map (reduce env ctx) args)
     | _ -> t
 
 and pos x t =
@@ -293,34 +296,55 @@ let string_of_error = function
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
-let nat_def = {
-  name = "Nat"; params = []; level = 0;
-  constrs = [
-    (1, Inductive { name = "Nat"; params = []; level = 0; constrs = [] });
-    (2, Pi ("n", Inductive { name = "Nat"; params = []; level = 0; constrs = [] },
-           Inductive { name = "Nat"; params = []; level = 0; constrs = [] }))]
-}
+let unit_def = { name = "Unit"; params = []; level = 0; constrs = [
+      (0, Universe 0)] }
 
-let list_def (a : term) = {
-  name = "List"; params = [("A", a)]; level = 0;
-  constrs = [
-    (1, Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] });
-    (2, Pi ("x", a, Pi ("xs", Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] },
-                        Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] }))) ]
-}
+let bool_def = { name = "Bool"; params = []; level = 0; constrs = [
+      (0, Universe 0); (1, Universe 0)] }
 
-let tree_def a = {
-  name = "Tree";
-  params = [("A", a)];
-  level = 0;
-  constrs = [
-    (1, Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] });
-    (2, Pi ("x", a,
-           Pi ("l", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
-               Pi ("r", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
-                   Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] }))))
-  ]
-}
+let rec w_def = { name = "W";
+    params = [
+      ("A", Universe 0);
+      ("B", Pi ("x", Var "A", Universe 0))]; level = 0;
+    constrs = [
+      (0, Pi ("a", Var "A", Pi ("f", Pi ("y", App (Var "B", Var "a"),
+          Inductive w_def),
+          Inductive w_def))) ] }
+
+let rec w_nat = { name = "N";
+    params = [
+      ("A", Inductive bool_def);
+      ("B", Lam ("x", Inductive bool_def,
+                    Ind (bool_def,
+                         Var "x",
+                         [Inductive empty_def; Inductive unit_def],
+                         Universe 0))) ]; level = 0;
+    constrs = [
+      (0, Pi ("a", Inductive bool_def,
+          Pi ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+          Inductive w_nat))) ] }
+
+let nat_def = { name = "Nat"; params = []; level = 0;
+    constrs = [
+      (1, Inductive { name = "Nat"; params = []; level = 0; constrs = [] });
+      (2, Pi ("n",
+          Inductive { name = "Nat"; params = []; level = 0; constrs = [] },
+          Inductive { name = "Nat"; params = []; level = 0; constrs = [] }))] }
+
+let list_def (a : term) = { name = "List"; params = [("A", a)]; level = 0;
+    constrs = [
+      (1, Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] });
+      (2, Pi ("x", a, Pi ("xs",
+          Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] },
+          Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] }))) ] }
+
+let tree_def a = { name = "Tree"; params = [("A", a)]; level = 0;
+    constrs = [
+      (1, Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] });
+      (2, Pi ("x", a,
+          Pi ("l", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
+          Pi ("r", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
+          Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] })))) ] }
 
 let empty_ind = Inductive empty_def
 let nat_ind = Inductive nat_def
@@ -332,6 +356,8 @@ let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
 let sample_tree = node (Constr (1, nat_def, [])) leaf leaf
 
 let env = [("Empty", empty_def);
+           ("Unit", unit_def);
+           ("Bool", bool_def);
            ("Nat", nat_def);
            ("List", list_def (Universe 0));
            ("Tree", tree_def (Inductive nat_def))]
