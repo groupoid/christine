@@ -128,7 +128,7 @@ and reduce env ctx t =
     | App (Pi (x, a, b), arg) -> subst x arg b
     | App (f, a) -> App (reduce env ctx f, reduce env ctx a)
     | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
-      let case = List.nth cases j in let cj = List.assoc j d.constrs in  (* Change j - 1 to j *)
+      let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in
       apply_case env ctx d p cases case cj_subst args
     | Ind (d, p, cases, t') ->
@@ -299,17 +299,18 @@ let string_of_error = function
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
 let unit_def = { name = "Unit"; params = []; level = 0; constrs = [
-      (0, Universe 0)] }
+      (1, Universe 0)] }
 
 let bool_def = { name = "Bool"; params = []; level = 0; constrs = [
-      (0, Universe 0); (1, Universe 0)] }
+      (1, Universe 0);
+      (2, Universe 0)] }
 
 let rec w_def = { name = "W";
     params = [
       ("A", Universe 0);
       ("B", Pi ("x", Var "A", Universe 0))]; level = 0;
     constrs = [
-      (0, Pi ("a", Var "A", Pi ("f", Pi ("y", App (Var "B", Var "a"),
+      (1, Pi ("a", Var "A", Pi ("f", Pi ("y", App (Var "B", Var "a"),
           Inductive w_def),
           Inductive w_def))) ] }
 
@@ -322,7 +323,7 @@ let rec w_nat = { name = "N";
                          [Inductive empty_def; Inductive unit_def],
                          Universe 0))) ]; level = 0;
     constrs = [
-      (0, Pi ("a", Inductive bool_def,
+      (1, Pi ("a", Inductive bool_def,
           Pi ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
           Inductive w_nat))) ] }
 
@@ -355,11 +356,11 @@ let nat_ind = Inductive nat_def
 let list_ind = Inductive (list_def (Universe 0))
 let tree_ind = Inductive (tree_def (Inductive nat_def))
 
-let true_val = Constr (0, bool_def, [])
 let false_val = Constr (1, bool_def, [])
-let tt = Constr (0, unit_def, [])
-let zero_w = Constr (0, w_nat, [true_val; Lam ("y", Inductive empty_def, Var "y")])
-let succ_w n = Constr (0, w_nat, [false_val; Lam ("y", Inductive unit_def, n)])
+let true_val = Constr (2, bool_def, [])
+let tt = Constr (1, unit_def, [])
+let zero_w = Constr (1, w_nat, [true_val; Lam ("y", Inductive empty_def, Var "y")])
+let succ_w n = Constr (1, w_nat, [false_val; Lam ("y", Inductive unit_def, n)])
 let one_w = succ_w zero_w
 let two_w = succ_w one_w
 let four_w = succ_w (succ_w two_w)
