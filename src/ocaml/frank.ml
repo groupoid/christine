@@ -504,11 +504,11 @@ let test_basic_setup () =
     end
 
 let test_w() =
+    let plus = normalize env [] (App (App (plus_w, one_w), three_w)) in
     let four = normalize env [] four_w in
-    let nat = normalize env [] (App (App (plus_w, one_w), three_w)) in
-    Printf.printf "eval plus_w = "; print_term nat; print_endline "";
+    Printf.printf "eval plus_w = "; print_term plus; print_endline "";
     Printf.printf "eval four_w = "; print_term four; print_endline "";
-    assert (equal env [] nat four);
+    assert (equal env [] plus four);
     print_string "W Checking PASSED.\n"
 
 let test () =
