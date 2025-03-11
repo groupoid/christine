@@ -335,9 +335,9 @@ let rec w_nat = { name = "N";
           Inductive w_nat))) ] }
 
 let nat_def = { name = "Nat"; params = []; level = 0;
-    constrs = [
+     constrs = [
       (1, Inductive { name = "Nat"; params = []; level = 0; constrs = [] });
-      (2, Pi ("n",
+       (2, Pi ("n",
           Inductive { name = "Nat"; params = []; level = 0; constrs = [] },
           Inductive { name = "Nat"; params = []; level = 0; constrs = [] }))] }
 
@@ -388,19 +388,9 @@ let plus_w =
          Pi ("_", Inductive w_nat, Inductive w_nat),
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Var "m"))],
-         Var "n")))
-
-let plus_w2 =
-    Lam ("n", Inductive w_nat,
-    Lam ("m", Inductive w_nat,
-    Ind (w_nat,
-         Pi ("_", Inductive w_nat, Inductive w_nat),
-         [Lam ("a", Inductive bool_def,
-          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive w_nat),
-               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "m")])],
+               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, (Var "m"))])],
                Var "a")))],
          Var "n")))
 
@@ -433,7 +423,6 @@ let sample_list =
        Constr (2, list_def (Universe 0),
          [Constr (2, nat_def, [Constr (1, nat_def, [])]);
           Constr (1, list_def (Universe 0), [])])])
-
 
 let plus_ty = Pi ("m", nat_ind, Pi ("n", nat_ind, nat_ind))
 
@@ -515,7 +504,7 @@ let test_basic_setup () =
     end
 
 let test_w() =
-    let plus4 = normalize env [] (App (App (plus_w, three_w), one_w)) in
+    let plus4 = normalize env [] (App (App (plus_w, two_w), two_w)) in
     let plus6 = normalize env [] (App (App (plus_w, three_w), three_w)) in
     let four = normalize env [] four_w in
     try ignore(infer env [] plus_w) with Error x -> Printf.printf "Error Infer: %s\n" (string_of_error x);
