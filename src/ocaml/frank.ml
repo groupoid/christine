@@ -118,10 +118,44 @@ and apply_case env ctx d p cases case ty args =
           | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
           | t, [] -> t
           | _ -> raise (Error ApplyCaseTermMismatch)
+        in
+        (* Ensure recursive args are fully applied *)
+        let applied = apply_term case (List.rev args_acc) in
+        (match applied with
+         | Lam (x, _, _) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
+             (* If expecting an ih and a recursive arg was provided, apply it *)
+             let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
+             let ih = reduce env ctx (Ind (d, p, cases, rec_arg)) in
+             apply_term applied [ih]
+         | _ -> applied)
+    | _ -> raise (Error ApplyCaseCtorArgMismatch)
+    in apply ty [] args
+(*
+and apply_case env ctx d p cases case ty args =
+    let rec apply ty args_acc remaining_args =
+    match ty, remaining_args with
+    | Pi (x, a, b), arg :: rest ->
+        let b' = subst x arg b in
+        let rec_arg =
+          if equal env ctx a (Inductive d) then
+            match arg with
+            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
+            | _ -> None
+          else None
+        in
+        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
+        apply b' new_args_acc rest
+    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArgMismatch)
+    | _, [] ->
+        let rec apply_term t args =
+          match t, args with
+          | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
+          | t, [] -> t
+          | _ -> raise (Error ApplyCaseTermMismatch)
         in apply_term case (List.rev args_acc)
     | _ -> raise (Error ApplyCaseCtorArgMismatch)
     in apply ty [] args
-
+*)
 and reduce env ctx t =
     match t with
     | App (Lam (x, domain, body), arg) -> subst x arg body
@@ -363,7 +397,8 @@ let zero_w = Constr (1, w_nat, [false_val; Lam ("y", Inductive empty_def, Var "y
 let succ_w n = Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, n)])
 let one_w = succ_w zero_w
 let two_w = succ_w one_w
-let four_w = succ_w (succ_w two_w)
+let three_w = succ_w two_w
+let four_w = succ_w three_w
 
 let plus =
     Lam ("m", nat_ind,
@@ -497,7 +532,7 @@ let test_basic_setup () =
 
 let test_w() =
     let four = normalize env [] four_w in
-    let nat = normalize env [] (App (App (plus_w, two_w), two_w)) in
+    let nat = normalize env [] (App (App (plus_w, one_w), three_w)) in
     Printf.printf "eval plus_w = "; print_term nat; print_endline "";
     Printf.printf "eval four_w = "; print_term four; print_endline "";
     assert (equal env [] nat four);
