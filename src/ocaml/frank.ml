@@ -305,12 +305,12 @@ let string_of_error = function
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
-let unit_def = { name = "Unit"; params = []; level = 0; constrs = [
-      (1, Universe 0)] }
+let rec unit_def = { name = "Unit"; params = []; level = 0; constrs = [
+      (1, Inductive unit_def)] }
 
-let bool_def = { name = "Bool"; params = []; level = 0; constrs = [
-      (1, Universe 0);
-      (2, Universe 0)] }
+let rec bool_def = { name = "Bool"; params = []; level = 0; constrs = [
+      (1, Inductive bool_def);
+      (2, Inductive bool_def)] }
 
 let rec w_def = { name = "W";
     params = [
@@ -326,7 +326,7 @@ let rec w_nat = { name = "N";
       ("A", Inductive bool_def);
       ("B", Lam ("x", Inductive bool_def,
                     Ind (bool_def,
-                         Var "x",
+                         Pi ("_", Inductive bool_def, Universe 0),
                          [Inductive empty_def; Inductive unit_def],
                          Universe 0))) ]; level = 0;
     constrs = [
@@ -381,49 +381,28 @@ let plus =
          [Var "m"; Lam ("k", nat_ind, Lam ("ih", nat_ind, Constr (2, nat_def, [Var "ih"])))],
          Var "n")))
 
-(*
-let w_nat_ind =
-    Lam ("P", Pi ("w", Inductive w_nat, Universe 0),
-    Lam ("step", Pi ("a", Inductive bool_def,
-                  Pi ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-                  Pi ("ih", Pi ("y", App (Var "B", Var "a"), App (Var "P", App (Var "f", Var "y"))),
-                  App (Var "P", Constr (1, w_nat, [Var "a"; Var "f"]))))),
-    Lam ("w", Inductive w_nat,
+let plus_w =
+    Lam ("n", Inductive w_nat,
+    Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Pi ("w", Inductive w_nat, Universe 0),
+         Pi ("_", Inductive w_nat, Inductive w_nat),
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Lam ("ih", Pi ("y", App (Var "B", Var "a"), App (Var "P", App (Var "f", Var "y"))),
-          App (App (App (Var "step", Var "a"), Var "f"), Var "ih"))))],
-         Var "w"))))
-
-let plus_w =
-    Lam ("n", Inductive w_nat,
-    Lam ("m", Inductive w_nat,
-    App (App (App (w_nat_ind,
-                  Pi ("_", Inductive w_nat, Inductive w_nat)),
-                  Lam ("a", Inductive bool_def,
-                  Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-                  Lam ("ih", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-                  Ind (bool_def,
-                       Inductive w_nat,
-                       [Var "m"; App (Var "f", Constr (1, unit_def, []))],
-                       Var "a"))))),
+          Var "m"))],
          Var "n")))
-*)
 
-let plus_w =
+let plus_w2 =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Var "m",
+         Pi ("_", Inductive w_nat, Inductive w_nat),
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
           Ind (bool_def,
-               Inductive w_nat,
-               [Var "m"; succ_w (Var "m")],
+               Pi ("_", Inductive bool_def, Inductive w_nat),
+               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "m")])],
                Var "a")))],
-          Var "n")))
+         Var "n")))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
@@ -432,6 +411,7 @@ let sample_tree = node (Constr (1, nat_def, [])) leaf leaf
 let env = [("Empty", empty_def);
            ("Unit", unit_def);
            ("Bool", bool_def);
+           ("N", w_nat);
            ("Nat", nat_def);
            ("List", list_def (Universe 0));
            ("Tree", tree_def (Inductive nat_def))]
@@ -535,11 +515,13 @@ let test_basic_setup () =
     end
 
 let test_w() =
-    let plus = normalize env [] (App (App (plus_w, one_w), three_w)) in
+    let plus4 = normalize env [] (App (App (plus_w, three_w), one_w)) in
+    let plus6 = normalize env [] (App (App (plus_w, three_w), three_w)) in
     let four = normalize env [] four_w in
     try ignore(infer env [] plus_w) with Error x -> Printf.printf "Error Infer: %s\n" (string_of_error x);
-    Printf.printf "eval plus_w = "; print_term plus; print_endline "";
-    Printf.printf "eval four_w = "; print_term four; print_endline "";
+    Printf.printf "eval plus_w 4 = "; print_term plus4; print_endline "";
+    Printf.printf "eval four_w 4 = "; print_term four; print_endline "";
+    Printf.printf "eval plus_w 6 = "; print_term plus6; print_endline "";
     try assert(equal env [] plus four) with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x);
     print_string "W Checking PASSED.\n"
 
