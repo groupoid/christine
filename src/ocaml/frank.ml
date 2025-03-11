@@ -364,16 +364,23 @@ let one_w = succ_w zero_w
 let two_w = succ_w one_w
 let four_w = succ_w (succ_w two_w)
 
+let plus =
+    Lam ("m", nat_ind,
+    Lam ("n", nat_ind,
+    Ind (nat_def,
+         Pi ("_", nat_ind, nat_ind),
+         [Var "m"; Lam ("k", nat_ind, Lam ("ih", nat_ind, Constr (2, nat_def, [Var "ih"])))],
+         Var "n")))
+
 let plus_w =
-  Lam ("n", Inductive w_nat,
-       Lam ("m", Inductive w_nat,
-            Ind (w_nat, Var "n",
-                 [Lam ("a", Inductive bool_def,
-                  Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-                            Ind (bool_def, Var "xx",
-                                [Var "m"; succ_w (App (Var "f", tt))],
-                                Inductive w_nat)))],
-                 Inductive w_nat)))
+    Lam ("n", Inductive w_nat,
+    Lam ("m", Inductive w_nat,
+    Ind (w_nat,
+         Var "n",
+         [Lam ("a", Inductive bool_def,
+          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+          Ind (bool_def, Var "xx", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
+          Inductive w_nat)))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
@@ -404,11 +411,6 @@ let sample_list =
          [Constr (2, nat_def, [Constr (1, nat_def, [])]);
           Constr (1, list_def (Universe 0), [])])])
 
-let plus = Lam ("m", nat_ind, Lam ("n", nat_ind,
-           Ind (nat_def,
-                Pi ("_", nat_ind, nat_ind),
-                [Var "m"; Lam ("k", nat_ind, Lam ("ih", nat_ind, Constr (2, nat_def, [Var "ih"])))],
-                Var "n")))
 
 let plus_ty = Pi ("m", nat_ind, Pi ("n", nat_ind, nat_ind))
 
@@ -486,9 +488,16 @@ let test_basic_setup () =
         Printf.printf "Nat.Ind = "; print_term nat_elim; print_endline "";
         Printf.printf "Nat.succ : "; print_term (infer env ctx succ); print_endline "";
         Printf.printf "Nat.plus : "; print_term (infer env ctx plus); print_endline "";
-        Printf.printf "Nat.Ind : "; print_term (infer env ctx nat_elim); print_endline "";
-        print_endline "REALITY CHECK PASSED\n"
+        Printf.printf "Nat.Ind : "; print_term (infer env ctx nat_elim); print_endline ""
     end
+
+let test_w() =
+    try let nat = normalize env [] (App (App (plus_w, two_w), two_w)) in
+        let f = normalize env [] four_w in
+        Printf.printf "eval plus_w(two_w,two_w) = "; print_term nat; print_endline "";
+        Printf.printf "eval four_w = "; print_term f; print_endline "";
+        print_string "W Checking PASSED.\n"
+    with Error x -> Printf.printf "W-Nat failed: %s\n" (string_of_error x)
 
 let test () =
     test_universe ();
@@ -496,6 +505,8 @@ let test () =
     test_positivity ();
     test_edge_cases ();  
     test_lambda_totality ();
-    test_basic_setup ()
+    test_basic_setup ();
+    test_w();
+    print_endline "REALITY CHECK PASSED\n"
 
 let () = test ()
