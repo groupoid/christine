@@ -376,11 +376,11 @@ let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Var "n",
+         Pi ("_", nat_ind, nat_ind),
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Ind (bool_def, Var "xx", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
-          Inductive w_nat)))
+          Ind (bool_def, Var "a", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
+          Var "n")))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
@@ -492,12 +492,12 @@ let test_basic_setup () =
     end
 
 let test_w() =
-    try let nat = normalize env [] (App (App (plus_w, two_w), two_w)) in
-        let f = normalize env [] four_w in
-        Printf.printf "eval plus_w(two_w,two_w) = "; print_term nat; print_endline "";
-        Printf.printf "eval four_w = "; print_term f; print_endline "";
-        print_string "W Checking PASSED.\n"
-    with Error x -> Printf.printf "W-Nat failed: %s\n" (string_of_error x)
+    let nat = normalize env [] (App (App (plus_w, two_w), two_w)) in
+    let f = four_w in
+    Printf.printf "eval plus_w(two_w,two_w) = "; print_term nat; print_endline "";
+    Printf.printf "eval four_w = "; print_term f; print_endline "";
+    assert (equal env [] nat f);
+    print_string "W Checking PASSED.\n"
 
 let test () =
     test_universe ();
