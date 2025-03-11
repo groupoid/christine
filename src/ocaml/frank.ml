@@ -294,6 +294,8 @@ let string_of_error = function
     | CheckElimTypeMismatch -> "Elimination type mismatch"
     | CheckTypeError ->  "Type Mismatch Error"
 
+(* ENV *)
+
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
 let unit_def = { name = "Unit"; params = []; level = 0; constrs = [
@@ -346,10 +348,32 @@ let tree_def a = { name = "Tree"; params = [("A", a)]; level = 0;
           Pi ("r", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
           Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] })))) ] }
 
+(* DEF *)
+
 let empty_ind = Inductive empty_def
 let nat_ind = Inductive nat_def
 let list_ind = Inductive (list_def (Universe 0))
 let tree_ind = Inductive (tree_def (Inductive nat_def))
+
+let true_val = Constr (0, bool_def, [])
+let false_val = Constr (1, bool_def, [])
+let tt = Constr (0, unit_def, [])
+let zero_w = Constr (0, w_nat, [true_val; Lam ("y", Inductive empty_def, Var "y")])
+let succ_w n = Constr (0, w_nat, [false_val; Lam ("y", Inductive unit_def, n)])
+let one_w = succ_w zero_w
+let two_w = succ_w one_w
+let four_w = succ_w (succ_w two_w)
+
+let plus_w =
+  Lam ("n", Inductive w_nat,
+       Lam ("m", Inductive w_nat,
+            Ind (w_nat, Var "n",
+                 [Lam ("a", Inductive bool_def,
+                  Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+                            Ind (bool_def, Var "xx",
+                                [Var "m"; succ_w (App (Var "f", tt))],
+                                Inductive w_nat)))],
+                 Inductive w_nat)))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
@@ -395,6 +419,8 @@ let nat_elim =
          Constr (1, nat_def, []))
 
 let succ = Lam ("n", nat_ind, Constr (2, nat_def, [Var "n"]))
+
+(* SUITE *)
 
 let test_eta () =
     let ctx = [("f", Pi ("x", Universe 0, Universe 0))] in
