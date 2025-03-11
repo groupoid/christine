@@ -377,11 +377,14 @@ let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
     Ind (w_nat,
-         Var "n",
+         Var "m",
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Ind (bool_def, Var "xx", [Var "m"; succ_w (App (Var "f", tt))], Inductive w_nat)))],
-          Inductive w_nat)))
+          Ind (bool_def,
+               Inductive w_nat,
+               [Var "m"; succ_w (Var "m")],
+               Var "a")))],
+          Var "n")))
 
 let leaf = Constr (1, tree_def (Universe 0), [Inductive nat_def ])
 let node n l r = Constr (2, tree_def (Universe 0), [n; l; r])
@@ -493,11 +496,11 @@ let test_basic_setup () =
     end
 
 let test_w() =
+    let four = normalize env [] four_w in
     let nat = normalize env [] (App (App (plus_w, two_w), two_w)) in
-    let f = four_w in
-    Printf.printf "eval plus_w(two_w,two_w) = "; print_term nat; print_endline "";
-    Printf.printf "eval four_w = "; print_term f; print_endline "";
-    assert (equal env [] nat f);
+    Printf.printf "eval plus_w = "; print_term nat; print_endline "";
+    Printf.printf "eval four_w = "; print_term four; print_endline "";
+    assert (equal env [] nat four);
     print_string "W Checking PASSED.\n"
 
 let test () =
