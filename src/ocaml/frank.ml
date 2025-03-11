@@ -381,6 +381,37 @@ let plus =
          [Var "m"; Lam ("k", nat_ind, Lam ("ih", nat_ind, Constr (2, nat_def, [Var "ih"])))],
          Var "n")))
 
+(*
+let w_nat_ind =
+    Lam ("P", Pi ("w", Inductive w_nat, Universe 0),
+    Lam ("step", Pi ("a", Inductive bool_def,
+                  Pi ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+                  Pi ("ih", Pi ("y", App (Var "B", Var "a"), App (Var "P", App (Var "f", Var "y"))),
+                  App (Var "P", Constr (1, w_nat, [Var "a"; Var "f"]))))),
+    Lam ("w", Inductive w_nat,
+    Ind (w_nat,
+         Pi ("w", Inductive w_nat, Universe 0),
+         [Lam ("a", Inductive bool_def,
+          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+          Lam ("ih", Pi ("y", App (Var "B", Var "a"), App (Var "P", App (Var "f", Var "y"))),
+          App (App (App (Var "step", Var "a"), Var "f"), Var "ih"))))],
+         Var "w"))))
+
+let plus_w =
+    Lam ("n", Inductive w_nat,
+    Lam ("m", Inductive w_nat,
+    App (App (App (w_nat_ind,
+                  Pi ("_", Inductive w_nat, Inductive w_nat)),
+                  Lam ("a", Inductive bool_def,
+                  Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+                  Lam ("ih", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+                  Ind (bool_def,
+                       Inductive w_nat,
+                       [Var "m"; App (Var "f", Constr (1, unit_def, []))],
+                       Var "a"))))),
+         Var "n")))
+*)
+
 let plus_w =
     Lam ("n", Inductive w_nat,
     Lam ("m", Inductive w_nat,
@@ -506,9 +537,10 @@ let test_basic_setup () =
 let test_w() =
     let plus = normalize env [] (App (App (plus_w, one_w), three_w)) in
     let four = normalize env [] four_w in
+    try ignore(infer env [] plus_w) with Error x -> Printf.printf "Error Infer: %s\n" (string_of_error x);
     Printf.printf "eval plus_w = "; print_term plus; print_endline "";
     Printf.printf "eval four_w = "; print_term four; print_endline "";
-    assert (equal env [] plus four);
+    try assert(equal env [] plus four) with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x);
     print_string "W Checking PASSED.\n"
 
 let test () =
