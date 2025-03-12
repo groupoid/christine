@@ -169,19 +169,9 @@ and infer env ctx t =
     | Universe i -> if i < 0 then raise (Error (InferUniverse i)); Universe (i + 1)
     | Pi (x, a, b) -> Universe (max (universe env ctx a) (universe env (add_var ctx x a) b))
     | Lam (x, domain, body) ->
-      let domain_ty = infer env ctx domain in
-      check env ctx domain domain_ty;
-      let body_ty = infer env (add_var ctx x domain) body in
-      let pi_ty = Pi (x, domain, body_ty) in
-      let level = max (universe env ctx domain) (universe env (add_var ctx x domain) body_ty) in
-      check env ctx pi_ty (Universe level);
-      pi_ty
-(*
-    | Lam (x, domain, body) ->
         let domain_ty = infer env ctx domain in
         check env ctx domain domain_ty;
         Pi (x, domain, infer env (add_var ctx x domain) body)
-*)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
     | Inductive d ->
       let ind_name = d.name in
@@ -206,11 +196,9 @@ and infer env ctx t =
       let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst (params d.params)) (List.map snd (params d.params))) cj in
       let result = infer_ctor env ctx cj_subst args in
-(*      Printf.printf "Infer Constr %d of %s: %s\n" j d.name (string_of_term result); *)
       result
     | Ind (d, p, cases, t') -> infer_Ind env ctx d p cases t'
     in let normalized = normalize env ctx res in
-(*    Printf.printf "Infer %s -> %s (normalized)\n" (string_of_term t) (string_of_term normalized); *)
     normalized
 
 and infer_ctor env ctx ty args =
@@ -302,7 +290,7 @@ and check env ctx t ty =
         match inferred, ty' with
         | Universe i, Universe j when i <= j -> ()
         | _ -> if not (equal env ctx inferred ty') then (
-(*                 Printf.printf "Check failure - Infer: %s\n" (string_of_term inferred);
+(*               Printf.printf "Check failure - Infer: %s\n" (string_of_term inferred);
                  Printf.printf "Check failure - Type: %s\n" (string_of_term ty'); *)
                  raise (Error (CheckMismatch (8, inferred, ty')))
                )
