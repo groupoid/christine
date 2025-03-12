@@ -2,8 +2,6 @@
    Copyright (c) Groupoїd la Infini
  *)
 
-let trace: bool = false
-
 type term =
     | Var of string
     | Universe of int
@@ -22,11 +20,12 @@ and inductive = {
 }
 
 type error =
-    | ApplyCaseTermMismatch | ApplyCaseCtorArgMismatch
+    | ApplyCaseTerm | ApplyCaseCtorArg
     | InferUnboundVariable of string | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
-    | InferCtorInvalidArgType of int * error | InferCtorInvalidType of int * string | InferCtorTooManyArgs | InferCtorNegative of int
-    | IndWrongCases | IndElimTargetMismatch | IndMotiveExpetsPi | IndMotiveDomainMismatch | IndParametersMismatch
-    | CheckUniverseExpected | CheckPiDomainMismatch | UniverseLevelMismatch of int * int | CheckCtorTypeMismatch | CheckElimTypeMismatch | CheckTypeError
+    | InferCtorInvalidArgType of int * error | InferCtorInvalidType of int * string
+    | InferCtorTooManyArgs | InferCtorNegative of int | InferUniverse of int | InferUniverseExpected
+    | IndWrongCases | IndMotiveExpetsPi | IndParameters
+    | CheckMismatch of term * term
 
 exception Error of error
 
@@ -37,6 +36,8 @@ type subst_map = (string * term) list
 let empty_env : env = []
 let empty_ctx : context = []
 let add_var ctx x ty = (x, ty) :: ctx
+
+let trace: bool = false
 
 let rec is_lam = function | Lam _ -> true | _ -> false
 
@@ -96,13 +97,13 @@ and apply_case env ctx d p cases case ty args =
         in
         let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
         apply b' new_args_acc rest
-    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArgMismatch)
+    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArg)
     | _, [] ->
         let rec apply_term t args =
           match t, args with
           | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
           | t, [] -> t
-          | _ -> raise (Error ApplyCaseTermMismatch)
+          | _ -> raise (Error ApplyCaseTerm)
         in
         let applied = apply_term case (List.rev args_acc) in
         (match applied with
@@ -110,7 +111,7 @@ and apply_case env ctx d p cases case ty args =
              let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
              apply_term applied [reduce env ctx (Ind (d, p, cases, rec_arg))]
          | _ -> applied)
-    | _ -> raise (Error ApplyCaseCtorArgMismatch)
+    | _ -> raise (Error ApplyCaseCtorArg)
     in apply ty [] args
 
 and reduce env ctx t =
@@ -156,19 +157,19 @@ and is_positive env ctx ty ind_name =
 and infer env ctx t =
     let res = match t with
     | Var x -> (match lookup_var ctx x with | Some ty -> ty | None -> raise (Error (InferUnboundVariable x)))
-    | Universe i -> if i < 0 then raise (Error (UniverseLevelMismatch (i,-1))); Universe (i + 1)
-    | Pi (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
-    | Lam (x, domain, body) -> 
-        check env ctx domain (infer env ctx domain); 
+    | Universe i -> if i < 0 then raise (Error (InferUniverse i)); Universe (i + 1)
+    | Pi (x, a, b) -> Universe (max (universe env ctx a) (universe env (add_var ctx x a) b))
+    | Lam (x, domain, body) ->
+        check env ctx domain (infer env ctx domain);
         if not (pos x body) then raise (Error (InferBoundVariableNoPositive x));
         Pi (x, domain, infer env (add_var ctx x domain) body)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
-    | Inductive d -> 
+    | Inductive d ->
       let ind_name = d.name in
-      List.iter (fun (j, ty) -> 
+      List.iter (fun (j, ty) ->
         let rec check_pos ty' =
             match ty' with
-            | Pi (x, a, b) -> 
+            | Pi (x, a, b) ->
                 (try let _ = infer env ctx a in () with Error x -> raise (Error (InferCtorInvalidArgType (j,x))));
                 if not (is_positive env ctx a ind_name) then  raise (Error (InferCtorNegative j));
                 check_pos b
@@ -194,13 +195,13 @@ and infer_Ind env ctx d p cases t' =
     if List.length cases <> List.length d.constrs then raise (Error IndWrongCases);
     let t_ty = infer env ctx t' in
     let d_applied = apply_inductive d (List.map snd (params d.params)) in
-    if not (equal env ctx t_ty d_applied) then raise (Error IndElimTargetMismatch);
+    if not (equal env ctx t_ty d_applied) then raise (Error (CheckMismatch (t_ty, d_applied)));
     let (x, a, b) = match p with
-    | Pi (x, a, b) -> (x, a, b)
-    | _ -> raise (Error IndMotiveExpetsPi) in ignore(check_universe env ctx (infer env ctx p));
-    if not (equal env ctx t_ty a) then raise (Error IndMotiveDomainMismatch);
+      | Pi (x, a, b) -> (x, a, b)
+      | _ -> raise (Error IndMotiveExpetsPi)
+    in ignore(universe env ctx (infer env ctx p));
+    if not (equal env ctx t_ty a) then raise (Error (CheckMismatch (t_ty, a)));
     let result_ty = subst x t' b in
-    if (trace) then (print_Ind d p cases t' 0);
     List.iteri (fun j case ->
       let j_idx = j + 1 in
       let cj = List.assoc j_idx d.constrs in
@@ -219,49 +220,52 @@ and infer_Ind env ctx d p cases t' =
     result_ty
 
 and apply_inductive d args =
-    if List.length (params d.params) <> List.length args then raise (Error IndParametersMismatch);
+    if List.length (params d.params) <> List.length args then raise (Error IndParameters);
     let subst_param t = List.fold_left2 (fun acc (n, _) arg -> subst n arg acc) t (params d.params) args
     in Inductive { d with constrs = List.map (fun (j, ty) -> (j, subst_param ty)) d.constrs }
 
-and check_universe env ctx t =
+and universe env ctx t =
     match infer env ctx t with
     | Universe i -> i
-    | _ -> raise (Error CheckUniverseExpected)
+    | _ -> raise (Error InferUniverseExpected)
 
 and check env ctx t ty =
     match t, ty with
     | Universe i, Universe j ->
-        if (i > j) || (i < 0) then raise (Error (UniverseLevelMismatch (i,j)));
+        if (i > j) || (i < 0) then raise (Error (CheckMismatch (t,ty)));
     | Pi (x, a, b), Pi (y, a', b')
     | Lam (x, a, b), Pi (y, a', b') ->
-        if not (equal env ctx a a') then raise (Error CheckPiDomainMismatch); check env (add_var ctx x a) b (subst y (Var x) b')
+        if not (equal env ctx a a') then raise (Error (CheckMismatch (a,a'))); check env (add_var ctx x a) b (subst y (Var x) b')
     | Constr (j, d, args), Inductive d' when d.name = d'.name ->
-        let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error CheckCtorTypeMismatch)
-    | Ind (d, p, cases, t'), ty -> let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error CheckElimTypeMismatch)
+        let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (inferred,ty)))
+    | Ind (d, p, cases, t'), ty ->
+        let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (inferred,ty)))
     | _, _ ->
         let inferred = infer env ctx t in
         let ty' = normalize env ctx ty in
         match inferred, ty' with
         | Universe i, Universe j when i <= j || i < 0 -> ()
-        | _ -> if not (equal env ctx inferred ty') then raise (Error CheckTypeError)
+        | _ -> if not (equal env ctx inferred ty') then raise (Error (CheckMismatch (inferred,ty')))
 
-and print_Ind d p cases t' depth =
-    print_string (d.name ^ ".Ind "); print_term_depth (depth + 1) p;
-    print_string " ["; List.iteri (fun i c -> if i > 0 then print_string "; "; print_term_depth (depth + 1) c) cases; print_string "] ";
-    print_term_depth (depth + 1) t'
+and string_of_Ind d p cases t' depth =
+    d.name ^ ".Ind " ^ (string_of_term_depth (depth + 1) p) ^ " [" ^
+       (List.fold_left (fun acc c -> (if acc = "" then "" else "; ") ^ acc ^ (string_of_term_depth (depth + 1) c)) "" cases) ^
+    "] " ^ string_of_term_depth (depth + 1) t'
 
-and print_term_depth depth t =
-    if depth > 20 then print_string "<deep>"
+and string_of_term_depth depth t =
+    if depth > 20 then "<deep>"
     else match t with
-    | Var x -> print_string x
-    | Universe i -> print_string ("U_" ^ string_of_int i)
-    | Pi (x, a, b) -> print_string ("Π (" ^ x ^ " : "); print_term_depth (depth + 1) a; print_string "), "; print_term_depth (depth + 1) b
-    | Lam (x, _, body) -> print_string ("λ (" ^ x ^ "), "); print_term_depth (depth + 1) body
-    | App (f, arg) -> print_string "("; print_term_depth (depth + 1) f; print_string " "; print_term_depth (depth + 1) arg; print_string ")"
-    | Inductive d -> print_string d.name
-    | Constr (i, d, args) -> print_string d.name; print_string ("." ^ (string_of_int i) ^ " "); List.iteri (fun j c -> if j > 0 then print_string "; "; print_term_depth (depth + 1) c) args
-    | Ind (d, p, cases, t') -> print_Ind d p cases t' depth
+    | Var x -> x
+    | Universe i -> "U_" ^ (string_of_int i)
+    | Pi (x, a, b) -> "Π (" ^ x ^ " : " ^ (string_of_term_depth (depth + 1) a) ^ "), " ^ string_of_term_depth (depth + 1) b
+    | Lam (x, _, body) -> "λ (" ^ x ^ "), " ^ (string_of_term_depth (depth + 1) body)
+    | App (f, arg) -> "(" ^ (string_of_term_depth (depth + 1) f) ^ " " ^ (string_of_term_depth (depth + 1) arg) ^ ")"
+    | Inductive d -> d.name
+    | Constr (i, d, args) -> d.name ^ "." ^ (string_of_int i) ^ " " ^ (List.fold_left (fun acc c -> (if acc = "" then "" else "; ") ^ acc ^ (string_of_term_depth (depth + 1) c)) "" args) ^ ""
+    | Ind (d, p, cases, t') -> string_of_Ind d p cases t' depth
 
+and string_of_term t = string_of_term_depth 0 t
+and print_term_depth depth t = print_string (string_of_term_depth depth t)
 and print_term t = print_term_depth 0 t
 
 (* ENV *)
@@ -388,8 +392,8 @@ let succ = Lam ("n", nat_ind, Constr (2, nat_def, [Var "n"]))
 (* SUITE *)
 
 let rec string_of_error = function
-    | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
-    | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
+    | ApplyCaseTerm -> "Case application mismatch: too few arguments for lambda"
+    | ApplyCaseCtorArg -> "Constructor argument mismatch"
     | InferUnboundVariable x -> "Unbound variable " ^ x
     | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
     | InferApplicationRequiresPi -> "Application requires a Pi type"
@@ -397,17 +401,12 @@ let rec string_of_error = function
     | InferCtorInvalidArgType (i, x) -> "Invalid argument type in constructor " ^ string_of_int i ^ ": " ^ string_of_error x
     | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
     | InferCtorTooManyArgs -> "Too many arguments to constructor"
+    | InferUniverse i -> "Invalid universe " ^ (string_of_int i) ^ " during infering"
+    | InferUniverseExpected -> "Expected a universe"
     | IndWrongCases -> "Number of cases doesn't match constructors"
-    | IndElimTargetMismatch -> "Elimination target type mismatch"
     | IndMotiveExpetsPi -> "Motive must be a Pi type"
-    | IndMotiveDomainMismatch -> "Target type does not match motive domain"
-    | IndParametersMismatch -> "Parameter mismatch in inductive type"
-    | CheckUniverseExpected -> "Expected a universe"
-    | CheckPiDomainMismatch -> "Pi domain mismatch"
-    | UniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
-    | CheckCtorTypeMismatch -> "Constructor type mismatch"
-    | CheckElimTypeMismatch -> "Elimination type mismatch"
-    | CheckTypeError ->  "Type Mismatch Error"
+    | IndParameters -> "Parameter mismatch in inductive type"
+    | CheckMismatch (a, b) -> "Type mismatch between " ^ string_of_term a ^ " and " ^ string_of_term b
 
 let test_eta () =
     let ctx = [("f", Pi ("x", Universe 0, Universe 0))] in
