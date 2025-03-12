@@ -34,14 +34,6 @@ type env = (string * inductive) list
 type context = (string * term) list
 type subst_map = (string * term) list
 
-let empty_env : env = []
-let empty_ctx : context = []
-let add_var ctx x ty = (x, ty) :: ctx
-
-let trace: bool = false
-
-let rec is_lam = function | Lam _ -> true | _ -> false
-
 let rec subst_many m t =
     match t with
     | Var x -> (try List.assoc x m with Not_found -> t)
@@ -54,12 +46,12 @@ let rec subst_many m t =
     | _ -> t
 
 let subst x s t = subst_many [(x, s)] t
-
-let rec lookup_var ctx x =
-    try Some (List.assoc x ctx) with Not_found -> None
-
-let params ps =
-    List.map (fun (name, term, typ) -> (name, term)) ps
+let ctx : context = []
+let add_var ctx x ty = (x, ty) :: ctx
+let trace: bool = false
+let rec is_lam = function | Lam _ -> true | _ -> false
+let rec lookup_var ctx x = try Some (List.assoc x ctx) with Not_found -> None
+let params ps = List.map (fun (name, term, typ) -> (name, term)) ps
 
 let rec equal env ctx t1' t2' =
     let t1 = normalize env ctx t1' in
@@ -207,7 +199,7 @@ and infer_ctor env ctx ty args =
         | Pi (x, a, b), arg :: rest ->
             let arg_ty = infer env ctx arg in
             check env ctx arg a;
-(*            if not (equal env ctx arg_ty a) then raise (Error (CheckMismatch (1, arg_ty, a))); *)
+            (* if not (equal env ctx arg_ty a) then raise (Error (CheckMismatch (1, arg_ty, a))); *)
             let ctx' = add_var ctx x arg_ty in
             check_args (subst x arg b) (arg :: args_acc) rest ctx'
         | Pi (_, _, _), [] -> raise (Error (InferCtorTooManyArgs))
@@ -303,7 +295,7 @@ and check env ctx t ty =
 
 and string_of_Ind d p cases t' depth =
     d.name ^ ".Ind " ^ (string_of_term_depth (depth + 1) p) ^ " [" ^
-       (List.fold_left (fun acc c -> (if acc = "" then "" else "; ") ^ acc ^ (string_of_term_depth (depth + 1) c)) "" cases) ^
+       (List.fold_left (fun acc c -> acc ^ (string_of_term_depth (depth + 1) c) ^ ";") "" cases) ^
     "] " ^ string_of_term_depth (depth + 1) t'
 
 and string_of_term_depth depth t =
@@ -329,9 +321,7 @@ and print_term t = print_term_depth 0 t
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 let empty_ind = Inductive empty_def
-let empty_elim = Lam ("P", Universe 0,
-                 Lam ("e", Inductive empty_def,
-                 Ind (empty_def, Pi ("_", Inductive empty_def, Var "P"), [], Var "e")))
+let empty_elim = Lam ("P", Universe 0, Lam ("e", Inductive empty_def, Ind (empty_def, Pi ("_", Inductive empty_def, Var "P"), [], Var "e")))
 
 (* Unit *)
 
@@ -348,7 +338,6 @@ let bool_def = { bool_def_params with constrs = [
       (2, Inductive bool_def_params)] }
 let false_val = Constr (1, bool_def, [])
 let true_val = Constr (2, bool_def, [])
-
 
 (* Nat *)
 
@@ -395,7 +384,6 @@ let fin_def n nt = {
         (2, Pi ("n", (Inductive nat_def), (Pi ("k", Inductive (fin_def_params n nt), Inductive (fin_def_params n nt))))) ] }
 let fin_ind = Inductive (fin_def (one) (Inductive nat_def))
 let fzero = Constr (1, fin_def (one) (Inductive nat_def), [one])
-
 
 (* Vec *)
 
@@ -554,18 +542,17 @@ let test_eta () =
     let ctx = [("f", Pi ("x", Universe 0, Universe 0))] in
     let t1 = Lam ("x", Universe 0, App (Var "f", Var "x")) in
     let t2 = Var "f" in
-    assert (equal empty_env ctx t1 t2);
+    assert (equal [] ctx t1 t2);
     if trace then (Printf.printf "Eta test: "; print_term t1; print_string " = "; print_term t2; print_endline " (passed)");
     Printf.printf "Pi Eta-expansion PASSED.\n"
 
 let test_universe () =
-    let ctx = [] in
     let t1 = Universe 0 in
-    assert (equal empty_env ctx (infer empty_env ctx t1) (Universe 1));
-    check empty_env ctx (Universe 0) (Universe 1);
-    check empty_env ctx (Universe 0) (Universe 0);
-    begin try let _ = check env ctx (Universe 1) (Universe 0) in assert false with _ -> () end;
-    begin try let _ = infer empty_env ctx (Universe (-1)) in assert false with _ -> () end;
+    assert (equal [] ctx (infer [] ctx t1) (Universe 1));
+    check [] ctx (Universe 0) (Universe 1);
+    check [] ctx (Universe 0) (Universe 0);
+    begin try let _ = check [] ctx (Universe 1) (Universe 0) in assert false with _ -> () end;
+    begin try let _ = infer [] ctx (Universe (-1)) in assert false with _ -> () end;
     if trace then (Printf.printf "Universe test: Type0 : Type1 (passed)\n");
     Printf.printf "Universe Consistency PASSED\n"
 
@@ -575,21 +562,20 @@ let test_positivity () =
         constrs = [(1, Pi ("x", Pi ("y", Inductive { name = "Bad"; params = []; level = 0; constrs = [] }, Universe 0),
                        Inductive { name = "Bad"; params = []; level = 0; constrs = [] }))] } in
     let env = [("Nat", nat_def); ("List", list_def (Inductive nat_def) (Universe 0)); ("Bad", bad_def)] in
-    assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false);
-    assert (match infer env empty_ctx (Inductive (list_def (Inductive nat_def)  (Universe 0))) with | Universe _ -> true | _ -> false);
-    try let _ = infer env empty_ctx (Inductive bad_def) in assert false with Error x -> Printf.printf "Positivity check caught: %s\n" (string_of_error x);
+    assert (match infer env ctx (Inductive nat_def) with | Universe _ -> true | _ -> false);
+    assert (match infer env ctx (Inductive (list_def (Inductive nat_def)  (Universe 0))) with | Universe _ -> true | _ -> false);
+    try let _ = infer env ctx (Inductive bad_def) in assert false with Error x -> Printf.printf "Positivity check caught: %s\n" (string_of_error x);
     print_string "Positivity Checking PASSED.\n"
 
 let test_edge_cases () =
     let env = [("Nat", nat_def)] in
-    try let _ = infer env empty_ctx (Inductive { name = "X"; params = []; level = 0;
+    try let _ = infer env ctx (Inductive { name = "X"; params = []; level = 0;
                    constrs = [(1, Pi ("x", Var "Y", Inductive { name = "X"; params = []; level = 0; constrs = [] }))] }) in
         assert false with Error x ->  Printf.printf "Caught unbound type: %s\n" (string_of_error x);
     print_string "Unboundness Checking PASSED.\n"
 
 let test_lambda_typing () =
     let env = [("Nat", nat_def)] in
-    let ctx = empty_ctx in
     let id = Lam ("x", Inductive nat_def, Var "x") in
     assert (match infer env ctx id with | Pi (_, Inductive d1, Inductive d2) when d1.name = "Nat" && d2.name = "Nat" -> true | _ -> false);
     let const = Lam ("x", Inductive nat_def, Constr (1, nat_def, [])) in
@@ -605,7 +591,6 @@ let test_lambda_typing () =
     Printf.printf "Lambda Typing PASSED\n"
 
 let test_basic_setup () =
-    let ctx : context = [] in
     let zero = Constr (1, nat_def, []) in
     let one = Constr (2, nat_def, [zero]) in
     let two = Constr (2, nat_def, [one]) in
@@ -633,7 +618,6 @@ let test_robustness () =
     Printf.printf "Robustness PASSED\n"
 
 let test_fin_vec () =
-    let ctx = [] in
     (try Printf.printf "Fin 1: "; print_term (infer env ctx fzero); print_endline "" with Error x -> Printf.printf "Catch: %s\n" (string_of_error x));
     (try Printf.printf "Vec Nat 0: "; print_term (infer env ctx vnil); print_endline "";
          Printf.printf "Vec Nat 1: "; print_term (infer env ctx vcons); print_endline "" with Error x -> Printf.printf "Catch: %s\n" (string_of_error x));
