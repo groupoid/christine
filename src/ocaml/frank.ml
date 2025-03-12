@@ -2,6 +2,8 @@
    Copyright (c) Groupoїd la Infini
  *)
 
+(* VERIFIER *)
+
 type term =
     | Var of string
     | Universe of int
@@ -281,7 +283,7 @@ let bool_def = { bool_def_params with constrs = [
       (1, Inductive bool_def_params);
       (2, Inductive bool_def_params)] }
 
-let w_def_params (a: term)(at: term) (b: term) (bt: term) = { name = "W"; params = [("A",a,at);("B",b,bt)]; level = 0; constrs = [] }
+let w_def_params (a: term) (at: term) (b: term) (bt: term) = { name = "W"; params = [("A", a, at);("B", b, bt)]; level = 0; constrs = [] }
 let w_def (a: term) (at: term) (b: term) (bt: term) = { (w_def_params a at b bt) with constrs = [
       (1, Pi ("x", Var "A", Pi ("f", Pi ("_", App (Var "B", Var "x"), Inductive (w_def_params a at b bt)), Inductive (w_def_params a at b bt)) )) ] }
 
@@ -430,11 +432,11 @@ let test_universe () =
 let test_positivity () =
     let bad_def = {
         name = "Bad"; params = []; level = 0;
-        constrs = [(1, Pi ("x", Pi ("y", Inductive { name = "Bad"; params = []; level = 0; constrs = [] }, Universe 0), 
+        constrs = [(1, Pi ("x", Pi ("y", Inductive { name = "Bad"; params = []; level = 0; constrs = [] }, Universe 0),
                        Inductive { name = "Bad"; params = []; level = 0; constrs = [] }))] } in
     let env = [("Nat", nat_def); ("List", list_def (Inductive nat_def) (Universe 0)); ("Bad", bad_def)] in
-    assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false); 
-    assert (match infer env empty_ctx (Inductive (list_def (Inductive nat_def)  (Universe 0))) with | Universe _ -> true | _ -> false); 
+    assert (match infer env empty_ctx (Inductive nat_def) with | Universe _ -> true | _ -> false);
+    assert (match infer env empty_ctx (Inductive (list_def (Inductive nat_def)  (Universe 0))) with | Universe _ -> true | _ -> false);
     try let _ = infer env empty_ctx (Inductive bad_def) in assert false with Error x -> Printf.printf "Positivity check caught: %s\n" (string_of_error x);
     print_string "Positivity Checking PASSED.\n"
 
@@ -477,21 +479,21 @@ let test_basic_setup () =
     end
 
 let test_w() =
-    let plus4 = normalize env [] (App (App (plus_w, two_w), two_w)) in
+    let plus4 = normalize env [] (App (App (plus_w, one_w), three_w)) in
     let plus6 = normalize env [] (App (App (plus_w, three_w), three_w)) in
     let four = normalize env [] four_w in
     try ignore(infer env [] plus_w) with Error x -> Printf.printf "Error Infer: %s\n" (string_of_error x);
     Printf.printf "eval plus_w 4 = "; print_term plus4; print_endline "";
     Printf.printf "eval four_w 4 = "; print_term four; print_endline "";
     Printf.printf "eval plus_w 6 = "; print_term plus6; print_endline "";
-    try assert(equal env [] plus four) with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x);
+    try assert(equal env [] plus4 four) with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x);
     print_string "W Checking PASSED.\n"
 
 let test () =
     test_universe ();
     test_eta ();
     test_positivity ();
-    test_edge_cases ();  
+    test_edge_cases ();
     test_lambda_totality ();
     test_basic_setup ();
     test_w();
