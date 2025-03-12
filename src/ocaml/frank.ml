@@ -8,7 +8,7 @@ type term =
     | Var of string
     | Universe of int
     | Pi of string * term * term
-    | Lam of string * term * term
+    | Lam of string * term * term (* Lam has domain annotation for straightforward infer *)
     | App of term * term
     | Inductive of inductive
     | Constr of int * inductive * term list
@@ -25,10 +25,10 @@ exception TypeError of string
 
 type error =
     | ApplyCaseTermMismatch | ApplyCaseCtorArgMismatch
-    | InferUnboundVariable of string | InferNegativeUniverse of int | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
-    | InferCtorNegative of int | InferCtorInvalidArgumentType of int | InferCtorInvalidType of int * string | InferCtorTooManyArgs
+    | InferUnboundVariable of string | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
+    | InferCtorInvalidArgType of int | InferCtorInvalidType of int * string | InferCtorTooManyArgs | InferCtorNegative of int
     | IndWrongCases | IndElimTargetMismatch | IndMotiveExpetsPi | IndMotiveDomainMismatch | IndParametersMismatch
-    | CheckUniverseExpected | CheckPiDomainMismatch | CheckUniverseLevelMismatch of int * int | CheckCtorTypeMismatch | CheckElimTypeMismatch | CheckTypeError
+    | CheckUniverseExpected | CheckPiDomainMismatch | UniverseLevelMismatch of int * int | CheckCtorTypeMismatch | CheckElimTypeMismatch | CheckTypeError
 
 exception Error of error
 
@@ -110,8 +110,7 @@ and apply_case env ctx d p cases case ty args =
         (match applied with
          | Lam (x, _, _) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
              let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
-             let ih = reduce env ctx (Ind (d, p, cases, rec_arg)) in
-             apply_term applied [ih]
+             apply_term applied [reduce env ctx (Ind (d, p, cases, rec_arg))]
          | _ -> applied)
     | _ -> raise (Error ApplyCaseCtorArgMismatch)
     in apply ty [] args
@@ -159,7 +158,7 @@ and is_positive env ctx ty ind_name =
 and infer env ctx t =
     let res = match t with
     | Var x -> (match lookup_var ctx x with | Some ty -> ty | None -> raise (Error (InferUnboundVariable x)))
-    | Universe i -> if i < 0 then raise (Error (InferNegativeUniverse i)); Universe (i + 1)
+    | Universe i -> if i < 0 then raise (Error (UniverseLevelMismatch (i,-1))); Universe (i + 1)
     | Pi (x, a, b) -> let i = check_universe env ctx a in let ctx' = add_var ctx x a in let j = check_universe env ctx' b in Universe (max i j)
     | Lam (x, domain, body) -> 
         check env ctx domain (infer env ctx domain); 
@@ -172,9 +171,8 @@ and infer env ctx t =
         let rec check_pos ty' =
             match ty' with
             | Pi (x, a, b) -> 
-                (try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgumentType j)));
-                 if not (is_positive env ctx a ind_name) then 
-                  raise (Error (InferCtorNegative j)); 
+                (try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgType j)));
+                if not (is_positive env ctx a ind_name) then  raise (Error (InferCtorNegative j));
                 check_pos b
             | Inductive d' when d'.name = ind_name -> ()
             | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
@@ -234,16 +232,19 @@ and check_universe env ctx t =
 
 and check env ctx t ty =
     match t, ty with
-    | Universe i, Universe j -> if i < 0 then raise (Error (InferNegativeUniverse i)); if i > j then raise (Error (CheckUniverseLevelMismatch (i,j)));
-    | Pi (x, a, b), Pi (y, a', b') -> if not (equal env ctx a a') then raise (Error CheckPiDomainMismatch); let ctx' = add_var ctx x a in check env ctx' b (subst y (Var x) b')
-    | Lam (x, domain, body), Pi (y, a, b) -> check env ctx domain (infer env ctx domain); let b_subst = subst y (Var x) b in check env (add_var ctx x domain) body b_subst
-    | Constr (j, d, args), Inductive d' when d.name = d'.name -> let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error CheckCtorTypeMismatch)
+    | Universe i, Universe j ->
+        if (i > j) || (i < 0) then raise (Error (UniverseLevelMismatch (i,j)));
+    | Pi (x, a, b), Pi (y, a', b')
+    | Lam (x, a, b), Pi (y, a', b') ->
+        if not (equal env ctx a a') then raise (Error CheckPiDomainMismatch); check env (add_var ctx x a) b (subst y (Var x) b')
+    | Constr (j, d, args), Inductive d' when d.name = d'.name ->
+        let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error CheckCtorTypeMismatch)
     | Ind (d, p, cases, t'), ty -> let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error CheckElimTypeMismatch)
     | _, _ ->
         let inferred = infer env ctx t in
         let ty' = normalize env ctx ty in
         match inferred, ty' with
-        | Universe i, Universe j when i >= j -> ()
+        | Universe i, Universe j when i <= j || i < 0 -> ()
         | _ -> if not (equal env ctx inferred ty') then raise (Error CheckTypeError)
 
 and print_Ind d p cases t' depth =
@@ -392,11 +393,10 @@ let string_of_error = function
     | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
     | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
     | InferUnboundVariable x -> "Unbound variable " ^ x
-    | InferNegativeUniverse i -> "Negative Universe level " ^ (string_of_int i)
     | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
     | InferApplicationRequiresPi -> "Application requires a Pi type"
     | InferCtorNegative i -> "Negative occurrence in constructor " ^ string_of_int i
-    | InferCtorInvalidArgumentType i -> "Invalid argument type in constructor " ^ string_of_int i
+    | InferCtorInvalidArgType i -> "Invalid argument type in constructor " ^ string_of_int i
     | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
     | InferCtorTooManyArgs -> "Too many arguments to constructor"
     | IndWrongCases -> "Number of cases doesn't match constructors"
@@ -406,7 +406,7 @@ let string_of_error = function
     | IndParametersMismatch -> "Parameter mismatch in inductive type"
     | CheckUniverseExpected -> "Expected a universe"
     | CheckPiDomainMismatch -> "Pi domain mismatch"
-    | CheckUniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
+    | UniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
     | CheckCtorTypeMismatch -> "Constructor type mismatch"
     | CheckElimTypeMismatch -> "Elimination type mismatch"
     | CheckTypeError ->  "Type Mismatch Error"
