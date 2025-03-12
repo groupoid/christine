@@ -179,6 +179,7 @@ and infer env ctx t =
         if not (pos x body) then raise (Error (InferBoundVariableNoPositive x));
         Pi (x, domain, infer env (add_var ctx x domain) body)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
+(*
     | Inductive d -> 
       let ind_name = d.name in
       List.iter (fun (j, ty) -> 
@@ -195,7 +196,8 @@ and infer env ctx t =
       in check_pos ty []
       ) d.constrs;
       Universe d.level
-(*
+*)
+
     | Inductive d -> 
       let ind_name = d.name in
       List.iter (fun (j, ty) -> 
@@ -211,7 +213,6 @@ and infer env ctx t =
         in check_pos ty
       ) d.constrs;
       Universe d.level
-*)
     | Constr (j, d, args) -> let cj = List.assoc j d.constrs in let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in infer_ctor env ctx cj_subst args
     | Ind (d, p, cases, t') -> infer_Ind env ctx d p cases t'
     in normalize env ctx res
