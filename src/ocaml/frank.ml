@@ -23,7 +23,7 @@ type error =
     | ApplyCaseTerm | ApplyCaseCtorArg
     | InferUnboundVariable of string | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
     | InferCtorInvalidArgType of int * error | InferCtorInvalidType of int * string
-    | InferCtorTooManyArgs | InferCtorNegative of int | InferUniverse of int | InferUniverseExpected
+    | InferCtorTooManyArgs | InferCtorNegative of int | InferUniverse of int | InferUniverseExpected of term
     | IndWrongCases | IndMotiveExpetsPi | IndParameters
     | CheckMismatch of term * term
 
@@ -227,7 +227,7 @@ and apply_inductive d args =
 and universe env ctx t =
     match infer env ctx t with
     | Universe i -> i
-    | _ -> raise (Error InferUniverseExpected)
+    | x -> raise (Error (InferUniverseExpected x))
 
 and check env ctx t ty =
     match t, ty with
@@ -402,7 +402,7 @@ let rec string_of_error = function
     | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
     | InferCtorTooManyArgs -> "Too many arguments to constructor"
     | InferUniverse i -> "Invalid universe " ^ (string_of_int i) ^ " during infering"
-    | InferUniverseExpected -> "Expected a universe"
+    | InferUniverseExpected x -> "This type should belong to a Universe: " ^ (string_of_term x)
     | IndWrongCases -> "Number of cases doesn't match constructors"
     | IndMotiveExpetsPi -> "Motive must be a Pi type"
     | IndParameters -> "Parameter mismatch in inductive type"
