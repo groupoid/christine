@@ -464,6 +464,20 @@ let to_nat_w =
          Pi ("_", Inductive w_nat, Inductive nat_def),
          [Lam ("z", Inductive bool_def,
           Lam ("f", Pi ("y", App (b_term, Var "z"), Inductive w_nat),
+          Lam ("ih", Pi ("y", App (b_term, Var "z"), Inductive nat_def),
+          Ind (bool_def,
+               Pi ("_", Inductive bool_def, Inductive nat_def),
+               [zero; App (Lam ("u", Inductive unit_def, App (succ, App (Var "ih", Var "u"))), Constr (1, unit_def, []))],
+               Var "z"))))],
+         Var "w"))
+
+let to_nat_w2 =
+    let b_term = Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")) in
+    Lam ("w", Inductive w_nat,
+    Ind (w_nat,
+         Pi ("_", Inductive w_nat, Inductive nat_def),
+         [Lam ("z", Inductive bool_def,
+          Lam ("f", Pi ("y", App (b_term, Var "z"), Inductive w_nat),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive nat_def),
                [zero; App (Var "f", Constr (1, unit_def, []))],
