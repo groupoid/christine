@@ -422,14 +422,19 @@ let w_nat = {
       (Pi ("x", Inductive bool_def, Universe 0))) with name = "N" }
 
 let zero_w = Constr (1, { w_nat with name = "N" }, [false_val; Lam ("y", Inductive empty_def, App (App (empty_elim, Inductive { w_nat with name = "N" } ), Var "y"))])
-let succ_w n = Constr (1, { w_nat with name = "N" }, [true_val; Lam ("y", Inductive unit_def, n)])
-let one_w = succ_w zero_w
-let two_w = succ_w one_w
-let three_w = succ_w two_w
-let four_w = succ_w three_w
-let five_w = succ_w four_w
-let six_w = succ_w five_w
-let seven_w = succ_w six_w
+let succ_w = Lam("d", Inductive w_nat, Constr (1, { w_nat with name = "N" }, [true_val; Lam ("y", Inductive unit_def, Var "d")]))
+
+let env = [("Empty", Inductive empty_def);
+           ("Unit", Inductive unit_def);
+           ("Bool", Inductive bool_def);
+           ("Fin", Inductive (fin_def (one) (Inductive nat_def)));
+           ("N", Inductive w_nat);
+           ("B", Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")));
+           ("Nat", Inductive nat_def);
+           ("VecNat0", Inductive (vec_def (Inductive nat_def) (Universe 0) (Constr (1, nat_def, [])) (Inductive nat_def)));
+           ("VecNat1", Inductive (vec_def (Inductive nat_def) (Universe 0) (Constr (2, nat_def, [Constr (1, nat_def, [])])) (Inductive nat_def)));
+           ("List", Inductive (list_def (Inductive nat_def) (Universe 0)));
+           ("Tree", Inductive (tree_def (Inductive nat_def) (Universe 0)))]
 
 (* DEF *)
 
@@ -457,7 +462,7 @@ let plus_w =
                Var "a")))],
          Var "n")))
 
-let to_nat_w =
+let to_nat_w2 =
     let b_term = Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")) in
     Lam ("w", Inductive w_nat,
     Ind (w_nat,
@@ -467,11 +472,11 @@ let to_nat_w =
           Lam ("ih", Pi ("y", App (b_term, Var "z"), Inductive nat_def),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive nat_def),
-               [zero; App (Lam ("u", Inductive unit_def, App (succ, App (Var "ih", Var "u"))), Constr (1, unit_def, []))],
+               [zero; App (Lam ("u", Inductive unit_def, App (succ_w, App (Var "ih", Var "u"))), Constr (1, unit_def, []))],
                Var "z"))))],
          Var "w"))
 
-let to_nat_w2 =
+let to_nat_w =
     let b_term = Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")) in
     Lam ("w", Inductive w_nat,
     Ind (w_nat,
@@ -488,7 +493,7 @@ let from_nat_w =
     Lam ("n", Inductive nat_def,
     Ind (nat_def,
          Pi ("_", Inductive nat_def, Inductive w_nat),
-         [zero_w; Lam ("k", Inductive nat_def, Lam ("ih", Inductive w_nat, succ_w (Var "ih")))],
+         [zero_w; Lam ("k", Inductive nat_def, Lam ("ih", Inductive w_nat, App (succ, Var "ih")))],
          Var "n"))
 
 let plus_w_correct =
@@ -516,17 +521,14 @@ let sample_list =
          [Constr (2, nat_def, [Constr (1, nat_def, [])]);
           Constr (1, list_def (Inductive nat_def) (Universe 0), [])])])
 
-let env = [("Empty", Inductive empty_def);
-           ("Unit", Inductive unit_def);
-           ("Bool", Inductive bool_def);
-           ("Fin", Inductive (fin_def (one) (Inductive nat_def)));
-           ("N", Inductive w_nat);
-           ("B", Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")));
-           ("Nat", Inductive nat_def);
-           ("VecNat0", Inductive (vec_def (Inductive nat_def) (Universe 0) (Constr (1, nat_def, [])) (Inductive nat_def)));
-           ("VecNat1", Inductive (vec_def (Inductive nat_def) (Universe 0) (Constr (2, nat_def, [Constr (1, nat_def, [])])) (Inductive nat_def)));
-           ("List", Inductive (list_def (Inductive nat_def) (Universe 0)));
-           ("Tree", Inductive (tree_def (Inductive nat_def) (Universe 0)))]
+
+let one_w = normalize env [] (App (succ_w,zero_w))
+let two_w = normalize env [] (App (succ_w,one_w))
+let three_w = normalize env [] (App (succ_w,two_w))
+let four_w = normalize env [] (App (succ_w,three_w))
+let five_w = normalize env [] (App (succ_w,four_w))
+let six_w = normalize env [] (App (succ_w,five_w))
+let seven_w = normalize env [] (App (succ_w,six_w))
 
 (* SUITE *)
 
@@ -640,16 +642,16 @@ let test_fin_vec () =
 let test_w() =
     let plus6w = normalize env [] (App (App (plus_w, three_w), three_w)) in
     let plus4w = normalize env [] (App (App (plus_w, two_w), two_w)) in
-    let four4  = normalize env [] (App (to_nat_w, plus4w)) in begin
+    let four4  = normalize env [] (App (to_nat_w, four_w)) in begin
         Printf.printf "eval plus4w 4 = "; print_term plus4w; print_endline "";
         Printf.printf "eval plus6w 6 = "; print_term plus6w; print_endline "";
         Printf.printf "eval four4w 4 = "; print_term four_w; print_endline "";
         Printf.printf "eval conv4  4 = "; print_term four4;  print_endline "";
         Printf.printf "zero_w : "; print_term (infer env [] zero_w); print_endline "";
+        Printf.printf "succ_w : "; print_term (infer env [] succ_w); print_endline "";
+        Printf.printf "plus_w : "; print_term (infer env [] plus_w); print_endline "";
         Printf.printf "w_nat : "; print_term (infer env [] (Inductive w_nat)); print_endline "";
         try (Printf.printf "to_nat_w : "; print_term (infer env [] to_nat_w); print_endline "")
-        with Error x -> Printf.printf "Catch: %s\n" (string_of_error x);
-        try (Printf.printf "plus_w : "; print_term (infer env [] plus_w); print_endline "")
         with Error x -> Printf.printf "Catch: %s\n" (string_of_error x);
         try (Printf.printf "Four4 : "; print_term (infer env [] four4); print_endline "")
         with Error x -> Printf.printf "Catch: %s\n" (string_of_error x);
