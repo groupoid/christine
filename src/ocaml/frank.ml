@@ -490,6 +490,14 @@ let test_basic_setup () =
         Printf.printf "Nat.Ind : "; print_term (infer env ctx nat_elim); print_endline ""
     end
 
+let test_robustness () =
+    let env = [("Nat", nat_def)] in
+    let infinite_ind = Ind (nat_def, Pi ("x", nat_ind, nat_ind), [Lam ("x", nat_ind, Ind (nat_def, Pi ("x", nat_ind, nat_ind), [], Var "x"))], Constr (1, nat_def, [])) in
+    try let _ = normalize env [] infinite_ind in assert false with Error (NormalizationDepthExceeded _) -> Printf.printf "Caught infinite recursion\n";
+    let under_applied = Constr (2, nat_def, []) in
+    try let _ = infer env [] under_applied in assert false with Error (InferCtorTooManyArgs) -> Printf.printf "Caught under-applied constructor\n";
+    Printf.printf "Robustness PASSED\n"
+
 let test_w() =
     let plus4 = normalize env [] (App (App (plus_w, one_w), three_w)) in
     let plus6 = normalize env [] (App (App (plus_w, three_w), three_w)) in
@@ -509,6 +517,7 @@ let test () =
     test_lambda_typing ();
     test_basic_setup ();
     test_w();
+    test_robustness ();
     print_endline "REALITY CHECK PASSED\n"
 
 let () = test ()
