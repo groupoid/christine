@@ -265,7 +265,6 @@ and print_term_depth depth t =
 
 and print_term t = print_term_depth 0 t
 
-
 (* ENV *)
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
@@ -283,13 +282,11 @@ let w_def_params (a: term)(at: term) (b: term) (bt: term) = { name = "W"; params
 let w_def (a: term) (at: term) (b: term) (bt: term) = { (w_def_params a at b bt) with constrs = [
       (1, Pi ("x", Var "A", Pi ("f", Pi ("_", App (Var "B", Var "x"), Inductive (w_def_params a at b bt)), Inductive (w_def_params a at b bt)) )) ] }
 
-
-let w_nat = w_def (Inductive bool_def)
-                  (Universe 0)
-                  (Lam ("x", Inductive bool_def, 
-                        Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), 
-                            [Inductive empty_def; Inductive unit_def], Var "x")))
-                  (Pi ("x", Inductive bool_def, Universe 0))
+let w_nat =
+    w_def (Inductive bool_def)
+          (Universe 0)
+          (Lam ("x", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "x")))
+          (Pi ("x", Inductive bool_def, Universe 0))
 
 let nat_def_params = { name = "Nat"; params = []; level = 0; constrs = []}
 let nat_def = { nat_def_params with constrs = [
