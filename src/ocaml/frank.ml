@@ -168,20 +168,20 @@ and infer env ctx t =
     | Var x -> (match lookup_var ctx x with | Some ty -> ty | None -> raise (Error (InferUnboundVariable x)))
     | Universe i -> if i < 0 then raise (Error (InferUniverse i)); Universe (i + 1)
     | Pi (x, a, b) -> Universe (max (universe env ctx a) (universe env (add_var ctx x a) b))
-(*    | Lam (x, domain, body) ->
+    | Lam (x, domain, body) ->
       let domain_ty = infer env ctx domain in
       check env ctx domain domain_ty;
       let body_ty = infer env (add_var ctx x domain) body in
       let pi_ty = Pi (x, domain, body_ty) in
       let level = max (universe env ctx domain) (universe env (add_var ctx x domain) body_ty) in
       check env ctx pi_ty (Universe level);
-      pi_ty *)
-
+      pi_ty
+(*
     | Lam (x, domain, body) ->
         let domain_ty = infer env ctx domain in
         check env ctx domain domain_ty;
         Pi (x, domain, infer env (add_var ctx x domain) body)
-
+*)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
     | Inductive d ->
       let ind_name = d.name in
