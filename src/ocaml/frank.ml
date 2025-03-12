@@ -656,9 +656,9 @@ let test () =
     test_lambda_typing ();
     test_basic_setup ();
     test_false();
-    test_w();
     test_robustness ();
     test_fin_vec ();
+    test_w();
     print_endline "REALITY CHECK PASSED\n"
 
 let () = test ()
