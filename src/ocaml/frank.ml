@@ -646,6 +646,15 @@ let test_false() =
     try let ty = infer env [] false_val in Printf.printf "false_val type: %s\n" (string_of_term ty)
     with Error x -> Printf.printf "False Error: %s\n" (string_of_error x)
 
+let test_bool() =
+    let test_bool_ind =
+      Ind (bool_def,
+        Pi ("_", Inductive bool_def, Inductive nat_def),
+        [zero; Constr (2, nat_def, [zero])],
+        true_val) in
+    try (Printf.printf "test_bool_ind : "; print_term (infer env [] test_bool_ind); print_endline "")
+    with Error x -> Printf.printf "Catch: %s\n" (string_of_error x)
+
 let test () =
     test_universe ();
     test_eta ();
@@ -656,6 +665,7 @@ let test () =
     test_false();
     test_robustness ();
     test_fin_vec ();
+    test_bool();
     test_w();
     print_endline "REALITY CHECK PASSED\n"
 
