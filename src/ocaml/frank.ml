@@ -8,7 +8,7 @@ type term =
     | Var of string
     | Universe of int
     | Pi of string * term * term
-    | Lam of string * term * term (* Lam has domain annotation for straightforward infer *)
+    | Lam of string * term * term
     | App of term * term
     | Inductive of inductive
     | Constr of int * inductive * term list
@@ -21,12 +21,10 @@ and inductive = {
     constrs : (int * term) list
 }
 
-exception TypeError of string
-
 type error =
     | ApplyCaseTermMismatch | ApplyCaseCtorArgMismatch
     | InferUnboundVariable of string | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
-    | InferCtorInvalidArgType of int | InferCtorInvalidType of int * string | InferCtorTooManyArgs | InferCtorNegative of int
+    | InferCtorInvalidArgType of int * error | InferCtorInvalidType of int * string | InferCtorTooManyArgs | InferCtorNegative of int
     | IndWrongCases | IndElimTargetMismatch | IndMotiveExpetsPi | IndMotiveDomainMismatch | IndParametersMismatch
     | CheckUniverseExpected | CheckPiDomainMismatch | UniverseLevelMismatch of int * int | CheckCtorTypeMismatch | CheckElimTypeMismatch | CheckTypeError
 
@@ -171,7 +169,7 @@ and infer env ctx t =
         let rec check_pos ty' =
             match ty' with
             | Pi (x, a, b) -> 
-                (try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgType j)));
+                (try let _ = infer env ctx a in () with Error x -> raise (Error (InferCtorInvalidArgType (j,x))));
                 if not (is_positive env ctx a ind_name) then  raise (Error (InferCtorNegative j));
                 check_pos b
             | Inductive d' when d'.name = ind_name -> ()
@@ -211,7 +209,7 @@ and infer_Ind env ctx d p cases t' =
         match ty with
         | Pi (x, a, b) ->
             let var = Var x in let ctx' = add_var ctx_acc x a in let b_ty = compute_case_type b ctx' in
-            if equal env ctx a d_applied then Pi (x, a, Pi ("ih", App (p, var), b_ty)) else Pi (x, a, b_ty)
+            if equal env ctx a d_applied then Pi (x, a, Pi ("_", App (p, var), b_ty)) else Pi (x, a, b_ty)
         | Inductive d' when d'.name = d.name -> b
         | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
       in
@@ -389,14 +387,14 @@ let succ = Lam ("n", nat_ind, Constr (2, nat_def, [Var "n"]))
 
 (* SUITE *)
 
-let string_of_error = function
+let rec string_of_error = function
     | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
     | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
     | InferUnboundVariable x -> "Unbound variable " ^ x
     | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
     | InferApplicationRequiresPi -> "Application requires a Pi type"
     | InferCtorNegative i -> "Negative occurrence in constructor " ^ string_of_int i
-    | InferCtorInvalidArgType i -> "Invalid argument type in constructor " ^ string_of_int i
+    | InferCtorInvalidArgType (i, x) -> "Invalid argument type in constructor " ^ string_of_int i ^ ": " ^ string_of_error x
     | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
     | InferCtorTooManyArgs -> "Too many arguments to constructor"
     | IndWrongCases -> "Number of cases doesn't match constructors"
