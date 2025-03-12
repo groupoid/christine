@@ -182,6 +182,23 @@ and infer env ctx t =
     | Inductive d -> 
       let ind_name = d.name in
       List.iter (fun (j, ty) -> 
+      let rec check_pos ty' seen =
+          match ty' with
+          | Pi (x, a, b) -> 
+              (if not (List.mem a seen) then
+                try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgumentType j)));
+              if not (is_positive env ctx a ind_name) then 
+                raise (Error (InferCtorNegative j)); 
+              check_pos b (a :: seen)
+          | Inductive d' when d'.name = ind_name -> ()
+          | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
+      in check_pos ty []
+      ) d.constrs;
+      Universe d.level
+(*
+    | Inductive d -> 
+      let ind_name = d.name in
+      List.iter (fun (j, ty) -> 
         let rec check_pos ty' =
             match ty' with
             | Pi (x, a, b) -> 
@@ -194,6 +211,7 @@ and infer env ctx t =
         in check_pos ty
       ) d.constrs;
       Universe d.level
+*)
     | Constr (j, d, args) -> let cj = List.assoc j d.constrs in let cj_subst = subst_many (List.combine (List.map fst d.params) (List.map snd d.params)) cj in infer_ctor env ctx cj_subst args
     | Ind (d, p, cases, t') -> infer_Ind env ctx d p cases t'
     in normalize env ctx res
@@ -305,56 +323,36 @@ let string_of_error = function
 
 let empty_def = { name = "Empty"; params = []; level = 0; constrs = [] }
 
-let rec unit_def = { name = "Unit"; params = []; level = 0; constrs = [
-      (1, Inductive unit_def)] }
+let unit_def_params = { name = "Unit"; params = []; level = 0; constrs = [] }
+let unit_def = { unit_def_params with constrs = [
+      (1, Inductive unit_def_params )] }
 
-let rec bool_def = { name = "Bool"; params = []; level = 0; constrs = [
-      (1, Inductive bool_def);
-      (2, Inductive bool_def)] }
+let bool_def_params = { name = "Bool"; params = []; level = 0; constrs = [] }
+let bool_def = { bool_def_params with constrs = [
+      (1, Inductive bool_def_params);
+      (2, Inductive bool_def_params)] }
 
-let rec w_def = { name = "W";
-    params = [
-      ("A", Universe 0);
-      ("B", Pi ("x", Var "A", Universe 0))]; level = 0;
-    constrs = [
-      (1, Pi ("a", Var "A", Pi ("f", Pi ("y", App (Var "B", Var "a"),
-          Inductive w_def),
-          Inductive w_def))) ] }
+let w_def_params (a: term) (b: term) = { name = "W"; params = [("A", a);("B", Pi ("x", Var "A", b))]; level = 0; constrs = [] }
+let w_def (a: term) (b: term) = { (w_def_params a b) with constrs = [
+      (1, Pi ("x", Var "A", Pi ("f", Pi ("_", App (Var "B", Var "x"), Inductive (w_def_params a b)), Inductive (w_def_params a b)) )) ] }
 
-let rec w_nat = { name = "N";
-    params = [
-      ("A", Inductive bool_def);
-      ("B", Lam ("x", Inductive bool_def,
-                    Ind (bool_def,
-                         Pi ("_", Inductive bool_def, Universe 0),
-                         [Inductive empty_def; Inductive unit_def],
-                         Universe 0))) ]; level = 0;
-    constrs = [
-      (1, Pi ("a", Inductive bool_def,
-          Pi ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
-          Inductive w_nat))) ] }
+let w_nat = w_def (Inductive bool_def)
+    (Lam ("x", Var "A", Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "x")))
 
-let nat_def = { name = "Nat"; params = []; level = 0;
-     constrs = [
-      (1, Inductive { name = "Nat"; params = []; level = 0; constrs = [] });
-       (2, Pi ("n",
-          Inductive { name = "Nat"; params = []; level = 0; constrs = [] },
-          Inductive { name = "Nat"; params = []; level = 0; constrs = [] }))] }
+let nat_def_params = { name = "Nat"; params = []; level = 0; constrs = []}
+let nat_def = { nat_def_params with constrs = [
+      (1, Inductive nat_def_params);
+      (2, Pi ("n", Inductive nat_def_params, Inductive nat_def_params))] }
 
-let list_def (a : term) = { name = "List"; params = [("A", a)]; level = 0;
-    constrs = [
-      (1, Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] });
-      (2, Pi ("x", a, Pi ("xs",
-          Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] },
-          Inductive { name = "List"; params = [("A", a)]; level = 0; constrs = [] }))) ] }
+let list_def_params (a : term) = { name = "List"; params = [("A", a)]; level = 0; constrs = [] }
+let list_def (a : term) = { (list_def_params (a : term)) with constrs = [
+      (1, Inductive (list_def_params a));
+      (2, Pi ("x", a, Pi ("xs", Inductive (list_def_params a), Inductive (list_def_params a)))) ] }
 
-let tree_def a = { name = "Tree"; params = [("A", a)]; level = 0;
-    constrs = [
-      (1, Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] });
-      (2, Pi ("x", a,
-          Pi ("l", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
-          Pi ("r", Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] },
-          Inductive { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] })))) ] }
+let tree_def_params (a : term) = { name = "Tree"; params = [("A", a)]; level = 0; constrs = [] }
+let tree_def a = { (tree_def_params a) with constrs = [
+      (1, Inductive (tree_def_params a));
+      (2, Pi ("x", a, Pi ("l", Inductive (tree_def_params a), Pi ("r", Inductive (tree_def_params a), Inductive (tree_def_params a))))) ] }
 
 (* DEF *)
 
@@ -489,13 +487,14 @@ let test_basic_setup () =
     let zero = Constr (1, nat_def, []) in
     let one = Constr (2, nat_def, [zero]) in
     let two = Constr (2, nat_def, [one]) in
+    let three = Constr (2, nat_def, [two]) in
     let len = App (list_length, sample_list) in
-    let add_term = App (App (plus, two), two) in
+    let add_term = App (App (plus, three), two) in
     let absurd = Lam ("e", empty_ind, Ind (empty_def, Pi ("_", empty_ind, Inductive nat_def), [], Var "e")) in
     begin
         Printf.printf "eval absurd = "; print_term (normalize env ctx absurd); print_endline "";
         Printf.printf "eval Tree.leaf = "; print_term leaf; print_endline "";
-        Printf.printf "eval Nat.add(2,2) = "; print_term (normalize env ctx add_term); print_endline "";
+        Printf.printf "eval Nat.plus(3,1) = "; print_term (normalize env ctx add_term); print_endline "";
         Printf.printf "eval List.length(list) = "; print_term (normalize env ctx len); print_endline "";
         Printf.printf "Nat.Ind = "; print_term nat_elim; print_endline "";
         Printf.printf "Nat.succ : "; print_term (infer env ctx succ); print_endline "";
