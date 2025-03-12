@@ -179,25 +179,6 @@ and infer env ctx t =
         if not (pos x body) then raise (Error (InferBoundVariableNoPositive x));
         Pi (x, domain, infer env (add_var ctx x domain) body)
     | App (f, arg) -> (match infer env ctx f with | Pi (x, a, b) -> check env ctx arg a; subst x arg b | _ -> raise (Error InferApplicationRequiresPi))
-(*
-    | Inductive d -> 
-      let ind_name = d.name in
-      List.iter (fun (j, ty) -> 
-      let rec check_pos ty' seen =
-          match ty' with
-          | Pi (x, a, b) -> 
-              (if not (List.mem a seen) then
-                try let _ = infer env ctx a in () with _ -> raise (Error (InferCtorInvalidArgumentType j)));
-              if not (is_positive env ctx a ind_name) then 
-                raise (Error (InferCtorNegative j)); 
-              check_pos b (a :: seen)
-          | Inductive d' when d'.name = ind_name -> ()
-          | _ -> raise (Error (InferCtorInvalidType (j, d.name)))
-      in check_pos ty []
-      ) d.constrs;
-      Universe d.level
-*)
-
     | Inductive d -> 
       let ind_name = d.name in
       List.iter (fun (j, ty) -> 
