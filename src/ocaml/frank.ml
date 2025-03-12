@@ -24,27 +24,11 @@ and inductive = {
 exception TypeError of string
 
 type error =
-    | ApplyCaseTermMismatch
-    | ApplyCaseCtorArgMismatch
-    | InferUnboundVariable of string
-    | InferNegativeUniverse of int
-    | InferBoundVariableNoPositive of string
-    | InferApplicationRequiresPi
-    | InferCtorNegative of int
-    | InferCtorInvalidArgumentType of int
-    | InferCtorInvalidType of int * string
-    | InferCtorTooManyArgs
-    | IndWrongCases
-    | IndElimTargetMismatch
-    | IndMotiveExpetsPi
-    | IndMotiveDomainMismatch
-    | IndParametersMismatch
-    | CheckUniverseExpected
-    | CheckPiDomainMismatch
-    | CheckUniverseLevelMismatch of int * int
-    | CheckCtorTypeMismatch
-    | CheckElimTypeMismatch
-    | CheckTypeError
+    | ApplyCaseTermMismatch | ApplyCaseCtorArgMismatch
+    | InferUnboundVariable of string | InferNegativeUniverse of int | InferBoundVariableNoPositive of string | InferApplicationRequiresPi
+    | InferCtorNegative of int | InferCtorInvalidArgumentType of int | InferCtorInvalidType of int * string | InferCtorTooManyArgs
+    | IndWrongCases | IndElimTargetMismatch | IndMotiveExpetsPi | IndMotiveDomainMismatch | IndParametersMismatch
+    | CheckUniverseExpected | CheckPiDomainMismatch | CheckUniverseLevelMismatch of int * int | CheckCtorTypeMismatch | CheckElimTypeMismatch | CheckTypeError
 
 exception Error of error
 
@@ -278,28 +262,6 @@ and print_term_depth depth t =
 
 and print_term t = print_term_depth 0 t
 
-let string_of_error = function
-    | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
-    | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
-    | InferUnboundVariable x -> "Unbound variable " ^ x
-    | InferNegativeUniverse i -> "Negative Universe level " ^ (string_of_int i)
-    | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
-    | InferApplicationRequiresPi -> "Application requires a Pi type"
-    | InferCtorNegative i -> "Negative occurrence in constructor " ^ string_of_int i
-    | InferCtorInvalidArgumentType i -> "Invalid argument type in constructor " ^ string_of_int i
-    | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
-    | InferCtorTooManyArgs -> "Too many arguments to constructor"
-    | IndWrongCases -> "Number of cases doesn't match constructors"
-    | IndElimTargetMismatch -> "Elimination target type mismatch"
-    | IndMotiveExpetsPi -> "Motive must be a Pi type"
-    | IndMotiveDomainMismatch -> "Target type does not match motive domain"
-    | IndParametersMismatch -> "Parameter mismatch in inductive type"
-    | CheckUniverseExpected -> "Expected a universe"
-    | CheckPiDomainMismatch -> "Pi domain mismatch"
-    | CheckUniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
-    | CheckCtorTypeMismatch -> "Constructor type mismatch"
-    | CheckElimTypeMismatch -> "Elimination type mismatch"
-    | CheckTypeError ->  "Type Mismatch Error"
 
 (* ENV *)
 
@@ -416,6 +378,29 @@ let succ = Lam ("n", nat_ind, Constr (2, nat_def, [Var "n"]))
 
 (* SUITE *)
 
+let string_of_error = function
+    | ApplyCaseTermMismatch -> "Case application mismatch: too few arguments for lambda"
+    | ApplyCaseCtorArgMismatch -> "Constructor argument mismatch"
+    | InferUnboundVariable x -> "Unbound variable " ^ x
+    | InferNegativeUniverse i -> "Negative Universe level " ^ (string_of_int i)
+    | InferBoundVariableNoPositive x -> "Bound variable " ^ x ^ " has no positive occurrence in lambda body; potential non-termination"
+    | InferApplicationRequiresPi -> "Application requires a Pi type"
+    | InferCtorNegative i -> "Negative occurrence in constructor " ^ string_of_int i
+    | InferCtorInvalidArgumentType i -> "Invalid argument type in constructor " ^ string_of_int i
+    | InferCtorInvalidType (i, typeName) -> "Constructor " ^ string_of_int i ^ " type must be " ^ typeName
+    | InferCtorTooManyArgs -> "Too many arguments to constructor"
+    | IndWrongCases -> "Number of cases doesn't match constructors"
+    | IndElimTargetMismatch -> "Elimination target type mismatch"
+    | IndMotiveExpetsPi -> "Motive must be a Pi type"
+    | IndMotiveDomainMismatch -> "Target type does not match motive domain"
+    | IndParametersMismatch -> "Parameter mismatch in inductive type"
+    | CheckUniverseExpected -> "Expected a universe"
+    | CheckPiDomainMismatch -> "Pi domain mismatch"
+    | CheckUniverseLevelMismatch (i, j) -> "Universe level mismatch " ^ string_of_int i ^ ", " ^ string_of_int j
+    | CheckCtorTypeMismatch -> "Constructor type mismatch"
+    | CheckElimTypeMismatch -> "Elimination type mismatch"
+    | CheckTypeError ->  "Type Mismatch Error"
+
 let test_eta () =
     let ctx = [("f", Pi ("x", Universe 0, Universe 0))] in
     let t1 = Lam ("x", Universe 0, App (Var "f", Var "x")) in
@@ -506,3 +491,4 @@ let test () =
     print_endline "REALITY CHECK PASSED\n"
 
 let () = test ()
+
