@@ -59,7 +59,7 @@ let rec lookup_var ctx x =
     try Some (List.assoc x ctx) with Not_found -> None
 
 let params ps =
-    List.map (fun (name, term, typ) -> (name, typ)) ps
+    List.map (fun (name, term, typ) -> (name, term)) ps
 
 let rec equal env ctx t1' t2' =
     let t1 = normalize env ctx t1' in
