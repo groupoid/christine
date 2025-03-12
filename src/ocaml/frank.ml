@@ -26,7 +26,7 @@ type error =
     | InferCtorInvalidArgType of int * error | InferCtorInvalidType of int * string * term
     | InferCtorTooManyArgs | InferCtorNegative of int | InferUniverse of int | InferUniverseExpected of term
     | IndWrongCases | IndMotiveExpetsPi | IndParameters
-    | CheckMismatch of term * term | NormalizationDepthExceeded of term
+    | CheckMismatch of int * term * term | NormalizationDepthExceeded of term
 
 exception Error of error
 
@@ -122,7 +122,15 @@ and reduce env ctx t =
     match t with
     | App (Lam (x, domain, body), arg) -> subst x arg body
     | App (Pi (x, a, b), arg) -> subst x arg b
-    | App (f, a) -> App (reduce env ctx f, reduce env ctx a)
+    | App (f, a) -> App (reduce env ctx f, reduce env ctx a) 
+(*
+    | App (f, a) ->
+        let f' = reduce env ctx f in
+        let a' = reduce env ctx a in
+        (match f' with
+         | Lam (x, _, _) -> reduce env ctx (App (f', a'))
+         | _ -> App (f', a'))
+*)
     | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
       let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst (params d.params)) (List.map snd (params d.params))) cj in
@@ -130,7 +138,7 @@ and reduce env ctx t =
     | Ind (d, p, cases, t') ->
       let t'' = reduce env ctx t' in
       let reduced_ind = Ind (d, p, cases, t'')
-      in (match t'' with | Constr _ -> reduce env ctx reduced_ind | _ -> reduced_ind)
+      in (match t'' with | Constr _ -> reduced_ind | _ -> reduced_ind)
     | Constr (i, ind, args) -> Constr (i, ind, List.map (reduce env ctx) args)
     | _ -> t
 
@@ -194,34 +202,29 @@ and infer env ctx t =
     in normalize env ctx res
 
 and infer_ctor env ctx ty args =
-    let rec check_args ty args_acc remaining_args =
+    let rec check_args ty args_acc remaining_args ctx =
         match ty, remaining_args with
-        | Pi (x, a, b), arg :: rest -> check env ctx arg a; check_args (subst x arg b) (arg :: args_acc) rest
-        | Pi (_, _, _), [] -> raise (Error (InferCtorTooManyArgs)) (* Too few args *)
-        | _, arg :: _ -> raise (Error (InferCtorTooManyArgs)) (* Too many args *)
-        | Inductive _, [] -> ty  (* Allow base case for constructors like vnil *)
-        | _ -> raise (Error (CheckMismatch (ty, Inductive { name = "Unknown"; params = []; level = 0; constrs = [] })))
-    in check_args ty [] args
-
-and infer_ctor2 env ctx ty args =
-    let rec check_args ty args_acc remaining_args =
-        match ty, remaining_args with
-        | Pi (x, a, b), arg :: rest -> check env ctx arg a; check_args (subst x arg b) (arg :: args_acc) rest
+        | Pi (x, a, b), arg :: rest ->
+            let arg_ty = infer env ctx arg in
+            if not (equal env ctx arg_ty a) then raise (Error (CheckMismatch (1, arg_ty, a)));
+            let ctx' = add_var ctx x arg in
+            check_args (subst x arg b) (arg :: args_acc) rest ctx'
         | Pi (_, _, _), [] -> raise (Error (InferCtorTooManyArgs))
         | _, arg :: _ -> raise (Error (InferCtorTooManyArgs))
-        | _, [] -> ty
-    in check_args ty [] args
+        | Inductive _, [] -> ty
+        | _ -> ty
+    in check_args ty [] args ctx
 
 and infer_Ind env ctx d p cases t' =
     if List.length cases <> List.length d.constrs then raise (Error IndWrongCases);
     let t_ty = infer env ctx t' in
     let d_applied = apply_inductive env ctx d (List.map snd (params d.params)) in
-    if not (equal env ctx t_ty d_applied) then raise (Error (CheckMismatch (t_ty, d_applied)));
+    if not (equal env ctx t_ty d_applied) then raise (Error (CheckMismatch (2, t_ty, d_applied)));
     let (x, a, b) = match p with
       | Pi (x, a, b) -> (x, a, b)
       | _ -> raise (Error IndMotiveExpetsPi)
     in ignore(universe env ctx (infer env ctx p));
-    if not (equal env ctx t_ty a) then raise (Error (CheckMismatch (t_ty, a)));
+    if not (equal env ctx t_ty a) then raise (Error (CheckMismatch (3, t_ty, a)));
     let result_ty = subst x t' b in
     List.iteri (fun j case ->
       let j_idx = j + 1 in
@@ -254,20 +257,24 @@ and universe env ctx t =
 and check env ctx t ty =
     match t, ty with
     | Universe i, Universe j ->
-        if (i > j) || (i < 0) then raise (Error (CheckMismatch (t,ty)));
+        if (i > j) || (i < 0) then raise (Error (CheckMismatch (4, t,ty)));
     | Pi (x, a, b), Pi (y, a', b')
     | Lam (x, a, b), Pi (y, a', b') ->
-        if not (equal env ctx a a') then raise (Error (CheckMismatch (a,a'))); check env (add_var ctx x a) b (subst y (Var x) b')
+        if not (equal env ctx a a') then raise (Error (CheckMismatch (5, a,a'))); check env (add_var ctx x a) b (subst y (Var x) b')
     | Constr (j, d, args), Inductive d' when d.name = d'.name ->
-        let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (inferred,ty)))
+        let inferred = infer env ctx t in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (6, inferred,ty)))
     | Ind (d, p, cases, t'), ty ->
-        let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (inferred,ty)))
+        let inferred = infer_Ind env ctx d p cases t' in if not (equal env ctx inferred ty) then raise (Error (CheckMismatch (7, inferred,ty)))
     | _, _ ->
-        let inferred = infer env ctx t in
+        let inferred = infer env ctx (normalize env ctx t) in
         let ty' = normalize env ctx ty in
         match inferred, ty' with
         | Universe i, Universe j when i <= j -> ()
-        | _ -> if not (equal env ctx inferred ty') then raise (Error (CheckMismatch (inferred,ty')))
+        | _ -> if not (equal env ctx inferred ty') then (
+                 Printf.printf "Infer: %s\n" (string_of_term inferred);
+                 Printf.printf "Type: %s\n" (string_of_term ty);
+                 raise (Error (CheckMismatch (8, inferred,ty')))
+               )
 
 (* SERIALIZER *)
 
@@ -333,6 +340,10 @@ let zero = Constr (1, nat_def, [])
 let one = Constr (2, nat_def, [zero])
 let two = Constr (2, nat_def, [one])
 let three = Constr (2, nat_def, [two])
+let four = Constr (2, nat_def, [three])
+let five = Constr (2, nat_def, [four])
+let six = Constr (2, nat_def, [five])
+let seven = Constr (2, nat_def, [six])
 
 (* List *)
 
@@ -377,15 +388,14 @@ let vcons = Constr (2, (vec_def (Inductive nat_def) (Universe 0) (Constr (1, nat
 
 let w_def_params (a: term) (at: term) (b: term) (bt: term) = { name = "W"; params = [("A", a, at);("B", b, bt)]; level = 0; constrs = [] }
 let w_def (a: term) (at: term) (b: term) (bt: term) = { (w_def_params a at b bt) with constrs = [
-      (1, Pi ("x", Var "A", Pi ("f", Pi ("_", App (Var "B", Var "x"), Inductive (w_def_params a at b bt)), Inductive (w_def_params a at b bt)) )) ] }
+      (1, Pi ("z", a, Pi ("f", Pi ("_", App (b, Var "z"), Inductive (w_def_params a at b bt)), Inductive (w_def_params a at b bt)) )) ] }
 
-(* W-Nat *)
+(* N *)
 
-let w_nat =
-    w_def (Inductive bool_def)
+let w_nat = { (w_def (Inductive bool_def)
           (Universe 0)
-          (Lam ("x", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "x")))
-          (Pi ("x", Inductive bool_def, Universe 0))
+          (Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")))
+          (Pi ("x", Inductive bool_def, Universe 0))) with name = "N" }
 
 let zero_w = Constr (1, w_nat, [false_val; Lam ("y", Inductive empty_def, App (App (empty_elim, Inductive w_nat), Var "y"))])
 let succ_w n = Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, n)])
@@ -393,6 +403,9 @@ let one_w = succ_w zero_w
 let two_w = succ_w one_w
 let three_w = succ_w two_w
 let four_w = succ_w three_w
+let five_w = succ_w four_w
+let six_w = succ_w five_w
+let seven_w = succ_w six_w
 
 (* DEF *)
 
@@ -415,9 +428,47 @@ let plus_w =
           Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive w_nat),
-               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, (Var "m"))])],
+               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "m")])],
                Var "a")))],
          Var "n")))
+
+let to_nat_w2 =
+    Lam ("w", Inductive w_nat,
+    Ind (w_nat,
+         Pi ("_", Inductive w_nat, Inductive nat_def),
+         [Lam ("a", Inductive bool_def,
+          Lam ("f", Pi ("y", subst_many [("A", Inductive bool_def); ("B", Lam ("x", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "x")))] (App (Var "B", Var "a")), Inductive w_nat),
+          Lam ("ih", Pi ("y", subst_many [("A", Inductive bool_def); ("B", Lam ("x", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "x")))] (App (Var "B", Var "a")), Inductive nat_def),
+          Ind (bool_def,
+               Pi ("_", Inductive bool_def, Inductive nat_def),
+               [zero; Constr (2, nat_def, [Var "ih"])],
+               Var "a"))))],
+         Var "w"))
+
+let to_nat_w =
+    Lam ("w", Inductive w_nat,
+    Ind (w_nat,
+         Pi ("_", Inductive w_nat, Inductive nat_def),
+         [Lam ("a", Inductive bool_def,
+          Lam ("f", Pi ("y", App (Var "B", Var "a"), Inductive w_nat),
+          Lam ("ih", Pi ("y", App (Var "B", Var "a"), Inductive nat_def),
+          Ind (bool_def,
+               Pi ("_", Inductive bool_def, Inductive nat_def),
+               [zero; App (Var "ih", Constr (1, unit_def, []))],  (* Apply ih to tt *)
+               Var "a"))))],
+         Var "w"))
+
+let from_nat_w =
+    Lam ("n", Inductive nat_def,
+    Ind (nat_def,
+         Pi ("_", Inductive nat_def, Inductive w_nat),
+         [zero_w; Lam ("k", Inductive nat_def, Lam ("ih", Inductive w_nat, succ_w (Var "ih")))],
+         Var "n"))
+
+let plus_w_correct =
+    Lam ("n", Inductive w_nat,
+    Lam ("m", Inductive w_nat,
+    App (from_nat_w, App (App (plus, App (to_nat_w, Var "n")), App (to_nat_w, Var "m")))))
 
 let sample_tree = node (Constr (1, nat_def, [])) leaf leaf
 
@@ -467,7 +518,7 @@ let rec string_of_error = function
     | IndWrongCases -> "Number of cases doesn't match constructors"
     | IndMotiveExpetsPi -> "Motive must be a Pi type"
     | IndParameters -> "Parameter mismatch in inductive type"
-    | CheckMismatch (a, b) -> "Type mismatch between " ^ string_of_term a ^ " and " ^ string_of_term b
+    | CheckMismatch (i, a, b) -> "Type mismatch (" ^ (string_of_int i) ^ ") between " ^ string_of_term a ^ " and " ^ string_of_term b
     | NormalizationDepthExceeded t -> "Normalization exceeded depth limit: " ^ string_of_term t
 
 let test_eta () =
@@ -563,15 +614,29 @@ let test_fin_vec () =
     Printf.printf "Fin and Vec PASSED\n"
 
 let test_w() =
-    let plus4 = normalize env [] (App (App (plus_w, one_w), three_w)) in
-    let plus6 = normalize env [] (App (App (plus_w, three_w), three_w)) in
-    let four = normalize env [] four_w in
-    try ignore(infer env [] plus_w) with Error x -> Printf.printf "Error Infer: %s\n" (string_of_error x);
-    Printf.printf "eval plus_w 4 = "; print_term plus4; print_endline "";
-    Printf.printf "eval four_w 4 = "; print_term four; print_endline "";
-    Printf.printf "eval plus_w 6 = "; print_term plus6; print_endline "";
-    try assert(equal env [] plus4 four) with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x);
-    print_string "W Checking PASSED.\n"
+    try let three3 = normalize env [] (App (to_nat_w, three_w)) in
+    Printf.printf "eval three3 3 = "; print_term (reduce env [] three3); print_endline "" with Error x -> Printf.printf "Convert W-Nat Error: %s\n" (string_of_error x);
+    let plus6w = normalize env [] (App (App (plus_w, three_w), three_w)) in
+    let plus4w = normalize env [] (App (App (plus_w, one_w), three_w)) in
+    let four4 = normalize env [] (App (from_nat_w, plus4w)) in
+    try ignore(infer env [] (Inductive w_nat)) with Error x -> Printf.printf "Infer W-Nat Error: %s\n" (string_of_error x);
+    try ignore(infer env [] (plus_w)) with Error x -> Printf.printf "Infer W-Nat Error: %s\n" (string_of_error x);
+    (
+      Printf.printf "eval plus4w 4 = "; print_term plus4w; print_endline "";
+      Printf.printf "eval plus6w 6 = "; print_term plus6w; print_endline "";
+      try assert (equal env [] plus4w four_w);
+          print_string "W Checking PASSED.\n"
+      with Error x -> Printf.printf "Error Equal: %s\n" (string_of_error x)
+    )
+
+let test_zero() =
+    try let _ = infer env [] zero_w in Printf.printf "zero_w OK\n"
+    with Error x -> Printf.printf "Zero Infer W-Nat Error: %s\n" (string_of_error x)
+
+let test_false() =
+    try let ty = infer env [] false_val in
+        Printf.printf "false_val type: %s\n" (string_of_term ty)
+    with Error x -> Printf.printf "False Error: %s\n" (string_of_error x)
 
 let test () =
     test_universe ();
@@ -580,6 +645,8 @@ let test () =
     test_edge_cases ();
     test_lambda_typing ();
     test_basic_setup ();
+    test_false();
+    test_zero();
     test_w();
     test_robustness ();
     test_fin_vec ();
