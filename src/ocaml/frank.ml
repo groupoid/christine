@@ -4,9 +4,10 @@
     1) VERIFIER    270
     2) SERIALIZER  30
     3) LIBRARY     320
-    4) SAMPLES     70
-    5) SUITE       130
-    5) RUNNER      20
+    4) ENV         15
+    5) SAMPLES     70
+    6) SUITE       130
+    7) RUNNER      20
 *)
 
 (* VERIFIER *)
