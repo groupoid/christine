@@ -78,63 +78,16 @@ let rec equal' env ctx t1 t2 =
 and equal env ctx t1' t2' = equal' env ctx (normalize env ctx t1') (normalize env ctx t2')
 and normalize env ctx t = normalize' env ctx 0 t
 
-and normalize' env ctx depth t =
-    if depth > 100 then raise (Error (NormalizationDepthExceeded t));
-    let t' = reduce env ctx t in (if equal' env ctx t t' then t else normalize env ctx t')
-
-and apply_case env ctx d p cases case ty args =
-    let rec apply ty args_acc remaining_args =
-    match ty, remaining_args with
-    | Pi (x, a, b), arg :: rest ->
-        let b' = subst x arg b in
-        let rec_arg =
-          if equal env ctx a (Inductive d) then
-            match arg with
-            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
-            | _ -> None
-          else None
-        in
-        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
-        apply b' new_args_acc rest
-    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArg)
-    | _, [] ->
-        let rec apply_term t args =
-          match t, args with
-          | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
-          | t, [] -> t
-          | _ -> raise (Error ApplyCaseTerm)
-        in
-        let applied = apply_term case (List.rev args_acc) in
-        (match applied with
-         | Lam (x, _, body) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
-             let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
-             if not (pos x body) then raise (Error (ApplyCaseTerm));
-             apply_term applied [reduce env ctx (Ind (d, p, cases, rec_arg))]
-         | _ -> applied)
-    | _ -> raise (Error ApplyCaseCtorArg)
-    in apply ty [] args
-
-and reduce env ctx t =
-    match t with
-    | Lam (x, a, b) -> Lam (x, reduce env ctx a, reduce env (add_var ctx x a) b)
-    | Pi (x, a, b) -> Pi (x, reduce env ctx a, reduce env (add_var ctx x a) b)
-    | App (Lam (x, domain, body), arg) -> subst x arg body
-    | App (Pi (x, a, b), arg) -> subst x arg b
-    | App (f, a) ->
-        let f' = reduce env ctx f in
-        (match f' with
-         | Lam (x, _, b) -> reduce env ctx (subst x a b)
-         | _ -> App (f', reduce env ctx a))
-    | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
-      let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
-      let cj_subst = subst_many (List.combine (List.map fst (params d.params)) (List.map snd (params d.params))) cj in
-      reduce env ctx (apply_case env ctx d p cases case cj_subst args)
-    | Ind (d, p, cases, t') ->
-      let t'' = reduce env ctx t' in
-      let reduced_ind = Ind (d, p, cases, t'')
-      in (match t'' with | Constr _ -> reduced_ind | _ -> reduced_ind)
-    | Constr (i, ind, args) -> Constr (i, ind, List.map (reduce env ctx) args)
-    | _ -> t
+and universe env ctx t =
+    match normalize env ctx t with
+    | Inductive d -> let inferred = infer env ctx (Inductive d) in (match inferred with | Universe i -> i | _ -> raise (Error (InferUniverseExpected t)))
+    | Universe i -> i
+    | Pi (x, a, b) -> max (universe env ctx a) (universe env (add_var ctx x a) b)
+    | Lam (_, a, b) -> max (universe env ctx a) (universe env (add_var ctx "_" a) b)
+    | App (f, _) -> (match normalize env ctx f with | Pi (_, _, b) -> universe env ctx b | _ -> raise (Error InferApplicationRequiresPi))
+    | Constr (_, d, _) -> (match infer env ctx t with | Universe i -> i | _ -> d.level)
+    | Ind (d, _, _, t') -> universe env ctx t'
+    | Var x -> (match lookup_var ctx x with | Some ty -> universe env ctx ty | None -> raise (Error (InferUnboundVariable x)))
 
 and pos x t =
     match t with
@@ -251,16 +204,59 @@ and apply_inductive env ctx d args =
     let subst_param t = List.fold_left2 (fun acc (n, _) arg -> subst n arg acc) t (params d.params) args
     in Inductive { d with constrs = List.map (fun (j, ty) -> (j, subst_param ty)) d.constrs }
 
-and universe env ctx t =
-    match normalize env ctx t with
-    | Inductive d -> let inferred = infer env ctx (Inductive d) in (match inferred with | Universe i -> i | _ -> raise (Error (InferUniverseExpected t)))
-    | Universe i -> i
-    | Pi (x, a, b) -> max (universe env ctx a) (universe env (add_var ctx x a) b)
-    | Lam (_, a, b) -> max (universe env ctx a) (universe env (add_var ctx "_" a) b)
-    | App (f, _) -> (match normalize env ctx f with | Pi (_, _, b) -> universe env ctx b | _ -> raise (Error InferApplicationRequiresPi))
-    | Constr (_, d, _) -> (match infer env ctx t with | Universe i -> i | _ -> d.level)
-    | Ind (d, _, _, t') -> universe env ctx t'
-    | Var x -> (match lookup_var ctx x with | Some ty -> universe env ctx ty | None -> raise (Error (InferUnboundVariable x)))
+and apply_case env ctx d p cases case ty args =
+    let rec apply ty args_acc remaining_args =
+    match ty, remaining_args with
+    | Pi (x, a, b), arg :: rest ->
+        let b' = subst x arg b in
+        let rec_arg =
+          if equal env ctx a (Inductive d) then
+            match arg with
+            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
+            | _ -> None
+          else None
+        in
+        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
+        apply b' new_args_acc rest
+    | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArg)
+    | _, [] ->
+        let rec apply_term t args =
+          match t, args with
+          | Lam (x, _, body), arg :: rest -> apply_term (subst x arg body) rest
+          | t, [] -> t
+          | _ -> raise (Error ApplyCaseTerm)
+        in
+        let applied = apply_term case (List.rev args_acc) in
+        (match applied with
+         | Lam (x, _, body) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
+             let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
+             if not (pos x body) then raise (Error (ApplyCaseTerm));
+             apply_term applied [reduce env ctx (Ind (d, p, cases, rec_arg))]
+         | _ -> applied)
+    | _ -> raise (Error ApplyCaseCtorArg)
+    in apply ty [] args
+
+and normalize' env ctx depth t =
+    if depth > 100 then raise (Error (NormalizationDepthExceeded t));
+    let t' = reduce env ctx t in (if equal' env ctx t t' then t else normalize env ctx t')
+
+and reduce env ctx t =
+    match t with
+    | Lam (x, a, b) -> Lam (x, reduce env ctx a, reduce env (add_var ctx x a) b)
+    | Pi (x, a, b) -> Pi (x, reduce env ctx a, reduce env (add_var ctx x a) b)
+    | App (Lam (x, domain, body), arg) -> subst x arg body
+    | App (Pi (x, a, b), arg) -> subst x arg b
+    | App (f, a) -> let f' = reduce env ctx f in (match f' with | Lam (x, _, b) -> reduce env ctx (subst x a b) | _ -> App (f', reduce env ctx a))
+    | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
+      let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
+      let cj_subst = subst_many (List.combine (List.map fst (params d.params)) (List.map snd (params d.params))) cj in
+      reduce env ctx (apply_case env ctx d p cases case cj_subst args)
+    | Ind (d, p, cases, t') ->
+      let t'' = reduce env ctx t' in
+      let reduced_ind = Ind (d, p, cases, t'')
+      in (match t'' with | Constr _ -> reduced_ind | _ -> reduced_ind)
+    | Constr (i, ind, args) -> Constr (i, ind, List.map (reduce env ctx) args)
+    | _ -> t
 
 and check env ctx t ty =
     match t, ty with
