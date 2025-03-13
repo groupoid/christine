@@ -112,8 +112,8 @@ and apply_case env ctx d p cases case ty args =
 
 and reduce env ctx t =
     match t with
-(*  | Lam (x, a, b) -> Lam (x, reduce env ctx a, reduce env (add_var ctx x a) b)
-    | Pi (x, a, b) -> Pi (x, reduce env ctx a, reduce env (add_var ctx x a) b) *)
+    | Lam (x, a, b) -> Lam (x, reduce env ctx a, reduce env (add_var ctx x a) b)
+    | Pi (x, a, b) -> Pi (x, reduce env ctx a, reduce env (add_var ctx x a) b)
     | App (Lam (x, domain, body), arg) -> subst x arg body
     | App (Pi (x, a, b), arg) -> subst x arg b
     | App (f, a) ->
@@ -124,7 +124,7 @@ and reduce env ctx t =
     | Ind (d, p, cases, Constr (j, d', args)) when d.name = d'.name ->
       let case = List.nth cases (j - 1) in let cj = List.assoc j d.constrs in
       let cj_subst = subst_many (List.combine (List.map fst (params d.params)) (List.map snd (params d.params))) cj in
-      (apply_case env ctx d p cases case cj_subst args)
+      reduce env ctx (apply_case env ctx d p cases case cj_subst args)
     | Ind (d, p, cases, t') ->
       let t'' = reduce env ctx t' in
       let reduced_ind = Ind (d, p, cases, t'')
@@ -235,10 +235,10 @@ and infer_Ind env ctx d p cases t' =
         | _ -> raise (Error (InferCtorInvalidType (j, d.name, ty)))
       in
       let expected_ty = compute_case_type cj_subst ctx in
-(*       Printf.printf "Checking case %d: %s against %s\n" j (string_of_term case) (string_of_term expected_ty); *)
+      if (trace) then Printf.printf "Checking case %d: %s against %s\n" j (string_of_term case) (string_of_term expected_ty);
       check env ctx case expected_ty
     ) cases;
-(*     Printf.printf "infer_Ind result: %s\n" (string_of_term result_ty); *)
+    if (trace) then Printf.printf "infer_Ind result: %s\n" (string_of_term result_ty);
     result_ty
 
 and apply_inductive env ctx d args =
@@ -437,21 +437,7 @@ let plus_w =
           Lam ("f", Pi ("y", App (b_term, Var "a"), Inductive w_nat),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive w_nat),
-               [Var "m"; App (succ_w, Var "m")],  (* Use succ_w *)
-               Var "a")))],
-         Var "n")))
-
-let plus_w2 =
-    let b_term = Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")) in
-    Lam ("n", Inductive w_nat,
-    Lam ("m", Inductive w_nat,
-    Ind (w_nat,
-         Pi ("_", Inductive w_nat, Inductive w_nat),
-         [Lam ("a", Inductive bool_def,
-          Lam ("f", Pi ("y", App (b_term, Var "a"), Inductive w_nat),
-          Ind (bool_def,
-               Pi ("_", Inductive bool_def, Inductive w_nat),
-               [Var "m"; Constr (1, w_nat, [true_val; Lam ("y", Inductive unit_def, Var "m")])],
+               [Var "m"; App (succ_w, App (Var "f", Var "a"))],
                Var "a")))],
          Var "n")))
 
@@ -464,10 +450,9 @@ let to_nat_w =
           Lam ("f", Pi ("y", App (b_term, Var "z"), Inductive w_nat),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive nat_def),
-               [zero; one],  (* Simplified: true case is 1, no recursion *)
+               [zero; one],
                Var "z")))],
          Var "w"))
-
 
 let from_nat_w =
     Lam ("n", Inductive nat_def,
@@ -616,18 +601,19 @@ let test_fin_vec () =
     Printf.printf "Fin and Vec PASSED\n"
 
 let test_w() =
-    let plus6w = normalize env [] (App (App (plus_w, three_w), three_w)) in
     let plus4w = normalize env [] (App (App (plus_w, two_w), two_w)) in
-    let four4  = normalize env [] (App (to_nat_w, two_w)) in begin
+    let plus6w = normalize env [] (App (App (plus_w, three_w), three_w)) in
+    let four4  = normalize env [] (App (to_nat_w, four_w)) in begin
         Printf.printf "eval plus4w 4 = "; print_term plus4w; print_endline "";
         Printf.printf "eval plus6w 6 = "; print_term plus6w; print_endline "";
         Printf.printf "eval four4w 4 = "; print_term four_w; print_endline "";
         Printf.printf "eval conv4  4 = "; print_term four4;  print_endline "";
         Printf.printf "zero_w : "; print_term (infer env [] zero_w); print_endline "";
         Printf.printf "succ_w : "; print_term (infer env [] succ_w); print_endline "";
-        Printf.printf "plus_w : "; print_term (infer env [] plus_w); print_endline "";
         Printf.printf "w_nat : "; print_term (infer env [] (Inductive w_nat)); print_endline "";
         Printf.printf "Four4 : "; print_term (normalize env [] four4); print_endline "";
+        try Printf.printf "plus_w : "; print_term (infer env [] plus_w); print_endline ""
+        with Error x -> Printf.printf "Catch: %s\n" (string_of_error x);
         Printf.printf "to_nat_w : "; print_term (infer env [] to_nat_w); print_endline "";
     end;
     if (equal env [] plus4w four_w) then Printf.printf "W Checking PASSED\n" else Printf.printf "W Checking FAILED (plus4w <> four_w)\n"
