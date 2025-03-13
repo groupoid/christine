@@ -1,6 +1,13 @@
-(* 1989 Frank Pfenning and Christine Paulin-Mohring: CoC + CIC
-   Copyright (c) Groupoїd la Infini
- *)
+(* 1989 (c) Frank Pfenning and Christine Paulin-Mohring *)
+(* 2025 (c) Groupoїd la Infini *)
+(*
+    1) VERIFIER    270
+    2) SERIALIZER  30
+    3) LIBRARY     320
+    4) SAMPLES     70
+    5) SUITE       130
+    5) RUNNER      20
+*)
 
 (* VERIFIER *)
 
@@ -53,12 +60,7 @@ let rec is_lam = function | Lam _ -> true | _ -> false
 let rec lookup_var ctx x = try Some (List.assoc x ctx) with Not_found -> None
 let params ps = List.map (fun (name, term, typ) -> (name, term)) ps
 
-let rec equal env ctx t1' t2' =
-    let t1 = normalize env ctx t1' in
-    let t2 = normalize env ctx t2' in
-    equal' env ctx t1 t2
-
-and equal' env ctx t1 t2 =
+let rec equal' env ctx t1 t2 =
     match t1, t2 with
     | Var x, Var y -> x = y
     | Universe i, Universe j -> i = j
@@ -72,11 +74,12 @@ and equal' env ctx t1 t2 =
     | Ind (d1, p1, cases1, t1), Ind (d2, p2, cases2, t2) -> d1.name = d2.name && equal' env ctx p1 p2 && List.for_all2 (equal' env ctx) cases1 cases2 && equal' env ctx t1 t2
     | _ -> t1 = t2
 
+and equal env ctx t1' t2' = equal' env ctx (normalize env ctx t1') (normalize env ctx t2')
+and normalize env ctx t = normalize' env ctx 0 t
+
 and normalize' env ctx depth t =
     if depth > 100 then raise (Error (NormalizationDepthExceeded t));
     let t' = reduce env ctx t in (if equal' env ctx t t' then t else normalize env ctx t')
-
-and normalize env ctx t = normalize' env ctx 0 t
 
 and apply_case env ctx d p cases case ty args =
     let rec apply ty args_acc remaining_args =
@@ -305,7 +308,7 @@ and string_of_term t = string_of_term_depth 0 t
 and print_term_depth depth t = print_string (string_of_term_depth depth t)
 and print_term t = print_term_depth 0 t
 
-(* ENV *)
+(* LIBRARY *)
 
 (* Empty *)
 
@@ -400,8 +403,17 @@ let w_nat = {
       (Lam ("s", Inductive bool_def, Ind (bool_def, Pi ("_", Inductive bool_def, Universe 0), [Inductive empty_def; Inductive unit_def], Var "s")))
       (Pi ("x", Inductive bool_def, Universe 0))) with name = "N" }
 
-let zero_w = Constr (1, { w_nat with name = "N" }, [false_val; Lam ("y", Inductive empty_def, App (App (empty_elim, Inductive { w_nat with name = "N" } ), Var "y"))])
-let succ_w = Lam("d", Inductive w_nat, Constr (1, { w_nat with name = "N" }, [true_val; Lam ("y", Inductive unit_def, Var "d")]))
+let zero_w  = Constr (1, { w_nat with name = "N" }, [false_val; Lam ("y", Inductive empty_def, App (App (empty_elim, Inductive { w_nat with name = "N" } ), Var "y"))])
+let succ_w  = Lam("d", Inductive w_nat, Constr (1, { w_nat with name = "N" }, [true_val; Lam ("y", Inductive unit_def, Var "d")]))
+let one_w   = normalize [] [] (App (succ_w,zero_w))
+let two_w   = normalize [] [] (App (succ_w,one_w))
+let three_w = normalize [] [] (App (succ_w,two_w))
+let four_w  = normalize [] [] (App (succ_w,three_w))
+let five_w  = normalize [] [] (App (succ_w,four_w))
+let six_w   = normalize [] [] (App (succ_w,five_w))
+let seven_w = normalize [] [] (App (succ_w,six_w))
+
+(* ENV *)
 
 let env = [("Empty", Inductive empty_def);
            ("Unit", Inductive unit_def);
@@ -415,7 +427,7 @@ let env = [("Empty", Inductive empty_def);
            ("List", Inductive (list_def (Inductive nat_def) (Universe 0)));
            ("Tree", Inductive (tree_def (Inductive nat_def) (Universe 0)))]
 
-(* DEF *)
+(* SAMPLES *)
 
 let plus =
     Lam ("m", nat_ind,
@@ -485,15 +497,6 @@ let sample_list =
        Constr (2, list_def (Inductive nat_def) (Universe 0),
          [Constr (2, nat_def, [Constr (1, nat_def, [])]);
           Constr (1, list_def (Inductive nat_def) (Universe 0), [])])])
-
-
-let one_w = normalize env [] (App (succ_w,zero_w))
-let two_w = normalize env [] (App (succ_w,one_w))
-let three_w = normalize env [] (App (succ_w,two_w))
-let four_w = normalize env [] (App (succ_w,three_w))
-let five_w = normalize env [] (App (succ_w,four_w))
-let six_w = normalize env [] (App (succ_w,five_w))
-let seven_w = normalize env [] (App (succ_w,six_w))
 
 (* SUITE *)
 
@@ -625,6 +628,8 @@ let test_false() =
 let test_bool() =
     try (Printf.printf "bool_elim : "; print_term (infer env [] bool_elim); print_endline "")
     with Error x -> Printf.printf "Catch: %s\n" (string_of_error x)
+
+(* RUNNER *)
 
 let test () =
     test_universe ();
