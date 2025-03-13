@@ -183,8 +183,7 @@ and infer_Ind env ctx d p cases t' =
       let rec compute_case_type ty ctx_acc =
         match ty with
         | Pi (x, a, b) ->
-            let var = Var x in
-            let ctx' = add_var ctx_acc x a in
+            let var = Var x in let ctx' = add_var ctx_acc x a in
             let b_ty = compute_case_type b ctx' in
             if equal env ctx a d_applied then Pi (x, a, Pi ("_", App (p, var), b_ty)) else Pi (x, a, b_ty)
         | Inductive d' when d'.name = d.name -> b
