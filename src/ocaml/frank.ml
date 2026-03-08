@@ -1,6 +1,8 @@
 (* 1989 (c) Frank Pfenning and Christine Paulin-Mohring *)
 (* 2025 (c) Groupoїd la Infini *)
 (*
+    % ocamlopt -o frank frank.ml
+
     1) VERIFIER    270
     2) SERIALIZER  30
     3) LIBRARY     320
@@ -9,6 +11,7 @@
     6) SUITE       130
     7) RUNNER      20
 *)
+
 
 (* VERIFIER *)
 
@@ -100,6 +103,12 @@ and pos x t =
     | Constr (_, _, args) -> List.exists (pos x) args
     | Ind (_, p, cases, t') -> pos x p || List.exists (pos x) cases || pos x t'
 
+and is_recursive env ctx ty ind_name =
+    match ty with
+    | Inductive d when d.name = ind_name -> true
+    | Pi (x, a, b) -> is_recursive env (add_var ctx x a) b ind_name
+    | _ -> false
+
 and is_positive env ctx ty ind_name =
     match ty with
     | Pi (x, a, b) ->
@@ -185,14 +194,28 @@ and infer_Ind env ctx d p cases t' =
         | Pi (x, a, b) ->
             let var = Var x in let ctx' = add_var ctx_acc x a in
             let b_ty = compute_case_type b ctx' in
-            if equal env ctx a d_applied then Pi (x, a, Pi ("_", App (p, var), b_ty)) else Pi (x, a, b_ty)
+            if is_recursive env ctx a d.name then
+              match a with
+              | Pi (y, a_y, b_y) ->
+                  let ih_ty = Pi (y, a_y, App (p, App (var, Var y))) in
+                  Pi (x, a, Pi ("ih", ih_ty, b_ty))
+              | _ -> Pi (x, a, Pi ("ih", App (p, var), b_ty))
+            else Pi (x, a, b_ty)
         | Inductive d' when d'.name = d.name -> b
         | _ when equal env ctx ty d_applied -> b
         | _ -> raise (Error (InferCtorInvalidType (j, d.name, ty)))
       in
       let expected_ty = compute_case_type cj_subst ctx in
-      if (trace) then Printf.printf "Checking case %d: %s against %s\n" j (string_of_term case) (string_of_term expected_ty);
-      check env ctx case expected_ty
+      let (ctx', expected_ty') = match t' with
+          | Var x ->
+              let rec get_ctor_args ty = match ty with | Pi (x, a, b) -> x :: get_ctor_args b | _ -> [] in
+              let ctor_args = get_ctor_args cj_subst in
+              let refined_val = Constr (j_idx, d, List.map (fun n -> Var n) ctor_args) in
+              (List.map (fun (n, ty) -> (n, subst x refined_val ty)) ctx, subst x refined_val expected_ty)
+          | _ -> (ctx, expected_ty)
+      in
+      if (trace) then Printf.printf "Checking case %d: %s against %s\n" j (string_of_term case) (string_of_term expected_ty');
+      check env ctx' case expected_ty'
     ) cases;
     if (trace) then Printf.printf "infer_Ind result: %s\n" (string_of_term result_ty);
     result_ty
@@ -208,15 +231,14 @@ and apply_case env ctx d p cases case ty args =
     match ty, remaining_args with
     | Pi (x, a, b), arg :: rest ->
         let b' = subst x arg b in
-        let rec_arg =
-          if equal env ctx a (Inductive d) then
-            match arg with
-            | Constr (j, d', sub_args) when d.name = d'.name -> Some (reduce env ctx (Ind (d, p, cases, arg)))
-            | _ -> None
-          else None
-        in
-        let new_args_acc = match rec_arg with | Some r -> r :: arg :: args_acc | None -> arg :: args_acc in
-        apply b' new_args_acc rest
+        if is_recursive env ctx a d.name then
+            let rec_arg = match a with
+                | Pi (y, a_y, b_y) -> Lam (y, a_y, reduce env ctx (Ind (d, p, cases, App (arg, Var y))))
+                | _ -> reduce env ctx (Ind (d, p, cases, arg))
+            in
+            apply b' (rec_arg :: arg :: args_acc) rest
+        else
+            apply b' (arg :: args_acc) rest
     | Pi (_, _, b), [] -> raise (Error ApplyCaseCtorArg)
     | _, [] ->
         let rec apply_term t args =
@@ -225,13 +247,7 @@ and apply_case env ctx d p cases case ty args =
           | t, [] -> t
           | _ -> raise (Error ApplyCaseTerm)
         in
-        let applied = apply_term case (List.rev args_acc) in
-        (match applied with
-         | Lam (x, _, body) when List.exists (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc ->
-             let rec_arg = List.find (fun arg -> equal env ctx (Inductive d) (infer env ctx arg)) args_acc in
-             if not (pos x body) then raise (Error (ApplyCaseTerm));
-             apply_term applied [reduce env ctx (Ind (d, p, cases, rec_arg))]
-         | _ -> applied)
+        apply_term case (List.rev args_acc)
     | _ -> raise (Error ApplyCaseCtorArg)
     in apply ty [] args
 
@@ -443,10 +459,11 @@ let plus_w =
          Pi ("_", Inductive w_nat, Inductive w_nat),
          [Lam ("a", Inductive bool_def,
           Lam ("f", Pi ("y", App (b_term, Var "a"), Inductive w_nat),
+          Lam ("ih", Pi ("y", App (b_term, Var "a"), Inductive w_nat),
           Ind (bool_def,
-               Pi ("_", Inductive bool_def, Inductive w_nat),
-               [Var "m"; App (succ_w, App (Var "f", Var "a"))],
-               Var "a")))],
+               Pi ("z", Inductive bool_def, Inductive w_nat),
+               [Var "m"; App (succ_w, App (Var "ih", tt))],
+               Var "a"))))],
          Var "n")))
 
 let to_nat_w =
@@ -456,17 +473,18 @@ let to_nat_w =
          Pi ("_", Inductive w_nat, Inductive nat_def),
          [Lam ("z", Inductive bool_def,
           Lam ("f", Pi ("y", App (b_term, Var "z"), Inductive w_nat),
+          Lam ("ih", Pi ("y", App (b_term, Var "z"), Inductive nat_def),
           Ind (bool_def,
                Pi ("_", Inductive bool_def, Inductive nat_def),
-               [zero; one],
-               Var "z")))],
+               [zero; App (succ, App (Var "ih", tt))],
+               Var "z"))))],
          Var "w"))
 
 let from_nat_w =
     Lam ("n", Inductive nat_def,
     Ind (nat_def,
          Pi ("_", Inductive nat_def, Inductive w_nat),
-         [zero_w; Lam ("k", Inductive nat_def, Lam ("ih", Inductive w_nat, App (succ, Var "ih")))],
+         [zero_w; Lam ("k", Inductive nat_def, Lam ("ih", Inductive w_nat, App (succ_w, Var "ih")))],
          Var "n"))
 
 let plus_w_correct =
@@ -611,9 +629,10 @@ let test_w() =
         Printf.printf "succ_w : "; print_term (infer env [] succ_w); print_endline "";
         Printf.printf "w_nat : "; print_term (infer env [] (Inductive w_nat)); print_endline "";
         Printf.printf "Four4 : "; print_term (normalize env [] four4); print_endline "";
-        try Printf.printf "plus_w : "; print_term (infer env [] plus_w); print_endline ""
-        with Error x -> Printf.printf "Catch: %s\n" (string_of_error x);
-        Printf.printf "to_nat_w : "; print_term (infer env [] to_nat_w); print_endline "";
+        try Printf.printf "plus_w    : "; print_term (infer env [] plus_w); print_endline ""; flush stdout
+        with Error x -> Printf.printf "Catch: %s\n" (string_of_error x); flush stdout;
+        try Printf.printf "to_nat_w  : "; print_term (infer env [] to_nat_w); print_endline ""; flush stdout
+        with Error x -> Printf.printf "Catch: %s\n" (string_of_error x); flush stdout;
     end;
     if (equal env [] plus4w four_w) then Printf.printf "W Checking PASSED\n" else Printf.printf "W Checking FAILED (plus4w <> four_w)\n"
 
