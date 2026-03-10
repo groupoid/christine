@@ -1,0 +1,18 @@
+-- Identity type for Christine
+-- Formation: Id A a b
+-- Introduction: Refl a
+-- Elimination: J A a b C d p
+
+module Data.Eq where
+
+data Eq A (a: A) : A -> Type where
+    Refl : Eq A a a
+
+sym A a b (p: Eq A a b) : Eq A b a =
+    J A a b (\x y p -> Eq A y x) (\x -> Refl x) p
+
+trans A a b c (p: Eq A a b) (q: Eq A b c) : Eq A a c =
+    J A a b (\x y p -> Eq A b c -> Eq A a c) (\x q -> q) p q
+
+cong A B (f: A -> B) a b (p: Eq A a b) : Eq B (f a) (f b) =
+    J A a b (\x y p -> Eq B (f x) (f y)) (\x -> Refl (f x)) p

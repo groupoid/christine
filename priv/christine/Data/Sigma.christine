@@ -1,0 +1,15 @@
+-- Dependent pair type for Christine
+-- Formation: Sigma A B
+-- Introduction: Pair a b
+-- Elimination: Fst p, Snd p
+
+module Data.Sigma where
+
+data Sigma (A: Type) (B: A -> Type) where
+    Pair : (a: A) -> B a -> Sigma A B
+
+fst (A: Type) (B: A -> Type) (p: Sigma A B) : A =
+    case p of Pair a b -> a
+
+snd (A: Type) (B: A -> Type) (p: Sigma A B) : B (fst A B p) =
+    case p of Pair a b -> b
