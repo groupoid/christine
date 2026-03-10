@@ -39,3 +39,31 @@ Definition length (A: Type) (l: List A) : Nat :=
   | Nil => Zero
   | Cons x xs => Succ (length A xs)
   end.
+
+Definition append (A: Type) (l1: List A) (l2: List A) : List A :=
+  match l1 with
+  | Nil => l2
+  | Cons x xs => Cons A x (append A xs l2)
+  end.
+
+Definition foldr (A: Type) (B: Type) (f: forall (x: A), forall (y: B), B) (acc: B) (l: List A) : B :=
+  match l with
+  | Nil => acc
+  | Cons x xs => f x (foldr A B f acc xs)
+  end.
+
+Definition reverse (A: Type) (l: List A) : List A :=
+  match l with
+  | Nil => Nil A
+  | Cons x xs => append A (reverse A xs) (Cons A x (Nil A))
+  end.
+
+Definition zipWith (A: Type) (B: Type) (C: Type) (f: forall (x: A), forall (y: B), C) (l1: List A) (l2: List B) : List C :=
+  match l1 with
+  | Nil => Nil C
+  | Cons x xs =>
+    match l2 with
+    | Nil => Nil C
+    | Cons y ys => Cons C (f x y) (zipWith A B C f xs ys)
+    end
+  end.
