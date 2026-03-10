@@ -1,57 +1,41 @@
--- List datatype for Christine
+(* Polymorphic lists for Christine *)
 
-module Data.List where
+Module Data.List.
 
-data List A = Nil | Cons A (List A)
+Inductive List (A: Type) :=
+| Nil
+| Cons (x: A) (xs: List A).
 
-length l = case l of
-    Nil -> Zero
-    Cons x xs -> Succ (length xs)
+Definition head (A: Type) (default: A) (l: List A) : A :=
+  match l with
+  | Nil => default
+  | Cons x xs => x
+  end.
 
-reverse l = rev l Nil
-  where
-    rev l1 l2 = case l1 of
-        Nil -> l2
-        Cons x xs -> rev xs (Cons x l2)
+Definition tail (A: Type) (l: List A) : List A :=
+  match l with
+  | Nil => Nil A
+  | Cons x xs => xs
+  end.
 
-append l1 l2 = case l1 of
-    Nil -> l2
-    Cons x xs -> Cons x (append xs l2)
+Definition map (A: Type) (B: Type) (f: forall (x: A), B) (l: List A) : List B :=
+  match l with
+  | Nil => Nil B
+  | Cons x xs => Cons B (f x) (map A B f xs)
+  end.
 
-map f l = case l of
-    Nil -> Nil
-    Cons x xs -> Cons (f x) (map f xs)
+Definition filter (A: Type) (p: forall (x: A), Bool) (l: List A) : List A :=
+  match l with
+  | Nil => Nil A
+  | Cons x xs =>
+    match p x with
+    | True => Cons A x (filter A p xs)
+    | False => filter A p xs
+    end
+  end.
 
-filter p l = case l of
-    Nil -> Nil
-    Cons x xs -> case p x of
-        True  -> Cons x (filter p xs)
-        False -> filter p xs
--- concat flattens a List of Lists
-concat l = case l of
-    Nil -> Nil
-    Cons xs xss -> append xs (concat xss)
-
--- drop removes first n elements
-drop n l = case n of
-    Zero -> l
-    Succ k -> case l of
-        Nil -> Nil
-        Cons x xs -> drop k xs
-
--- zipWith combines two lists using a binary function
-zipWith f l1 l2 = case l1 of
-    Nil -> Nil
-    Cons x xs -> case l2 of
-        Nil -> Nil
-        Cons y ys -> Cons (f x y) (zipWith f xs ys)
-
--- foldr is the standard right fold
-foldr f acc l = case l of
-    Nil -> acc
-    Cons x xs -> f x (foldr f acc xs)
-
--- foldl is the standard left fold
-foldl f acc l = case l of
-    Nil -> acc
-    Cons x xs -> foldl f (f acc x) xs
+Definition length (A: Type) (l: List A) : Nat :=
+  match l with
+  | Nil => Zero
+  | Cons x xs => Succ (length A xs)
+  end.

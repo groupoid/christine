@@ -1,28 +1,41 @@
--- Test cases for Data.List functionality
+(* Test cases for Data.List functionality *)
 
-module Test.List where
+Module Test.List.
 
-import Data.List
-import Data.Bool
-import Data.Nat
+import Data.List.
+import Data.Bool.
+import Data.Nat.
 
-l1 = Cons (Succ Zero) (Cons (Succ (Succ Zero)) Nil)
-l2 = Cons (Succ (Succ (Succ Zero))) Nil
+Definition l1 : List Nat :=
+  Cons Nat (Succ Zero) (Cons Nat (Succ (Succ Zero)) (Nil Nat)).
 
--- Should be Cons (Succ Zero) (Cons (Succ (Succ Zero)) (Cons (Succ (Succ (Succ Zero))) Nil))
-test_append = append l1 l2
+Definition l2 : List Nat :=
+  Cons Nat (Succ (Succ (Succ Zero))) (Nil Nat).
 
--- Should be Cons (Succ (Succ Zero)) (Cons (Succ Zero) Nil)
-test_reverse = reverse l1
+(* Should be Cons (Succ Zero) (Cons (Succ (Succ Zero)) (Cons (Succ (Succ (Succ Zero))) Nil)) *)
+Definition test_append : List Nat := append Nat l1 l2.
 
--- Should be Cons (Succ (Succ Zero)) (Cons (Succ (Succ (Succ Zero))) Nil)
-test_map = map (\x -> Succ x) l1
+(* Should be Cons (Succ (Succ Zero)) (Cons (Succ Zero) Nil) *)
+Definition test_reverse : List Nat := reverse Nat l1.
 
--- Should be Succ (Succ (Succ Zero))
-test_foldr = foldr plus Zero l1
+(* Should be Cons (Succ (Succ Zero)) (Cons (Succ (Succ (Succ Zero))) Nil) *)
+Definition test_map : List Nat := map Nat Nat (fun (x: Nat) => Succ x) l1.
 
--- Should be Cons (Succ (Succ (Succ Zero))) Nil
-test_filter = filter (\x -> case x of Zero -> False; Succ y -> case y of Zero -> False; Succ z -> True) l1
+(* Should be Succ (Succ (Succ Zero)) *)
+Definition test_foldr : Nat := foldr Nat Nat plus Zero l1.
 
--- Should be Cons (Succ (Succ (Succ (Succ Zero)))) Nil
-test_zipWith = zipWith plus l1 l2
+Definition is_gt_one (x: Nat) : Bool :=
+  match x with
+  | Zero => False
+  | Succ y =>
+    match y with
+    | Zero => False
+    | Succ z => True
+    end
+  end.
+
+(* Should be Cons (Succ (Succ (Succ Zero))) Nil *)
+Definition test_filter : List Nat := filter Nat is_gt_one l1.
+
+(* Should be Cons (Succ (Succ (Succ (Succ Zero)))) Nil *)
+Definition test_zipWith : List Nat := zipWith Nat Nat Nat plus l1 l2.

@@ -1,5 +1,15 @@
--- Tree datatype for Christine
+(* Polymorphic binary trees for Christine *)
 
-module Data.Tree where
+Module Data.Tree.
 
-data Tree A = Leaf | Node A (Tree A) (Tree A)
+import Data.Nat
+
+Inductive Tree (A: Type) :=
+| Leaf
+| Node (left: Tree A) (value: A) (right: Tree A).
+
+Definition depth (A: Type) (t: Tree A) : Nat :=
+  match t with
+  | Leaf => Zero
+  | Node l v r => Succ (max (depth A l) (depth A r))
+  end.

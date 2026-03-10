@@ -1,5 +1,6 @@
--- W-types (well-founded trees) for Christine
+(* W-types for Christine *)
 
-module Data.W where
+Module Data.W.
 
-data W A B = Sup (x:A) (f:B x -> W A B)
+Inductive W (A: Type) (B: forall (x: A), Type) :=
+| Lim (A: Type) (B: forall (x: A), Type) (x: A) (f: forall (y: B x), W A B).

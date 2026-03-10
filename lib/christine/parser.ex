@@ -14,38 +14,49 @@ defmodule Christine.Parser do
   end
 
   defp parse_module(tokens) do
-    # Skip any leading virtual tokens
-    tokens = Enum.drop_while(tokens, fn t -> elem(t, 0) == :v_left_brace end)
+    tokens = skip_virtual(tokens)
 
     case tokens do
       [{:module, _, _} | rest] ->
         case parse_module_name(rest) do
-          {:ok, name, [{:where, _, _} | rest2]} ->
-            # Skip optional v_left_brace after where
-            rest3 = Enum.drop_while(rest2, fn t -> elem(t, 0) == :v_left_brace end)
+          {:ok, name, rest2} ->
+            case skip_virtual(rest2) do
+              [{:dot, _, _} | rest3] ->
+                case parse_decls(rest3, []) do
+                  {:ok, decls, rest4} ->
+                    {:ok, %AST.Module{name: name, declarations: decls}, rest4}
 
-            case parse_decls(rest3, []) do
-              {:ok, decls, remaining} ->
-                {:ok, %AST.Module{name: name, declarations: decls}, remaining}
+                  err ->
+                    err
+                end
 
-              {:error, _} = err ->
-                err
-
-              {:error, _, _} = err ->
-                err
+              _ ->
+                {:error, :expected_dot_after_module_name}
             end
 
-          _ ->
-            {:error, {:invalid_module_header, Enum.take(rest, 5)}}
+          err ->
+            err
         end
 
       _ ->
-        {:error, {:invalid_module, Enum.take(tokens, 5)}}
+        case parse_decls(tokens, []) do
+          {:ok, decls, remaining} ->
+            {:ok, %AST.Module{name: "Main", declarations: decls}, remaining}
+
+          err ->
+            err
+        end
     end
   end
 
-  defp parse_module_name([{:ident, _, _, name} | rest]) do
-    parse_module_name_tail(rest, name)
+  defp parse_module_name(tokens) do
+    case skip_virtual(tokens) do
+      [{:ident, _, _, name} | rest] ->
+        parse_module_name_tail(rest, name)
+
+      _ ->
+        {:error, :invalid_module_name}
+    end
   end
 
   defp parse_module_name_tail([{:dot, _, _}, {:ident, _, _, next} | rest], acc) do
@@ -54,85 +65,202 @@ defmodule Christine.Parser do
 
   defp parse_module_name_tail(rest, acc), do: {:ok, acc, rest}
 
-  defp parse_decls([], acc), do: {:ok, Enum.reverse(acc), []}
-  defp parse_decls([{:v_left_brace, _, _} | rest], acc), do: parse_decls(rest, acc)
-  defp parse_decls([{:v_right_brace, _, _} | rest], acc), do: {:ok, Enum.reverse(acc), rest}
-  defp parse_decls([{:v_semicolon, _, _} | rest], acc), do: parse_decls(rest, acc)
+  defp skip_virtual(tokens) do
+    Enum.drop_while(tokens, fn t ->
+      elem(t, 0) in [:v_left_brace, :v_semicolon, :v_right_brace, :semicolon]
+    end)
+  end
 
   defp parse_decls(tokens, acc) do
-    # Proactively skip semicolons before parse_decl
-    tokens = Enum.drop_while(tokens, fn t -> elem(t, 0) == :v_semicolon end)
+    tokens = skip_virtual(tokens)
 
-    if tokens == [] or elem(hd(tokens), 0) == :v_right_brace do
-      {:ok, Enum.reverse(acc), tokens}
-    else
-      case parse_decl(tokens) do
-        {:ok, decl, rest} -> parse_decls(rest, [decl | acc])
-        err when elem(err, 0) == :error -> err
-      end
+    case tokens do
+      [] ->
+        {:ok, Enum.reverse(acc), []}
+
+      _ ->
+        case parse_decl(tokens) do
+          {:ok, decl, rest} -> parse_decls(rest, [decl | acc])
+          err when elem(err, 0) == :error -> err
+        end
     end
   end
 
-  defp parse_decl([{:data, _, _} | rest]) do
-    case rest do
-      [{:ident, _, _, name} | rest1] ->
-        case parse_type_params(rest1, []) do
-          {:ok, params, [{:=, _, _} | rest2]} ->
-            case parse_constructors(rest2, []) do
-              {:ok, constructors, rest3} ->
-                {:ok, %AST.DeclData{name: name, params: params, constructors: constructors},
-                 rest3}
+  defp parse_decl(tokens) do
+    case skip_virtual(tokens) do
+      [{:inductive_kw, _, _} | rest] ->
+        case skip_virtual(rest) do
+          [{:ident, _, _, name} | rest1] ->
+            case parse_decl_params(rest1, []) do
+              {:ok, params, rest2} ->
+                case skip_virtual(rest2) do
+                  [{:assign, _, _} | rest3] ->
+                    case parse_constructors(rest3, []) do
+                      {:ok, constructors, rest4} ->
+                        case skip_virtual(rest4) do
+                          [{:dot, _, _} | rest5] ->
+                            {:ok,
+                             %AST.DeclData{
+                               name: name,
+                               params: params,
+                               constructors: constructors
+                             }, rest5}
 
-              _ ->
-                {:error, :invalid_constructors}
+                          _ ->
+                            {:error, :expected_dot_after_inductive}
+                        end
+
+                      err ->
+                        err
+                    end
+
+                  _ ->
+                    {:error, :expected_assign_after_inductive}
+                end
+
+              err ->
+                err
             end
 
           _ ->
-            {:error, :invalid_data_params}
+            {:error, :expected_name_after_inductive}
         end
 
+      [{:definition, _, _} | rest] ->
+        parse_def_theorem(rest)
+
+      [{:theorem, _, _} | rest] ->
+        parse_def_theorem(rest)
+
+      [{:import, _, _} | rest] ->
+        case parse_module_name(rest) do
+          {:ok, name, rest2} ->
+            case skip_virtual(rest2) do
+              [{:dot, _, _} | rest3] -> {:ok, {:import, name}, rest3}
+              _ -> {:ok, {:import, name}, rest2}
+            end
+
+          _ ->
+            {:error, :invalid_import}
+        end
+
+      [{:ident, _, _, name} | rest] ->
+        # Try as type signature
+        tokens2 = skip_virtual(rest)
+
+        case tokens2 do
+          [{:colon, _, _} | rest2] ->
+            case parse_type(rest2) do
+              {:ok, ty, rest3} ->
+                case skip_virtual(rest3) do
+                  [{:dot, _, _} | rest4] ->
+                    {:ok, %AST.DeclTypeSignature{name: name, type: ty}, rest4}
+
+                  _ ->
+                    {:ok, %AST.DeclTypeSignature{name: name, type: ty}, rest3}
+                end
+
+              _ ->
+                {:error, :invalid_type_sig}
+            end
+
+          _ ->
+            # Try as definition (ident binders := expr)
+            case parse_binders(rest, []) do
+              {:ok, binders, rest2} ->
+                case skip_virtual(rest2) do
+                  [{:assign, _, _} | rest3] ->
+                    case parse_expr(rest3) do
+                      {:ok, expr, rest4} ->
+                        case skip_virtual(rest4) do
+                          [{:dot, _, _} | rest5] ->
+                            {:ok, %AST.DeclValue{name: name, binders: binders, expr: expr}, rest5}
+
+                          _ ->
+                            {:ok, %AST.DeclValue{name: name, binders: binders, expr: expr}, rest4}
+                        end
+
+                      err ->
+                        err
+                    end
+
+                  _ ->
+                    {:error, :unrecognized_decl}
+                end
+
+              _ ->
+                {:error, :unrecognized_decl}
+            end
+        end
+
+      [] ->
+        {:error, :empty_tokens}
+
       _ ->
-        {:error, :invalid_data_decl}
+        case tokens do
+          [] -> :ok
+          _ -> IO.inspect(Enum.take(tokens, 5), label: "UNRECOGNIZED DECL")
+        end
+
+        {:error, :unrecognized_decl, Enum.take(tokens, 5)}
     end
   end
 
-  defp parse_decl([{:import, _, _} | rest]) do
-    case parse_module_name(rest) do
-      {:ok, name, rest2} -> {:ok, {:import, name}, rest2}
-      _ -> {:error, :invalid_import}
-    end
-  end
+  defp parse_def_theorem(tokens) do
+    case skip_virtual(tokens) do
+      [{:ident, _, _, name} | rest] ->
+        case parse_decl_params(rest, []) do
+          {:ok, params, rest2} ->
+            case skip_virtual(rest2) do
+              [{:colon, _, _} | rest3] ->
+                case parse_type(rest3) do
+                  {:ok, ty, rest4} ->
+                    case skip_virtual(rest4) do
+                      [{:assign, _, _} | rest5] ->
+                        case parse_expr(rest5) do
+                          {:ok, expr, rest6} ->
+                            case skip_virtual(rest6) do
+                              [{:dot, _, _} | rest7] ->
+                                {:ok, %AST.DeclValue{name: name, binders: params, expr: expr},
+                                 rest7}
 
-  defp parse_decl([{:ident, _, _, name} | rest]) do
-    case parse_binders(rest, []) do
-      {:ok, binders, [{:=, _, _} | rest2]} ->
-        case parse_expr(rest2) do
-          {:ok, expr, rest3} ->
-            # Check for where block
-            case rest3 do
-              [{:where, _, _} | rest4] ->
-                rest5 = Enum.drop_while(rest4, fn t -> elem(t, 0) == :v_left_brace end)
+                              _ ->
+                                {:ok, %AST.DeclValue{name: name, binders: params, expr: expr},
+                                 rest6}
+                            end
 
-                case parse_decls(rest5, []) do
-                  {:ok, where_decls, rest6} ->
-                    # parse_decls stops at v_right_brace, consume it
-                    remaining = Enum.drop_while(rest6, fn t -> elem(t, 0) == :v_right_brace end)
+                          err ->
+                            err
+                        end
 
-                    {:ok,
-                     %AST.DeclValue{
-                       name: name,
-                       binders: binders,
-                       expr: expr,
-                       where_decls: where_decls
-                     }, remaining}
+                      [{:dot, _, _} | rest5] ->
+                        {:ok, %AST.DeclValue{name: name, binders: params, expr: ty}, rest5}
+
+                      _ ->
+                        {:error, :expected_assign_after_type}
+                    end
+
+                  err ->
+                    err
+                end
+
+              [{:assign, _, _} | rest3] ->
+                case parse_expr(rest3) do
+                  {:ok, expr, rest4} ->
+                    case skip_virtual(rest4) do
+                      [{:dot, _, _} | rest5] ->
+                        {:ok, %AST.DeclValue{name: name, binders: params, expr: expr}, rest5}
+
+                      _ ->
+                        {:ok, %AST.DeclValue{name: name, binders: params, expr: expr}, rest4}
+                    end
 
                   err ->
                     err
                 end
 
               _ ->
-                {:ok, %AST.DeclValue{name: name, binders: binders, expr: expr, where_decls: []},
-                 rest3}
+                {:error, :expected_colon_or_assign_in_definition}
             end
 
           err ->
@@ -140,227 +268,328 @@ defmodule Christine.Parser do
         end
 
       _ ->
-        # try as type signature
-        case rest do
-          [{:colon, _, _} | rest2] ->
-            case parse_type(rest2) do
-              {:ok, ty, rest3} -> {:ok, %AST.DeclTypeSignature{name: name, type: ty}, rest3}
-              _ -> {:error, :invalid_type_sig}
-            end
+        {:error, :invalid_definition_name}
+    end
+  end
+
+  defp parse_decl_params(tokens, acc) do
+    tokens = skip_virtual(tokens)
+
+    case tokens do
+      [{:left_paren, _, _}, {:ident, _, _, name}, {:colon, _, _} | rest] ->
+        case parse_type(rest) do
+          {:ok, ty, [{:right_paren, _, _} | rest2]} ->
+            parse_decl_params(rest2, [{name, ty} | acc])
 
           _ ->
-            {:error, :unrecognized_decl}
+            {:error, :invalid_param_type}
+        end
+
+      _ ->
+        {:ok, Enum.reverse(acc), tokens}
+    end
+  end
+
+  defp parse_constructors(tokens, acc) do
+    tokens = skip_virtual(tokens)
+
+    case tokens do
+      [{:pipe, _, _} | _] ->
+        case parse_constructor(tokens) do
+          {:ok, constr, rest} -> parse_constructors(rest, [constr | acc])
+          err -> err
+        end
+
+      [{:dot, _, _} | _] ->
+        {:ok, Enum.reverse(acc), tokens}
+
+      _ ->
+        # Try a single constructor without pipe (e.g. Unit := tt.)
+        case parse_constructor_no_pipe(tokens) do
+          {:ok, constr, rest} -> {:ok, Enum.reverse([constr | acc]), rest}
+          _ -> {:ok, Enum.reverse(acc), tokens}
         end
     end
   end
 
-  defp parse_decl(tokens), do: {:error, :invalid_declaration, Enum.take(tokens, 5)}
+  defp parse_constructor_no_pipe(tokens) do
+    case tokens do
+      [{:ident, _, _, name} | rest] ->
+        case parse_decl_params(rest, []) do
+          {:ok, params, rest2} ->
+            case skip_virtual(rest2) do
+              [{:colon, _, _} | rest3] ->
+                case parse_type(rest3) do
+                  {:ok, ty, rest4} -> {:ok, {name, params, ty}, rest4}
+                  err -> err
+                end
 
-  defp parse_type_params([{:ident, _, _, name} | rest], acc),
-    do: parse_type_params(rest, [name | acc])
+              _ ->
+                {:ok, {name, params, nil}, rest2}
+            end
 
-  defp parse_type_params(tokens, acc), do: {:ok, Enum.reverse(acc), tokens}
+          err ->
+            err
+        end
 
-  defp parse_constructors(tokens, acc) do
-    case parse_constructor(tokens) do
-      {:ok, constr, rest} -> parse_constructors_tail(rest, [constr | acc])
-      _ -> {:ok, Enum.reverse(acc), tokens}
+      _ ->
+        {:error, :expected_constructor_name}
     end
   end
 
-  defp parse_constructors_tail([{:pipe, _, _} | rest], acc) do
-    case parse_constructor(rest) do
-      {:ok, constr, rest2} -> parse_constructors_tail(rest2, [constr | acc])
-      _ -> {:error, :expected_constructor_after_pipe}
-    end
-  end
+  defp parse_constructor([{:pipe, _, _} | rest]) do
+    case skip_virtual(rest) do
+      [{:ident, _, _, name} | rest2] ->
+        case parse_decl_params(rest2, []) do
+          {:ok, params, rest3} ->
+            case skip_virtual(rest3) do
+              [{:colon, _, _} | rest4] ->
+                case parse_type(rest4) do
+                  {:ok, ty, rest5} -> {:ok, {name, params, ty}, rest5}
+                  err -> err
+                end
 
-  defp parse_constructors_tail(tokens, acc) do
-    {:ok, Enum.reverse(acc), tokens}
-  end
+              _ ->
+                {:ok, {name, params, nil}, rest3}
+            end
 
-  defp parse_constructor([{:ident, _, _, name} | rest]) do
-    case parse_type_atoms(rest, []) do
-      {:ok, args, rest2} -> {:ok, {name, args}, rest2}
-      # Constructor with no args
-      _ -> {:ok, {name, []}, rest}
+          err ->
+            err
+        end
+
+      _ ->
+        {:error, :expected_constructor_name}
     end
   end
 
   defp parse_constructor(tokens), do: {:error, :no_constructor, Enum.take(tokens, 5)}
 
   defp parse_type(tokens) do
-    case parse_type_app(tokens) do
-      {:ok, t, [{:arrow, _, _} | rest]} ->
-        case parse_type(rest) do
-          {:ok, t2, rest2} -> {:ok, %AST.Pi{name: "_", domain: t, codomain: t2}, rest2}
-          _ -> {:ok, t, rest}
+    case skip_virtual(tokens) do
+      [{:forall, _, _} | rest] ->
+        case parse_forall_binders(rest, []) do
+          {:ok, binders, [{:comma, _, _} | rest2]} ->
+            case parse_type(rest2) do
+              {:ok, body, rest3} ->
+                final =
+                  Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
+                    %AST.Pi{name: n, domain: d, codomain: acc}
+                  end)
+
+                {:ok, final, rest3}
+
+              err ->
+                err
+            end
+
+          _ ->
+            {:error, :expected_comma_in_forall}
         end
 
-      res ->
-        res
+      _ ->
+        case parse_type_app(tokens) do
+          {:ok, t, [{:arrow, _, _} | rest]} ->
+            case parse_type(rest) do
+              {:ok, body, rest2} ->
+                {:ok, %AST.Pi{name: "_", domain: t, codomain: body}, rest2}
+
+              err ->
+                err
+            end
+
+          res ->
+            res
+        end
+    end
+  end
+
+  defp parse_forall_binders(tokens, acc) do
+    tokens = skip_virtual(tokens)
+
+    case tokens do
+      [{:left_paren, _, _}, {:ident, _, _, name}, {:colon, _, _} | rest] ->
+        case parse_type(rest) do
+          {:ok, ty, [{:right_paren, _, _} | rest2]} ->
+            parse_forall_binders(rest2, [{name, ty} | acc])
+
+          _ ->
+            {:error, :invalid_forall_param}
+        end
+
+      [{:ident, _, _, name} | rest] ->
+        # Simple identifier in forall: forall x, T is PI x: Any -> T
+        # But in Coq subset we usually use (x: A)
+        parse_forall_binders(rest, [{name, %AST.Var{name: "Any"}} | acc])
+
+      _ ->
+        {:ok, Enum.reverse(acc), tokens}
     end
   end
 
   defp parse_type_app(tokens) do
     case parse_type_atom(tokens) do
-      {:ok, t, rest} -> parse_type_app_tail(t, rest)
+      {:ok, t, rest} -> parse_type_args(rest, t)
       err -> err
     end
   end
 
-  defp parse_type_app_tail(f, tokens) do
+  defp parse_type_args(tokens, acc) do
     case parse_type_atom(tokens) do
-      {:ok, arg, rest} -> parse_type_app_tail(%AST.App{func: f, arg: arg}, rest)
-      _ -> {:ok, f, tokens}
-    end
-  end
-
-  defp parse_type_atom([{:ident, _, _, name} | rest]), do: {:ok, %AST.Var{name: name}, rest}
-
-  defp parse_type_atom([{:left_paren, _, _}, {:ident, _, _, _name}, {:colon, _, _} | rest]) do
-    case parse_type(rest) do
-      {:ok, t, [{:right_paren, _, _} | rest2]} ->
-        {:ok, t, rest2}
-
-      err ->
-        err
-    end
-  end
-
-  defp parse_type_atom([{:left_paren, _, _} | rest] = tokens) do
-    case parse_type(rest) do
-      {:ok, t, [{:right_paren, _, _} | rest2]} ->
-        {:ok, t, rest2}
-
-      _ ->
-        case parse_expr_atom(tokens) do
-          {:ok, e, rest2} -> {:ok, e, rest2}
-          err -> err
-        end
+      {:ok, t, rest} -> parse_type_args(rest, %AST.App{func: acc, arg: t})
+      _ -> {:ok, acc, tokens}
     end
   end
 
   defp parse_type_atom(tokens) do
-    case parse_expr_atom(tokens) do
-      {:ok, e, rest} -> {:ok, e, rest}
-      _ -> {:error, :no_type_atom, Enum.take(tokens, 5)}
+    case skip_virtual(tokens) do
+      [{:ident, _, _, name} | rest] ->
+        {:ok, %AST.Var{name: name}, rest}
+
+      [{:type_kw, _, _} | rest] ->
+        {:ok, %AST.Universe{level: 0}, rest}
+
+      [{:prop_kw, _, _} | rest] ->
+        {:ok, %AST.Universe{level: -1}, rest}
+
+      [{:left_paren, _, _} | rest] ->
+        case parse_type(rest) do
+          {:ok, t, [{:right_paren, _, _} | rest2]} -> {:ok, t, rest2}
+          _ -> {:error, :expected_right_paren}
+        end
+
+      _ ->
+        {:error, :not_a_type_atom}
     end
   end
-
-  defp parse_type_atoms(tokens, acc) do
-    case parse_type_atom(tokens) do
-      {:ok, t, rest} -> parse_type_atoms(rest, [t | acc])
-      _ -> {:ok, Enum.reverse(acc), tokens}
-    end
-  end
-
-  defp parse_binders([{:ident, _, _, name} | rest], acc),
-    do: parse_binders(rest, [%AST.Var{name: name} | acc])
-
-  defp parse_binders(tokens, acc), do: {:ok, Enum.reverse(acc), tokens}
 
   defp parse_expr(tokens) do
+    case skip_virtual(tokens) do
+      [{:fun_kw, _, _} | rest] ->
+        case parse_binders(rest, []) do
+          {:ok, binders, [{arrow_type, _, _} | rest2]} when arrow_type in [:arrow, :fat_arrow] ->
+            case parse_expr(rest2) do
+              {:ok, body, rest3} ->
+                {:ok, %AST.Lambda{binders: binders, body: body}, rest3}
+
+              err ->
+                err
+            end
+
+          _ ->
+            {:error, :expected_arrow_in_lambda}
+        end
+
+      [{:match_kw, _, _} | rest] ->
+        case parse_expr(rest) do
+          {:ok, e, [{:with_kw, _, _} | rest2]} ->
+            case parse_branches(rest2, []) do
+              {:ok, branches, [{:end_kw, _, _} | rest3]} ->
+                {:ok, %AST.Case{expr: e, branches: branches}, rest3}
+
+              err ->
+                err
+            end
+
+          err ->
+            err
+        end
+
+      _ ->
+        parse_expr_app(tokens)
+    end
+  end
+
+  defp parse_expr_app(tokens) do
     case parse_expr_atom(tokens) do
-      {:ok, f, rest} -> parse_expr_app_tail(f, rest)
+      {:ok, e, rest} -> parse_expr_args(rest, e)
       err -> err
     end
   end
 
-  defp parse_expr_atom([{:ident, _, _, name} | rest]), do: {:ok, %AST.Var{name: name}, rest}
-  defp parse_expr_atom([{:number, _, _, val} | rest]), do: {:ok, %AST.Universe{level: val}, rest}
+  defp parse_expr_args(tokens, acc) do
+    case parse_expr_atom(tokens) do
+      {:ok, e, rest} -> parse_expr_args(rest, %AST.App{func: acc, arg: e})
+      _ -> {:ok, acc, tokens}
+    end
+  end
 
-  defp parse_expr_atom([{:case, _, _} | rest]) do
-    case parse_expr(rest) do
-      {:ok, e, [{:of, _, _} | rest2]} ->
-        case parse_branches(rest2, []) do
-          {:ok, branches, rest3} -> {:ok, %AST.Case{expr: e, branches: branches}, rest3}
-          err -> err
+  defp parse_expr_atom(tokens) do
+    case skip_virtual(tokens) do
+      [{:ident, _, _, name} | rest] ->
+        {:ok, %AST.Var{name: name}, rest}
+
+      [{:number, _, _, n} | rest] ->
+        {:ok, %AST.Number{value: n}, rest}
+
+      [{:string, _, _, s} | rest] ->
+        {:ok, %AST.String{value: s}, rest}
+
+      [{:left_paren, _, _} | rest] ->
+        case parse_expr(rest) do
+          {:ok, e, [{:right_paren, _, _} | rest2]} -> {:ok, e, rest2}
+          _ -> {:error, :expected_right_paren_expr}
         end
 
       _ ->
-        {:error, :expected_of}
+        {:error, :not_an_expr_atom}
     end
   end
 
-  defp parse_expr_atom([{:backslash, _, _} | rest]) do
-    case parse_binders(rest, []) do
-      {:ok, binders, [{:arrow, _, _} | rest2]} ->
-        case parse_expr(rest2) do
-          {:ok, body, rest3} -> {:ok, %AST.Lambda{binders: binders, body: body}, rest3}
-          err -> err
+  defp parse_binders(tokens, acc) do
+    tokens = skip_virtual(tokens)
+
+    case tokens do
+      [{:ident, _, _, name} | rest] ->
+        parse_binders(rest, [{name, %AST.Var{name: "Any"}} | acc])
+
+      [{:left_paren, _, _}, {:ident, _, _, name}, {:colon, _, _} | rest] ->
+        case parse_type(rest) do
+          {:ok, ty, [{:right_paren, _, _} | rest2]} ->
+            parse_binders(rest2, [{name, ty} | acc])
+
+          _ ->
+            {:error, :invalid_binder}
         end
 
       _ ->
-        {:error, :invalid_lambda}
+        {:ok, Enum.reverse(acc), tokens}
     end
   end
-
-  defp parse_expr_atom([{:left_paren, _, _} | rest]) do
-    case parse_expr(rest) do
-      {:ok, e, [{:right_paren, _, _} | rest2]} -> {:ok, e, rest2}
-      err -> err
-    end
-  end
-
-  defp parse_expr_atom(tokens), do: {:error, :no_expr_atom, Enum.take(tokens, 5)}
-
-  defp parse_branches([{:v_left_brace, _, _} | rest], acc), do: parse_branches(rest, acc)
-  defp parse_branches([{:v_right_brace, _, _} | rest], acc), do: {:ok, Enum.reverse(acc), rest}
-  defp parse_branches([{:v_semicolon, _, _} | rest], acc), do: parse_branches(rest, acc)
-  defp parse_branches([{:semicolon, _, _} | rest], acc), do: parse_branches(rest, acc)
 
   defp parse_branches(tokens, acc) do
-    case parse_branch(tokens) do
-      {:ok, branch, rest} -> parse_branches(rest, [branch | acc])
-      _ -> {:ok, Enum.reverse(acc), tokens}
+    tokens = skip_virtual(tokens)
+
+    case tokens do
+      [{:pipe, _, _} | rest] ->
+        case parse_branch(rest) do
+          {:ok, branch, rest2} -> parse_branches(rest2, [branch | acc])
+          err -> err
+        end
+
+      _ ->
+        {:ok, Enum.reverse(acc), tokens}
     end
   end
 
   defp parse_branch(tokens) do
-    case parse_pattern(tokens) do
-      {:ok, pat, [{:arrow, _, _} | rest]} ->
-        case parse_expr(rest) do
-          {:ok, body, rest2} -> {:ok, {pat, body}, rest2}
-          err -> err
+    case skip_virtual(tokens) do
+      [{:ident, _, _, cname} | rest] ->
+        case parse_binders(rest, []) do
+          {:ok, args, [{:fat_arrow, _, _} | rest2]} ->
+            case parse_expr(rest2) do
+              {:ok, body, rest3} ->
+                {:ok, {%AST.BinderConstructor{name: cname, args: args}, body}, rest3}
+
+              err ->
+                err
+            end
+
+          _ ->
+            {:error, :expected_arrow_in_branch}
         end
 
       _ ->
         {:error, :invalid_branch}
-    end
-  end
-
-  defp parse_pattern([{:ident, _, _, name} | rest]) do
-    case parse_patterns_atom(rest, []) do
-      {:ok, args, rest2} -> {:ok, %AST.BinderConstructor{name: name, args: args}, rest2}
-      _ -> {:ok, %AST.Var{name: name}, rest}
-    end
-  end
-
-  defp parse_pattern(tokens), do: {:error, :expected_pattern, Enum.take(tokens, 5)}
-
-  defp parse_patterns_atom(tokens, acc) do
-    case parse_pattern_atom(tokens) do
-      {:ok, p, rest} -> parse_patterns_atom(rest, [p | acc])
-      _ -> {:ok, Enum.reverse(acc), tokens}
-    end
-  end
-
-  defp parse_pattern_atom([{:ident, _, _, name} | rest]), do: {:ok, %AST.Var{name: name}, rest}
-
-  defp parse_pattern_atom([{:left_paren, _, _} | rest]) do
-    case parse_pattern(rest) do
-      {:ok, p, [{:right_paren, _, _} | rest2]} -> {:ok, p, rest2}
-      _ -> {:error, :invalid_pattern_paren}
-    end
-  end
-
-  defp parse_pattern_atom(_), do: {:error, :no_pattern_atom}
-
-  defp parse_expr_app_tail(f, tokens) do
-    case parse_expr_atom(tokens) do
-      {:ok, arg, rest} -> parse_expr_app_tail(%AST.App{func: f, arg: arg}, rest)
-      _ -> {:ok, f, tokens}
     end
   end
 end

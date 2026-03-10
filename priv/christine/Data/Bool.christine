@@ -1,19 +1,53 @@
--- Boolean datatype for Christine
+(* Boolean logic for Christine *)
 
-module Data.Bool where
+Module Data.Bool.
 
-data Bool = False | True
+Inductive Bool :=
+| False
+| True.
 
-not b = case b of
-    False -> True
-    True  -> False
+Definition not (b: Bool) : Bool :=
+  match b with
+  | True => False
+  | False => True
+  end.
 
-and a b = case a of
-    True  -> b
-    False -> False
+Definition and (a: Bool) (b: Bool) : Bool :=
+  match a with
+  | True => b
+  | False => False
+  end.
 
-or a b = case a of
-    True  -> True
-    False -> b
+Definition or (a: Bool) (b: Bool) : Bool :=
+  match a with
+  | True => True
+  | False => b
+  end.
 
-otherwise = True
+Definition xor (a: Bool) (b: Bool) : Bool :=
+  match a with
+  | True => not b
+  | False => b
+  end.
+
+import Data.Eq.
+
+Definition not_not_id (b: Bool) : Eq Bool (not (not b)) b :=
+  match b with
+  | True => Refl Bool True True
+  | False => Refl Bool False False
+  end.
+
+Definition and_comm (a: Bool) (b: Bool) : Eq Bool (and a b) (and b a) :=
+  match a with
+  | True =>
+    match b with
+    | True => Refl Bool True True
+    | False => Refl Bool False False
+    end
+  | False =>
+    match b with
+    | True => Refl Bool False False
+    | False => Refl Bool False False
+    end
+  end.

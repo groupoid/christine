@@ -108,6 +108,14 @@ defmodule Christine.Typechecker do
     infer(new_env, body)
   end
 
+  def infer(%Env{}, %AST.Number{}) do
+    %AST.Var{name: "Number"}
+  end
+
+  def infer(%Env{}, %AST.String{}) do
+    %AST.Var{name: "String"}
+  end
+
   def check(%Env{} = _e, _t, %AST.Var{name: "Any"}), do: :ok
 
   def check(%Env{} = e, t, ty) do

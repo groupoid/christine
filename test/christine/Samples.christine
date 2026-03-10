@@ -1,29 +1,46 @@
--- Frank Samples ported from frank.ml
+(* Christine Samples ported from frank.ml *)
 
-module Samples where
+Module Samples.
 
-data Bool = False | True
+Inductive Bool :=
+| False
+| True.
 
-data Nat = Zero | Succ Nat
+Inductive Nat :=
+| Zero
+| Succ (n: Nat).
 
-plus m n = case m of
-    Zero -> n
-    Succ k -> Succ (plus k n)
+Definition plus (m: Nat) (n: Nat) : Nat :=
+  match m with
+  | Zero => n
+  | Succ k => Succ (plus k n)
+  end.
 
-data Tree A = Leaf | Node A (Tree A) (Tree A)
+Inductive Tree (A: Type) :=
+| Leaf
+| Node (v: A) (l: Tree A) (r: Tree A).
 
-data Empty =
+Inductive Empty := .
 
-data Unit = tt
+Inductive Unit := tt.
 
--- W-types
-data W A B = Sup (x:A) (f:B x -> W A B)
+(* W-types *)
+Inductive W (A: Type) (B: forall (x: A), Type) :=
+| Sup (x: A) (f: forall (y: B x), W A B).
 
--- Nat as W-type
--- A = Bool, B False = Empty, B True = Unit
-data WNat = WNat (W Bool (\b -> case b of False -> Empty; True -> Unit))
+(* Nat as W-type *)
+(* A = Bool, B False = Empty, B True = Unit *)
+Definition B_nat (b: Bool) : Type :=
+  match b with
+  | False => Empty
+  | True => Unit
+  end.
 
-zero_w = Sup False (\e -> case e of)
-succ_w n = Sup True (\u -> n)
+Inductive WNat :=
+| WNat (w: W Bool B_nat).
 
--- to_nat_w w = ... (requires more complex induction handling)
+Definition zero_w : W Bool B_nat :=
+  Sup Bool B_nat False (fun (e: Empty) => match e with end).
+
+Definition succ_w (n: W Bool B_nat) : W Bool B_nat :=
+  Sup Bool B_nat True (fun (u: Unit) => n).

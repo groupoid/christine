@@ -1,23 +1,56 @@
--- Natural numbers (Peano) for Christine
+(* Natural numbers (Peano) for Christine *)
 
-module Data.Nat where
+Module Data.Nat.
 
-data Nat = Zero | Succ Nat
+Inductive Nat :=
+| Zero
+| Succ (n: Nat).
 
-plus m n = case m of
-    Zero -> n
-    Succ k -> Succ (plus k n)
+Definition plus (m: Nat) (n: Nat) : Nat :=
+  match m with
+  | Zero => n
+  | Succ k => Succ (plus k n)
+  end.
 
-minus m n = case n of
-    Zero -> m
-    Succ k -> case m of
-        Zero   -> Zero
-        Succ j -> minus j k
+Definition minus (m: Nat) (n: Nat) : Nat :=
+  match n with
+  | Zero => m
+  | Succ k =>
+    match m with
+    | Zero => Zero
+    | Succ j => minus j k
+    end
+  end.
 
-mult m n = case m of
-    Zero -> Zero
-    Succ k -> plus n (mult k n)
+Definition mult (m: Nat) (n: Nat) : Nat :=
+  match m with
+  | Zero => Zero
+  | Succ k => plus n (mult k n)
+  end.
 
-isZero n = case n of
-    Zero -> True
-    Succ _ -> False
+Definition isZero (n: Nat) : Bool :=
+  match n with
+  | Zero => True
+  | Succ _ => False
+  end.
+
+Definition max (m: Nat) (n: Nat) : Nat :=
+  match m with
+  | Zero => n
+  | Succ k =>
+    match n with
+    | Zero => m
+    | Succ j => Succ (max k j)
+    end
+  end.
+
+import Data.Eq.
+
+Definition plus_zero_n (n: Nat) : Eq Nat (plus Zero n) n :=
+  Refl Nat n n.
+
+Definition plus_n_zero (n: Nat) : Eq Nat (plus n Zero) n :=
+  match n with
+  | Zero => Refl Nat Zero Zero
+  | Succ k => cong Nat Nat (fun (x: Nat) => Succ x) (plus k Zero) k (plus_n_zero k)
+  end.

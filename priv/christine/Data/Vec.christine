@@ -1,5 +1,7 @@
--- Vectors (indexed lists) for Christine
+(* Length-indexed vectors for Christine *)
 
-module Data.Vec where
+Module Data.Vec.
 
-data Vec A N = VNil | VCons A (Vec A N)
+Inductive Vec (A: Type) (n: Nat) :=
+| Vnil (A: Type)
+| Vcons (A: Type) (n: Nat) (x: A) (xs: Vec A n).

@@ -1,22 +1,36 @@
--- W-defined Nat addition for Frank
--- Test for 2 + 1
+(* W-defined Nat addition for Christine *)
+(* Test for 2 + 1 *)
 
-module Test.W where
+Module Test.W.
 
-import Prelude
+import Prelude.
 
-data W A B = Sup (x:A) (f:B x -> W A B)
+Inductive W (A: Type) (B: forall (x: A), Type) :=
+| Sup (x: A) (f: forall (y: B x), W A B).
 
-zero_w = Sup False (\e -> case e of)
-succ_w n = Sup True (\u -> n)
+Definition B_nat (b: Bool) : Type :=
+  match b with
+  | False => Empty
+  | True => Unit
+  end.
 
-wTwo = succ_w (succ_w zero_w)
-wOne = succ_w zero_w
+Definition zero_w : W Bool B_nat :=
+  Sup Bool B_nat False (fun (e: Empty) => match e with end).
 
-wplus m n = case m of
-    Sup b f -> case b of
-        False -> n
-        True  -> succ_w (wplus (f tt) n)
+Definition succ_w (n: W Bool B_nat) : W Bool B_nat :=
+  Sup Bool B_nat True (fun (u: Unit) => n).
 
--- Test case: 2 + 1
-test_W = wplus wTwo wOne
+Definition wTwo : W Bool B_nat := succ_w (succ_w zero_w).
+Definition wOne : W Bool B_nat := succ_w zero_w.
+
+Definition wplus (m: W Bool B_nat) (n: W Bool B_nat) : W Bool B_nat :=
+  match m with
+  | Sup b f =>
+    match b with
+    | False => n
+    | True  => succ_w (wplus (f tt) n)
+    end
+  end.
+
+(* Test case: 2 + 1 *)
+Definition test_W : W Bool B_nat := wplus wTwo wOne.

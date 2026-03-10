@@ -1,18 +1,31 @@
--- Identity type for Christine
--- Formation: Id A a b
--- Introduction: Refl a
--- Elimination: J A a b C d p
+(* Intensional Equality for Christine *)
 
-module Data.Eq where
+Module Data.Eq.
 
-data Eq A (a: A) : A -> Type where
-    Refl : Eq A a a
+Inductive Eq (A: Type) (x: A) (y: A) :=
+| Refl : Eq A x x.
 
-sym A a b (p: Eq A a b) : Eq A b a =
-    J A a b (\x y p -> Eq A y x) (\x -> Refl x) p
+Definition J (A: Type) (x: A) (P: forall (y: A), forall (p: Eq A x y), Type) (f: P x (Refl A x x)) (y: A) (p: Eq A x y) : P y p :=
+  match p with
+  | Refl => f
+  end.
 
-trans A a b c (p: Eq A a b) (q: Eq A b c) : Eq A a c =
-    J A a b (\x y p -> Eq A b c -> Eq A a c) (\x q -> q) p q
+Definition transport (A: Type) (P: forall (x: A), Type) (x: A) (y: A) (p: Eq A x y) (u: P x) : P y :=
+  match p with
+  | Refl => u
+  end.
 
-cong A B (f: A -> B) a b (p: Eq A a b) : Eq B (f a) (f b) =
-    J A a b (\x y p -> Eq B (f x) (f y)) (\x -> Refl (f x)) p
+Definition cong (A: Type) (B: Type) (f: forall (x: A), B) (x: A) (y: A) (p: Eq A x y) : Eq B (f x) (f y) :=
+  match p with
+  | Refl => Refl B (f x) (f x)
+  end.
+
+Definition sym (A: Type) (x: A) (y: A) (p: Eq A x y) : Eq A y x :=
+  match p with
+  | Refl => Refl A x x
+  end.
+
+Definition trans (A: Type) (x: A) (y: A) (z: A) (p: Eq A x y) (q: Eq A y z) : Eq A x z :=
+  match p with
+  | Refl => q
+  end.

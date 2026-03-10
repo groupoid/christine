@@ -388,27 +388,14 @@ CIC [1], Section 4.5; Identity Type Elimination Rule).</p>
             <h2>Announcement</h2>
             <div style="max-width:720px;margin:0 auto;">
                 <pre class="code-snippet">
-https://christine.groupoid.space/
-
-  🧊 Christine MLTT/CIC Theorem Prover version 0.3.11
-
-For help type `help`.
-Starting proof for: Π(n : Nat).Nat
-Goal 1:
-Context: []
-⊢ Π(n : Nat).Nat
-
-1 goals remaining
-> intro x
-Goal 1:
-Context: [(x : Nat); ]
-⊢ Nat
-
-1 goals remaining
-> assumption
-0 goals remaining
-Proof complete!
-Final term: x
+tonpa@Sky-M4 christine % mix christine.repl
+Christine REPL (Coq-like syntax)
+Christine> Theorem plus_0_n : forall (n: Nat), Eq Nat (plus Zero n) n.
+Proof started for plus_0_n
+Proof> intro n.
+Proof> exact (Refl Nat n n).
+Goal solved!
+Proof>
 </pre>
 
 </div>

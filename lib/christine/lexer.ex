@@ -1,6 +1,6 @@
 defmodule Christine.Lexer do
   @moduledoc """
-  Lexer for Christine (TODO: Change Miranda-like syntax to Coq-like syntax).
+  Lexer for Christine (Coq 8.2-like syntax).
   """
 
   def lex(input) do
@@ -14,11 +14,23 @@ defmodule Christine.Lexer do
   defp lex([?\r | rest], line, col, acc), do: lex(rest, line, col, acc)
   defp lex([?\t | rest], line, col, acc), do: lex(rest, line, col + 4, acc)
 
-  # Comments (PureScript/Haskell style --)
+  # Comments (Coq style (* *) or -- for now, keeping -- to avoid breaking logic)
+  defp lex([?(, ?* | rest], line, col, acc) do
+    {rest2, line2, col2} = skip_comment(rest, line, col + 2)
+    lex(rest2, line2, col2, acc)
+  end
+
   defp lex([?-, ?- | rest], line, col, acc) do
     rest2 = Enum.drop_while(rest, fn c -> c != ?\n end)
     lex(rest2, line, col, acc)
   end
+
+  # Arrow, Backslash
+  defp lex([?-, ?> | rest], line, col, acc),
+    do: lex(rest, line, col + 2, [{:arrow, line, col} | acc])
+
+  defp lex([?\\ | rest], line, col, acc),
+    do: lex(rest, line, col + 1, [{:backslash, line, col} | acc])
 
   # Special symbols
   defp lex([?( | rest], line, col, acc),
@@ -39,10 +51,8 @@ defmodule Christine.Lexer do
   defp lex([?} | rest], line, col, acc),
     do: lex(rest, line, col + 1, [{:right_brace, line, col} | acc])
 
-  defp lex([?, | rest], line, col, acc), do: lex(rest, line, col + 1, [{:comma, line, col} | acc])
-
-  defp lex([?; | rest], line, col, acc),
-    do: lex(rest, line, col + 1, [{:semicolon, line, col} | acc])
+  defp lex([?| | rest], line, col, acc),
+    do: lex(rest, line, col + 1, [{:pipe, line, col} | acc])
 
   defp lex([?., ?. | rest], line, col, acc),
     do: lex(rest, line, col + 2, [{:dotdot, line, col} | acc])
@@ -50,12 +60,10 @@ defmodule Christine.Lexer do
   defp lex([?. | rest], line, col, acc),
     do: lex(rest, line, col + 1, [{:dot, line, col} | acc])
 
-  # Arrow, Backslash
-  defp lex([?-, ?> | rest], line, col, acc),
-    do: lex(rest, line, col + 2, [{:arrow, line, col} | acc])
+  defp lex([?, | rest], line, col, acc), do: lex(rest, line, col + 1, [{:comma, line, col} | acc])
 
-  defp lex([?\\ | rest], line, col, acc),
-    do: lex(rest, line, col + 1, [{:backslash, line, col} | acc])
+  defp lex([?; | rest], line, col, acc),
+    do: lex(rest, line, col + 1, [{:semicolon, line, col} | acc])
 
   # Numbers
   defp lex([c | rest], line, col, acc) when c >= ?0 and c <= ?9 do
@@ -71,19 +79,56 @@ defmodule Christine.Lexer do
     ident = List.to_string(ident_chars)
 
     case ident do
-      "module" -> lex(rest2, line, col + String.length(ident), [{:module, line, col} | acc])
-      "where" -> lex(rest2, line, col + String.length(ident), [{:where, line, col} | acc])
-      "import" -> lex(rest2, line, col + String.length(ident), [{:import, line, col} | acc])
-      "data" -> lex(rest2, line, col + String.length(ident), [{:data, line, col} | acc])
-      "let" -> lex(rest2, line, col + String.length(ident), [{:let, line, col} | acc])
-      "in" -> lex(rest2, line, col + String.length(ident), [{:in, line, col} | acc])
-      "if" -> lex(rest2, line, col + String.length(ident), [{:if_kw, line, col} | acc])
-      "then" -> lex(rest2, line, col + String.length(ident), [{:then_kw, line, col} | acc])
-      "else" -> lex(rest2, line, col + String.length(ident), [{:else_kw, line, col} | acc])
-      "case" -> lex(rest2, line, col + String.length(ident), [{:case, line, col} | acc])
-      "of" -> lex(rest2, line, col + String.length(ident), [{:of, line, col} | acc])
-      "foreign" -> lex(rest2, line, col + String.length(ident), [{:foreign, line, col} | acc])
-      _ -> lex(rest2, line, col + String.length(ident), [{:ident, line, col, ident} | acc])
+      "Module" ->
+        lex(rest2, line, col + String.length(ident), [{:module, line, col} | acc])
+
+      "Definition" ->
+        lex(rest2, line, col + String.length(ident), [{:definition, line, col} | acc])
+
+      "Theorem" ->
+        lex(rest2, line, col + String.length(ident), [{:theorem, line, col} | acc])
+
+      "Proof" ->
+        lex(rest2, line, col + String.length(ident), [{:proof_kw, line, col} | acc])
+
+      "Qed" ->
+        lex(rest2, line, col + String.length(ident), [{:qed, line, col} | acc])
+
+      "Inductive" ->
+        lex(rest2, line, col + String.length(ident), [{:inductive_kw, line, col} | acc])
+
+      "forall" ->
+        lex(rest2, line, col + String.length(ident), [{:forall, line, col} | acc])
+
+      "fun" ->
+        lex(rest2, line, col + String.length(ident), [{:fun_kw, line, col} | acc])
+
+      "match" ->
+        lex(rest2, line, col + String.length(ident), [{:match_kw, line, col} | acc])
+
+      "with" ->
+        lex(rest2, line, col + String.length(ident), [{:with_kw, line, col} | acc])
+
+      "end" ->
+        lex(rest2, line, col + String.length(ident), [{:end_kw, line, col} | acc])
+
+      "Type" ->
+        lex(rest2, line, col + String.length(ident), [{:type_kw, line, col} | acc])
+
+      "Prop" ->
+        lex(rest2, line, col + String.length(ident), [{:prop_kw, line, col} | acc])
+
+      "import" ->
+        lex(rest2, line, col + String.length(ident), [{:import, line, col} | acc])
+
+      "let" ->
+        lex(rest2, line, col + String.length(ident), [{:let, line, col} | acc])
+
+      "in" ->
+        lex(rest2, line, col + String.length(ident), [{:in, line, col} | acc])
+
+      _ ->
+        lex(rest2, line, col + String.length(ident), [{:ident, line, col, ident} | acc])
     end
   end
 
@@ -99,9 +144,11 @@ defmodule Christine.Lexer do
 
     token =
       case op do
-        "=" -> {:=, line, col}
+        ":=" -> {:assign, line, col}
+        "=>" -> {:fat_arrow, line, col}
         "|" -> {:pipe, line, col}
         ":" -> {:colon, line, col}
+        "->" -> {:arrow, line, col}
         _ -> {:operator, line, col, op}
       end
 
@@ -120,6 +167,11 @@ defmodule Christine.Lexer do
   defp lex([c | _rest], line, col, _acc) do
     {:error, "Unexpected character: #{<<c::utf8>>} at #{line}:#{col}"}
   end
+
+  defp skip_comment([?*, ?) | rest], line, col), do: {rest, line, col + 2}
+  defp skip_comment([?\n | rest], line, _col), do: skip_comment(rest, line + 1, 1)
+  defp skip_comment([_ | rest], line, col), do: skip_comment(rest, line, col + 1)
+  defp skip_comment([], line, col), do: {[], line, col}
 
   defp take_ident([c | rest])
        when (c >= ?a and c <= ?z) or (c >= ?A and c <= ?Z) or (c >= ?0 and c <= ?9) or c == ?_ or

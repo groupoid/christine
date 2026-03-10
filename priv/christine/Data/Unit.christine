@@ -1,7 +1,6 @@
--- Unit datatype for Christine
+(* Unit type for Christine *)
 
-module Data.Unit where
+Module Data.Unit.
 
-data Unit = tt
-
-unit = tt
+Inductive Unit :=
+| tt.

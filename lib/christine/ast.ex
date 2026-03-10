@@ -84,6 +84,14 @@ defmodule Christine.AST do
     defstruct [:name, :args]
   end
 
+  defmodule Number do
+    defstruct [:value]
+  end
+
+  defmodule String do
+    defstruct [:value]
+  end
+
   # --- Pretty Printing ---
 
   def to_string(term) do
@@ -143,6 +151,12 @@ defmodule Christine.AST do
           end)
 
         "let #{decls_str} in #{to_string(body)}"
+
+      %Number{value: v} ->
+        inspect(v)
+
+      %String{value: s} ->
+        inspect(s)
 
       _ ->
         inspect(term)

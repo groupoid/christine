@@ -1,15 +1,16 @@
--- Dependent pair type for Christine
--- Formation: Sigma A B
--- Introduction: Pair a b
--- Elimination: Fst p, Snd p
+(* Sigma Types (Dependent Pairs) for Christine *)
 
-module Data.Sigma where
+Module Data.Sigma.
 
-data Sigma (A: Type) (B: A -> Type) where
-    Pair : (a: A) -> B a -> Sigma A B
+Inductive Sigma (A: Type) (B: forall (x: A), Type) :=
+| DPair (x: A) (y: B x).
 
-fst (A: Type) (B: A -> Type) (p: Sigma A B) : A =
-    case p of Pair a b -> a
+Definition pr1 (A: Type) (B: forall (x: A), Type) (p: Sigma A B) : A :=
+  match p with
+  | DPair x y => x
+  end.
 
-snd (A: Type) (B: A -> Type) (p: Sigma A B) : B (fst A B p) =
-    case p of Pair a b -> b
+Definition pr2 (A: Type) (B: forall (x: A), Type) (p: Sigma A B) : B (pr1 A B p) :=
+  match p with
+  | DPair x y => y
+  end.

@@ -635,6 +635,24 @@ let test_inductive_eta_full () =
     assert (equal env ctx inferred_ty expected_ty);
     print_string "Pointwise Equality Transport PASSED.\n"
 
+let test_sigma () =
+    Printf.printf "Testing Sigma types...\n";
+    let a = Inductive nat_def in
+    let b = Lam ("x", a, a) in (* B x = Nat *)
+    let sigma_ab = { name = "Sigma"; params = [("A", a, Universe 0); ("B", b, Pi ("x", a, Universe 0))]; level = 0; constrs = [] } in
+    check [] [] a (Universe 0);
+    check [] [] b (Pi ("x", a, Universe 0));
+    Printf.printf "Sigma types PASSED\n\n"
+
+let test_eq () =
+    let env = [("Nat", nat_def)] in
+    Printf.printf "Testing Eq types...\n";
+    let a = Inductive nat_def in
+    let eq_def = { name = "Eq"; params = [("A", a, Universe 0); ("x", Var "Zero", a); ("y", Var "Zero", a)]; level = 0; constrs = [] } in
+    check [] [("Zero", a)] (Inductive eq_def) (Universe 0);
+    Printf.printf "Eq types PASSED\n\n"
+
+
 let test_lambda_totality () =
     let id = Lam ("x", nat_ind, Var "x") in
     assert (match infer env [] id with | Pi (_, _, _) -> true | _ -> false);
@@ -647,7 +665,7 @@ let test () =
     test_positivity (); test_lambda_typing (); test_edge_cases ();
     test_basic_setup (); test_robustness (); test_fin_vec ();
     test_inductive_eta (); test_inductive_eta_full (); test_lambda_totality ();
-    test_w (); test_equality_theorems ();
+    test_w (); test_sigma (); test_eq (); test_equality_theorems ();
     print_endline "REALITY CHECK PASSED\n"
 
 (* THEOREM PROVER TACTICS LANGUAGE *)

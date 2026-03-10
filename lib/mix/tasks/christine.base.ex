@@ -22,7 +22,9 @@ defmodule Mix.Tasks.Christine.Base do
       "priv/christine/Data/Tree.christine",
       "priv/christine/Data/Fin.christine",
       "priv/christine/Data/Vec.christine",
-      "priv/christine/Data/W.christine"
+      "priv/christine/Data/W.christine",
+      "priv/christine/Data/Sigma.christine",
+      "priv/christine/Data/Eq.christine"
     ]
 
     out_dir = "ebin"

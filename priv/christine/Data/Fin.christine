@@ -1,5 +1,7 @@
--- Finite sets for Christine
+(* Finite sets for Christine *)
 
-module Data.Fin where
+Module Data.Fin.
 
-data Fin N = FZero N | FSucc N (Fin N)
+Inductive Fin (n: Nat) :=
+| Fone (n: Nat)
+| Fsucc (n: Nat) (f: Fin n).

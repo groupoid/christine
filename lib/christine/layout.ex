@@ -35,7 +35,8 @@ defmodule Christine.Layout do
         {blocks, acc}
       end
 
-    wait_next = elem(tok, 0) in [:where, :of, :let]
+    wait_next =
+      elem(tok, 0) in [:where, :of, :let, :inductive_kw, :definition, :theorem, :module, :assign]
 
     process(rest, blocks, line, wait_next, [tok | acc])
   end

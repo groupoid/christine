@@ -1,23 +1,43 @@
--- Christine Prelude
+(* Christine Prelude *)
 
-module Prelude where
+Module Prelude.
 
-data Empty =
+Inductive Empty := .
 
-data Unit = tt
+Inductive Unit := tt.
 
-data Bool = False | True
+Inductive Bool :=
+| False
+| True.
 
-data Nat = Zero | Succ Nat
+Inductive Nat :=
+| Zero
+| Succ (n: Nat).
 
-id x = x
+Definition id (A: Type) (x: A) : A := x.
 
-plus m n = case n of
-    Zero -> m
-    Succ k -> Succ (plus m k)
+Definition plus (m: Nat) (n: Nat) : Nat :=
+  match n with
+  | Zero => m
+  | Succ k => Succ (plus m k)
+  end.
 
-data List A = Nil | Cons A (List A)
+Inductive List (A: Type) :=
+| Nil
+| Cons (x: A) (xs: List A).
 
-length l = case l of
-    Nil -> Zero
-    Cons x xs -> Succ (length xs)
+Definition depth (A: Type) (t: Tree A) : Nat :=
+  match t with
+  | Leaf => Zero
+  | Node l v r => Succ (max (depth A l) (depth A r))
+  end.
+
+Definition max (m: Nat) (n: Nat) : Nat :=
+  match m with
+  | Zero => n
+  | Succ k =>
+    match n with
+    | Zero => m
+    | Succ j => Succ (max k j)
+    end
+  end.

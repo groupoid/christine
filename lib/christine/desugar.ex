@@ -37,6 +37,7 @@ defmodule Christine.Desugar do
         env
       ) do
     desugared_where = Enum.map(where_decls || [], &desugar_decl(&1, env))
+
     expr_with_where =
       if desugared_where == [] do
         expr
@@ -44,27 +45,51 @@ defmodule Christine.Desugar do
         decls_list = Enum.map(desugared_where, fn d -> {d.name, d.expr} end)
         %AST.Let{decls: decls_list, body: expr}
       end
+
     body =
       Enum.reduce(Enum.reverse(binders), desugar_expression(expr_with_where, env, name), fn
+        {vn, vt}, acc ->
+          %AST.Lam{name: vn, domain: desugar_expression(vt, env), body: acc}
+
         %AST.Var{name: vn}, acc ->
+          # Fallback for simple binders if any
           %AST.Lam{name: vn, domain: %AST.Universe{level: 0}, body: acc}
       end)
 
     %AST.DeclValue{name: name, binders: [], expr: body}
   end
 
-  def desugar_decl(%AST.DeclData{name: name, params: params, constructors: constructors}, _env) do
-    ind_params = Enum.map(params, fn p -> {p, %AST.Universe{level: 0}} end)
+  def desugar_decl(%AST.DeclData{name: name, params: params, constructors: constructors}, env) do
+    # params is list of {name, type}
+    ind_params = Enum.map(params, fn {n, ty} -> {n, ty} end)
+
+    # default result type should be (name param1 param2 ...)
+    default_res_type =
+      Enum.reduce(params, %AST.Var{name: name}, fn {pname, _pty}, acc ->
+        %AST.App{func: acc, arg: %AST.Var{name: pname}}
+      end)
 
     constrs =
       Enum.with_index(constructors, 1)
-      |> Enum.map(fn {{cname, args}, idx} ->
-        ty =
-          Enum.reduce(Enum.reverse(args), %AST.Var{name: name}, fn arg, acc ->
-            %AST.Pi{name: "_", domain: arg, codomain: acc}
+      |> Enum.map(fn {{cname, cparams, ctype}, idx} ->
+        # Use explicit ctype if available, else default_res_type
+        # When desugaring ctype, we need the inductive name in scope
+        # and its parameters (but Pi takes care of that later)
+        res_type = if ctype, do: desugar_expression(ctype, env), else: default_res_type
+
+        # Type includes cparams then inductive params
+        # In CIC, it's usually (params) -> (cparams) -> (res_type)
+        inner_ty =
+          Enum.reduce(Enum.reverse(cparams), res_type, fn {_pname, pty}, acc ->
+            %AST.Pi{name: "_", domain: pty, codomain: acc}
           end)
 
-        {idx, cname, ty}
+        full_ty =
+          Enum.reduce(Enum.reverse(params), inner_ty, fn {pname, pty}, acc ->
+            %AST.Pi{name: pname, domain: pty, codomain: acc}
+          end)
+
+        {idx, cname, full_ty}
       end)
 
     %AST.Inductive{name: name, params: ind_params, level: 0, constrs: constrs}
@@ -76,6 +101,9 @@ defmodule Christine.Desugar do
     case expr do
       %AST.Lambda{binders: binders, body: body} ->
         Enum.reduce(Enum.reverse(binders), desugar_expression(body, env, func_name), fn
+          {vn, vt}, acc ->
+            %AST.Lam{name: vn, domain: desugar_expression(vt, env), body: acc}
+
           %AST.Var{name: vn}, acc ->
             %AST.Lam{name: vn, domain: %AST.Universe{level: 0}, body: acc}
         end)
@@ -125,6 +153,21 @@ defmodule Christine.Desugar do
                 case pat do
                   %AST.BinderConstructor{args: args} when args != [] ->
                     Enum.reduce(Enum.reverse(args), desugar_expression(body, env, func_name), fn
+                      {k, _}, acc ->
+                        ih_name = "ih_#{k}"
+                        # Recursive call replacement
+                        acc_with_ih = replace_recursion(acc, func_name, k, ih_name)
+
+                        %AST.Lam{
+                          name: k,
+                          domain: %AST.Var{name: "Any"},
+                          body: %AST.Lam{
+                            name: ih_name,
+                            domain: %AST.Var{name: "Any"},
+                            body: acc_with_ih
+                          }
+                        }
+
                       %AST.Var{name: k}, acc ->
                         ih_name = "ih_#{k}"
                         # Recursive call replacement

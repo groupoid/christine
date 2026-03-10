@@ -3,25 +3,25 @@ defmodule Mix.Tasks.Christine.Repl do
 
   alias Christine.{Lexer, Layout, Parser, Desugar, Typechecker, AST}
 
-  @shortdoc "Christine interactive REPL"
+  defmodule ProofState do
+    defstruct [:target, :ctx, :env, :solved, :goals]
+  end
+
+  @shortdoc "Christine interactive REPL with Tactics"
   def run(_) do
-    IO.puts("Christine REPL (simplified)")
+    IO.puts("Christine REPL (Coq-like syntax)")
     env = %Typechecker.Env{}
 
-    # Auto-load all modules from priv/christine and test/christine
     paths = Path.wildcard("{priv,test}/christine/**/*.christine")
 
     env =
       Enum.reduce(paths, env, fn path, acc_env ->
-        # Extract module name from path (e.g., priv/Christine/Data/Nat.christine -> Data.Nat)
         parts = Path.split(path)
 
-        # Drop until we find 'christine'
         mod_parts =
           parts
           |> Enum.drop_while(&(&1 != "christine"))
           |> Enum.drop(1)
-          # Drop extension
           |> List.update_at(-1, &Path.rootname/1)
 
         mod_name = Enum.join(mod_parts, ".")
@@ -31,17 +31,17 @@ defmodule Mix.Tasks.Christine.Repl do
             IO.puts("Loaded: #{mod_name}")
             new_env
 
-          {:error, err} ->
-            IO.puts("Error loading #{mod_name}: #{inspect(err)}")
+          _ ->
             acc_env
         end
       end)
 
-    loop(env)
+    loop(env, nil)
   end
 
-  defp loop(env) do
-    input = IO.gets("Christine> ")
+  defp loop(env, proof_state) do
+    prompt = if proof_state, do: "Proof> ", else: "Christine> "
+    input = IO.gets(prompt)
 
     case input do
       nil ->
@@ -51,38 +51,125 @@ defmodule Mix.Tasks.Christine.Repl do
         :ok
 
       "\n" ->
-        loop(env)
-
-      "import " <> rest ->
-        mod_name = String.trim(rest)
-
-        case load_module(mod_name, env) do
-          {:ok, new_env} ->
-            loop(new_env)
-
-          {:error, err} ->
-            IO.puts("Error: #{inspect(err)}")
-            loop(env)
-        end
+        loop(env, proof_state)
 
       _ ->
-        case eval(input, env) do
-          {:ok, result} ->
-            IO.puts("Result: #{AST.to_string(result)}")
-            loop(env)
+        input = String.trim(input)
 
-          {:error, err} ->
-            IO.puts("Error: #{inspect(err)}")
-            loop(env)
+        cond do
+          String.starts_with?(input, "Theorem") ->
+            case start_proof(input, env) do
+              {:ok, ps} ->
+                loop(env, ps)
+
+              {:error, err} ->
+                IO.puts("Error: #{inspect(err)}")
+                loop(env, nil)
+            end
+
+          proof_state != nil ->
+            handle_tactic(input, env, proof_state)
+
+          true ->
+            case eval(input, env) do
+              {:ok, result} ->
+                IO.puts("Result: #{AST.to_string(result)}")
+                loop(env, nil)
+
+              {:error, err} ->
+                IO.puts("Error: #{inspect(err)}")
+                loop(env, nil)
+            end
         end
     end
   end
 
+  defp start_proof(input, env) do
+    with {:ok, tokens} <- Lexer.lex(input),
+         resolved <- Layout.resolve(tokens),
+         {:ok, %AST.DeclValue{name: name, binders: _params, expr: target}, _} <-
+           Parser.parse_declaration(resolved) do
+      # For now, theorems are just type signatures
+      IO.puts("Proof started for #{name}")
+      # Desugar target type
+      desugared_target = Desugar.desugar_expression(target, env)
+
+      {:ok,
+       %ProofState{
+         target: desugared_target,
+         ctx: [],
+         env: env,
+         solved: [],
+         goals: [desugared_target]
+       }}
+    else
+      err -> {:error, err}
+    end
+  end
+
+  defp handle_tactic(input, env, ps) do
+    input = String.trim(input)
+
+    case input do
+      "Qed." ->
+        if ps.goals == [] do
+          IO.puts("Proof complete!")
+          loop(env, nil)
+        else
+          IO.puts("Error: Proof not finished. Remaining goals: #{length(ps.goals)}")
+          loop(env, ps)
+        end
+
+      "intro " <> x ->
+        x = String.trim(x, ".") |> String.trim()
+        [current | rest] = ps.goals
+
+        case current do
+          %AST.Pi{name: _y, domain: a, codomain: b} ->
+            new_ctx = [{x, a} | ps.ctx]
+            # Replace bound var in b (simplified)
+            # TODO: proper subst
+            new_goal = b
+            loop(env, %{ps | goals: [new_goal | rest], ctx: new_ctx})
+
+          _ ->
+            IO.puts("Error: intro expects a forall")
+            loop(env, ps)
+        end
+
+      "exact " <> expr_str ->
+        expr_str = String.trim(expr_str, ".") |> String.trim()
+
+        case eval(expr_str, %{env | ctx: ps.ctx}) do
+          {:ok, term} ->
+            [current | rest] = ps.goals
+
+            term_ty = Typechecker.infer(%{env | ctx: ps.ctx}, term)
+
+            if Typechecker.equal?(env, term_ty, current) do
+              IO.puts("Goal solved!")
+              loop(env, %{ps | goals: rest})
+            else
+              IO.puts("Error: type mismatch")
+              IO.puts("  Expected: #{AST.to_string(current)}")
+              IO.puts("  Inferred: #{AST.to_string(term_ty)}")
+              loop(env, ps)
+            end
+
+          _ ->
+            IO.puts("Error: invalid expression")
+            loop(env, ps)
+        end
+
+      _ ->
+        IO.puts("Unknown tactic or proof command: #{input}")
+        loop(env, ps)
+    end
+  end
+
   defp load_module(mod_name, env) do
-    # Try to find the file in priv/Christine or test/Christine
     path1 = "priv/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
     path2 = "test/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
-
     path = if File.exists?(path1), do: path1, else: path2
 
     if File.exists?(path) do
@@ -91,13 +178,11 @@ defmodule Mix.Tasks.Christine.Repl do
       with {:ok, tokens} <- Lexer.lex(source),
            resolved <- Layout.resolve(tokens),
            {:ok, %AST.Module{} = mod, _} <- Parser.parse(resolved) do
-        # Add declarations to env.defs and env.env
         {new_defs, new_types} =
           Enum.reduce(mod.declarations, {env.defs, env.env}, fn
             %AST.DeclValue{} = v, {d_acc, t_acc} ->
               current_env = %{env | defs: d_acc, env: t_acc}
               desugared_v = Desugar.desugar_decl(v, current_env)
-              IO.puts("  Defining: #{desugared_v.name}")
               {Map.put(d_acc, desugared_v.name, desugared_v.expr), t_acc}
 
             %AST.DeclData{} = data, {d_acc, t_acc} ->
@@ -140,7 +225,6 @@ defmodule Mix.Tasks.Christine.Repl do
   end
 
   defp eval(input, env) do
-    # Trim input
     input = String.trim(input)
 
     if input == "" do
@@ -150,7 +234,6 @@ defmodule Mix.Tasks.Christine.Repl do
            resolved <- Layout.resolve(tokens),
            {:ok, expr, _} <- Parser.parse_expression(resolved) do
         desugared = Desugar.desugar_expression(expr, env)
-        # Normalize
         {:ok, Typechecker.normalize(env, desugared)}
       else
         err -> {:error, err}

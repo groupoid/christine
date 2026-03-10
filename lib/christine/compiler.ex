@@ -11,7 +11,16 @@ defmodule Christine.Compiler do
       env = resolve_imports(ast, %Christine.Typechecker.Env{}, opts)
       env = collect_local_names(ast, env)
       desugared = Desugar.desugar(ast, env)
-      final_env = populate_local_env(desugared, env)
+
+      final_env =
+        populate_local_env(desugared, %{
+          env
+          | ctx: [
+              {"Number", %AST.Universe{level: 0}},
+              {"String", %AST.Universe{level: 0}} | env.ctx
+            ]
+        })
+
       typecheck_res =
         if Keyword.get(opts, :typecheck, true) do
           case Christine.Typechecker.check_module(desugared, final_env) do
@@ -34,7 +43,7 @@ defmodule Christine.Compiler do
         end
       end
     else
-      {:error, _} = err -> err
+      err -> err
     end
   end
 
