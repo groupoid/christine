@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christine — Coq for Ericsson Erlang/OTP</title>
+    <link rel="stylesheet" href="index.css?v=5">
+</head>
+<body>
+    <nav class="sticky">
+        <div class="nav-container">
+            <a href="https://groupoid.space" class="logo"><img width=50 style="padding-top:-30px;margin-bottom:-15px;" src="https://avatars.githubusercontent.com/u/17128096?s=200&v=4"></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Language</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero-content">
+            <h1>Christine</h1>
+
+    </header>
+
+    <main>
+        <section>
+            <h2>Abstract</h2>
+            <div style="max-width:720px;margin:0 auto;"><b>Christine</b> is a MLTT/CIC tactical theorem prover with Erlang/OTP bycode extraction,
+               implemented in <b>Elixir</b>, constitutes a minimal core for a dependently-typed lambda calculus resembling Coq's syntax and semantics,
+               constrained to exclude pattern matching, let-bindings, implicit arguments, modules, namespaces,
+               and function extensionality. It encompasses universes, dependent products Pi, dependent pairs Sigma,
+               identity types Id, and Inductive types with strict positivity enforcement. Recent refinements ensure
+               totality for user-defined lambda terms via a positive occurrence check. Its mathematical properties,
+               focusing on correctness, soundness, totality, canonicity, decidability and related attributes
+               relevant to formal mathematics are being analyzed.</p>
+            <div style="float:inline;align:center;margin-left:-23px;" class="code-snippet">
+Definition one := (S O).
+Definition two : nat := S one.
+Definition three : nat := S two.
+Definition double (m:nat) := plus m m.
+Definition add_n (m:nat) := plus m n.
+
+Goal (A -> B -> C) -> (A -> B) -> A -> C.
+  intro H.
+  intros H' HA.
+  apply H.
+  exact HA.
+  apply H'.
+  assumption.
+  Save trivial_lemma.
+
+Lemma distr_impl : (A -> B -> C) -> (A -> B) -> A -> C.
+  intros.
+  Abort.
+
+Lemma and_commutative : A /\ B -> B /\ A.
+  intro.
+  elim H.
+  split.
+  Restart.
+  Qed.
+        </div>
+        </div>
+        </section>
+        <section>
+            <h2>Features</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <h3>Art &amp; Science</h3>
+                    <p>Chistine combines the simplicity of Frank and the power of Tactical Equational Reasoning.
+                       It constitutes the core of the Coq (Rocq) type checker.</p>
+                </div>
+                <div class="product-card">
+                    <h3>Correct and Canonical</h3>
+                    <p>Unlike Hindley-Milner and other strongly typed non-consistent languages Christine
+                       remains Sound, Complete, Canonical, Total, Consistent, Decidable, and Conservative.</p>
+                </div>
+                <div class="product-card">
+                    <h3>Runtime Extraction</h3>
+                    <p>Ready for production code extraction for Erlang/OTP and AtomVM (GRiSP).</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Intro</h2>
+
+            <div style="max-width:720px;margin:0 auto;">
+The type checker operates over a term syntax comprising:
+* `Universe i`: Type universes with level `i ∈ ℕ`.
+* `Pi (x, A, B)`: Dependent function, where `A : Universe i` and `B : Universe j` under `x : A`.
+  `Lam (x, A, t)`: Lambda abstraction with totality enforced.
+  `App (f, a)`: Function application.
+* `Sigma (x, A, B)`: Dependent pair types.
+  `Pair (a, b)`, `Fst p`, `Snd p` construction and projections.
+* `Id (A, a, b)`: Identity type, with `Refl` a and `J` eliminator.
+* `Inductive d`: Inductive types with intros `Constr` and eliminator `Ind`.
+            </div>
+
+        </section>
+
+        <section>
+            <h2>Syntax</h2>
+
+            <div style="max-width:720px;margin:0 auto;">
+                <pre class="code-snippet">
+type term =
+  | Var of name
+  | Universe of level
+  | Pi of name * term * term
+  | Lam of name * term * term
+  | App of term * term
+  | Sigma of name * term * term
+  | Pair of term * term
+  | Fst of term
+  | Snd of term
+  | Id of term * term * term
+  | Refl of term
+  | J of term * term * term * term * term * term (* J A a b C d p *)
+  | Inductive of inductive
+  | Constr of int * inductive * term list
+  | Elim of inductive * term * term list * term
+
+type inductive = {
+  name : string;
+  params : (name * term) list;
+  level : level;
+  constrs : (int * term) list
+}
+
+type goal = {
+  ctx : context;     (* Current context *)
+  target : term;     (* Type to prove *)
+  id : int;          (* Goal identifier *)
+}
+
+type proof_state = {
+  goals : goal list; (* List of open goals *)
+  solved : (int * term) list; (* Solved goals with their terms *)
+}
+
+let initial_state target = {
+  goals = [{ ctx = empty_ctx; target; id = 1 }];
+  solved = [];
+}
+
+type tactic =
+  | Intro of name    (* Introduce a variable *)
+  | Elim of term     (* Case analysis *)
+  | Apply of term    (* Apply a term or hypothesis *)
+  | Assumption       (* Use a hypothesis from context *)
+  | Auto             (* Simple automation *)
+  | Exact of term    (* Provide an exact term *)
+
+</pre>
+            </div>
+
+        </section>
+
+
+        <section>
+            <h2>Semantics</h2>
+
+            <div style="max-width:720px;margin:0 auto;">
+
+            <h3>Syntactic Equality</h3>
+
+<p>The function <b>equal</b> implements judgmental equality with substitution to handle bound variables,
+avoiding explicit α-conversion by assuming fresh names (a simplification
+over full de Bruijn indices [3]). The recursive descent ensures congruence,
+but lacks normalization, making it weaker than CIC’s definitional equality,
+which includes β-reduction.</p>
+
+<p><b>Terminal Cases</b>: Variables `Var x` are equal if names match; universes `Universe i` if levels are identical.
+<b>Resursive Cases</b>: `App (f, arg)` requires equality of function and argument.
+`Pi (x, a, b)` compares domains and codomains, adjusting for variable renaming via substitution.
+`Inductive d` checks name, level, and parameters.
+`Constr` and `Elim` compare indices, definitions, and arguments/cases.
+<b>Default</b>: Returns false for mismatched constructors.</p>
+
+<p><b>Theorem</b>. Equality is reflexive, symmetric, and transitive modulo
+α-equivalence (cf. [1], Section 2). For `Pi (x, a, b)` and `Pi (y, a', b')`,
+equality holds if `a = a'` and `b[x := Var x] = b'[y := Var x]`,
+ensuring capture-avoiding substitution preserves meaning.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Context Variables Lookup</h3>
+
+            <p>The function <b>lookup_var</b> retrieves a variable’s type from the context.
+Context are the objects in the Substitutions categories.
+Searches `ctx` for `(x, ty)` using `List.assoc`. Returns `Some ty` if found, `None` otherwise.</p>
+
+<p><b>Theorem</b>: Context lookup is well-defined under uniqueness
+of names (cf. [1], Section 3). If `ctx = Γ, x : A, Δ`,
+then `lookup_var ctx x = Some A`.</p>
+
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Substitution Calculus</h3>
+
+
+            <p>The function <b>subst</b> substitute term `s` for variable `x` in term `t`.
+Substitutions are morphisms in Substitution categorties.</p>
+
+<p>The capture-avoiding check `if x = y` prevents variable capture
+but assumes distinct bound names, a simplification over full
+renaming or de Bruijn indices. For Elim, substituting in the
+motive and cases ensures recursive definitions remain sound,
+aligning with CIC’s eliminator semantics.</p>
+
+<p>Var: Replaces `x` with `s`, leaves others unchanged.
+Pi/Lam: Skips substitution if bound variable shadows `x`, else recurses on domain and body.
+App/Constr/Elim: Recurses on subterms.
+Inductive: No substitution (assumes no free variables).</p>
+
+<p><b>Theorem</b>. Substitution preserves typing (cf. [13], Lemma 2.1).
+If `Γ ⊢ t : T` and `Γ ⊢ s : A`, then `Γ ⊢ t[x := s] : T[x := s]`
+under suitable conditions on x.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Inductive Instantiation</h3>
+            <p>The function <b>apply_inductive</b> instantiates an inductive type’s constructors with parameters, used only in infer_Ind.</p>
+            <p>This function ensures type-level parametricity, critical for polymorphic inductives like List A. The fold-based substitution
+               avoids explicit recursion, leveraging OCaml’s functional style, but assumes args are well-typed, deferring validation to infer.
+               1) Validates argument count against d.params.
+            2) Substitutes each parameter into constructor types using subst_param.</p>
+            <p>Theorem: Parameter application preserves inductiveness (cf. [4], Section 4).
+               If D is an inductive type with parameters P, then D[P] is well-formed with substituted constructors.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Context Variables Lookup</h3>
+            <p>The function <b>infer_ctor</b> validates constructor arguments against its type.</p>
+            <p>This function implements the dependent application rule for constructors,
+               ensuring each argument satisfies the constructor’s domain type in sequence.
+               The recursive descent mirrors the structure of Pi types, where ty is peeled
+               layer by the layer, and subst x arg b updates the type for the next argument.
+               1) Recursively matches ty (a Pi chain) with args, checking each argument and substituting.
+               2) Returns the final type when all arguments are consumed.</p>
+            <p>Theorem. Constructor typing is preserved (cf. [1], Section 4, Application Rule; [1], Section 4.3).
+               If ctx ⊢ c : Π (x:A), B and ctx ⊢ a : A, then ctx ⊢ c a : B[x := a].</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Infer General Induction</h3>
+            <p>The function <b>infer_Ind</b> type-checks an dependent elimination (induction principle) over inductive type d.</p>
+            <p>This function implements the dependent elimination rule of CIC, generalizing both computation (e.g., plus : Nat → Nat → Nat)
+               and proof (e.g., nat_elim : Πx:Nat.Type0). The check equal env ctx t_ty a ensures the motive’s domain aligns with the target,
+               while compute_case_type constructs the induction principle by injecting App (p, var) as the hypothesis type for recursive
+               occurrences, mirroring the fixpoint-style eliminators of CIC [1]. The flexibility in result_ty avoids hardcoding it to D,
+               supporting higher-type motives (e.g., Type0).</p>
+            <p>Theorem. Elimination preserves typing (cf. [1], Section 4.5; Elimination Rule for Inductive Types).
+               For an inductive type D with constructors c_j, if ctx ⊢ t : D and ctx ⊢ P : D → Type_i, and each
+               case case_j has type Πx:A_j.P(c_j x) where A_j are the argument types of c_j (including recursive hypotheses),
+               then ctx ⊢ Ind(D, P, cases, t) : P t.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Infer Equality Induction</h3>
+<p>The function <b>infer_J</b> ensures `J (ty, a, b, c, d, p)` has type `c a b p by` validating the motive,
+base case, and path against CIC’s equality elimination rule.</p>
+
+<p>The `infer_J` function implements the dependent elimination rule for identity
+types in the Calculus of Inductive Constructions (CIC), enabling proofs and
+computations over equality (e.g., `symmetry : Π a b : ty, Π p : Id (ty, a, b), Id(ty, b, a)`).
+It type-checks the term `J (ty, a, b, c, d, p)` by ensuring 
+`ty : Universe 0` is the underlying type, `a : ty` and `b : ty` are endpoints,
+`c : Π (x:ty), Π (y:ty), Π (p: Id(ty, x, y)), Type0` is a motive over all paths,
+`d : Π (x:ty), c x x (Refl x)` handles the reflexive case,
+and `p : Id(ty, a, b)` is the path being eliminated.
+The function constructs fresh variables to define the motive
+and base case types, checks each component, and returns `c a b p` (normalized),
+reflecting the result of applying the motive to the specific path. </p>
+
+<p><b>Theorem</b>. For an environment `env` and context `ctx`, given a type `A : Type_i`,
+terms `a : A`, `b : A`, a motive `C : Π (x:A), Π (y:A), Π(p:Id(A, x, y)),Type_j`,
+a base case `d : Π(x:A), C x x (Refl x)`, and a path `p : Id(A, a, b)`, the
+term `J (A, a, b, C, d, p)` is well-typed with type `C a b p`. (Reference:
+CIC [1], Section 4.5; Identity Type Elimination Rule).</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Type Inference </h3>
+            <p>The function <b>infer</b> infers the type of term t in context ctx and environment env.</p>
+            <p>For Pi and Lam, universe levels ensure consistency (e.g., Type i : Type (i + 1)), while Elim
+               handles induction, critical for dependent elimination. Note that lambda agrument should be typed for easier type synthesis [13].</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Check Universes</h3>
+            <p>The function <b>check_universe</b> ensures t is a universe, returning its level. Infers type of t, expects Universe i.</p>
+            <p>This auxiliary enforces universe hierarchy, preventing paradoxes (e.g., Type : Type). It relies on infer, assuming its correctness,
+               and throws errors for non-universe types, aligning with ITT’s stratification.</p>
+            <p>Theorem: Universe checking is decidable (cf. [13]). If ctx ⊢ t : Universe i, then check_universe env ctx t = i.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Check</h3>
+            <p>The function <b>check</b> checks that t has type ty:
+            1) Lam: Ensures the domain is a type, extends the context, and checks the body against the codomain.
+            2) Constr: Infers the constructor’s type and matches it to the expected inductive type.
+            3) Elim: Computes the elimination type via check_elim and verifies it equals ty.
+            4) Default: Infers t’s type, normalizes ty, and checks equality.</p>
+            <p>The function leverages bidirectional typing: specific cases (e.g., Lam) check directly,
+               while the default case synthesizes via infer and compares with a normalized ty, ensuring
+               definitional equality (β-reduction). Completeness hinges on normalize terminating (ITT’s
+               strong normalization) and equal capturing judgmental equality.</p>
+            <p>Theorem. Type checking is complete (cf. [1], Normalization). If ctx ⊢ t : T in the type theory,
+               then check env ctx t T succeeds, assuming normalization and sound inference.</p>
+            </div>
+
+            <div style="max-width:720px;margin:0 auto;margin-top:30px;">
+            <h3>Branch Evaluation</h3>
+            <p>The function <b>apply_case</b> applies a case branch to constructor arguments, used only in reduce.</p>
+            <p>This function realizes CIC’s ι-reduction for inductive eliminators [1], where a case branch is applied
+               to constructor arguments, including recursive hypotheses. For Nat’s succ in plus, ty = Πn:Nat.Nat,
+               case = λk.λih.succ ih, and args = [n]. The recursive check a = Inductive d triggers for n : Nat,
+               computing ih = Elim(Nat, Π_:Nat.Nat, [m; λk.λih.succ ih], n), ensuring succ ih : Nat. The nested
+               apply_term handles multi-argument lambdas (e.g., k and ih), avoiding explicit uncurrying, while
+               substitution preserves typing per CIC’s rules.</p>
+            <p>Theorem. Case application is sound (cf. [1] Elimination Typing). If case : Πx:A.P(c x) and args match A,
+               then apply_case env ctx d p cases case ty args yields a term of type P(c args).</p>
+            </div>
+
+            <h3>One-step β-reductor</h3>
+            <p>The function <b>reduce</b> performs one-step β-reduction or inductive elimination.</p>
+            <p>The function implements a one-step reduction strategy combining ITT’s β-reduction with
+               CIC’s ι-reduction for inductives. The App (Lam, arg) case directly applies substitution,
+               while Elim (Constr) uses apply_case to handle induction, ensuring recursive calls preserve
+               typing via the motive p. The Pi case, though unconventional, supports type-level computation,
+               consistent with CIC’s flexibility:
+               1) App (Lam, arg): Substitutes arg into the lambda body (β-reduction).
+               2) App (Pi, arg): Substitutes arg into the codomain (type-level β-reduction).
+               3) App (f, arg): Reduces f, then arg if f is unchanged.
+               4) Elim (d, p, cases, Constr): Applies the appropriate case to constructor arguments, computing recursive calls (ι-reduction).
+               5) Elim (d, p, cases, t'): Reduces the target t'.
+               6) Constr: Reduces arguments.
+               7) Default: Returns unchanged.</p>
+            <p>Theorem. Reduction preserves typing (cf. [8], Normalization Lemma, Subject Reduction).
+               If ctx ⊢ t : T and t → t' via β-reduction or inductive elimination, then ctx ⊢ t' : T.</p>
+
+            <h3>Normalization</h3>
+            <p>The function <b>normalize</b> reduces a term t to its normal form by iteratively applying one-step
+               reductions via reduce until no further changes occur, ensuring termination for well-typed terms.</p>
+            <p>This function implements strong normalization, a cornerstone of MLTT [9] and CIC [1], where all reduction
+               sequences terminate. The fixpoint iteration relies on reduce’s one-step reductions (β for lambdas, ι for
+               inductives), with equal acting as the termination oracle. For plus 2 2, it steps to succ succ succ succ zero,
+               terminating at a constructor form.</p>
+            <p>Theorem. Normalization terminates (cf. [1]. Strong Normalization via CIC). Every well-typed term in the system
+               has a ormal form under β- and ι-reductions.</p>
+            </div>
+
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+
+            <div style="max-width:720px;margin:0 auto;">
+            Franks’s elegance rests on firm theoretical ground. Here, we reflect on key meta-theorems for Classical MLTT with
+            General Inductive Types, drawing from CIC’s lineage:
+
+            <h3>Soundness and Completeness</h3>
+<p>Franks’s type checker is sound—every term it accepts has a type under MLTT’s rules [Paulin-Mohring, 1996].
+   This ensures that every term accepted by Christineis typable in the underlying theory. Relative to the
+   bidirectional type checking algorithm, context is appropriately managed [Harper & Licata, 2007].
+   The interplay of inference and checking modes guarantees this property.</p>
+            <h3>Canonicity, Normalization, and Totality</h3>
+<p>Canonicity guarantees that every closed term of type Nat normalizes to zero or succ n [Martin-Löf, 1984].
+   Franks’s normalize achieves strong normalization—every term reduces to a unique normal form—thanks to CIC’s
+   strict positivity [Coquand & Paulin-Mohring, 1990]. Totality follows: all well-typed functions terminate,
+   as seen in list_length reducing to succ (succ zero).</p>
+            <h3>Consistency and Decidability</h3>
+<p>Consistency ensures no proof of ⊥ exists, upheld by normalization and the absence of paradoxes
+   like Girard’s [Girard, 1972]. Type checking is decidable in Per, as our algorithm terminates
+   for well-formed inputs, leveraging CIC’s decidable equality [Asperti et al., 2009].</P>
+            <h3>Conservativity and Initiality</h3>
+<p>Frank is conservative over simpler systems like System F, adding dependent types without altering propositional
+   truths [Pfenning & Paulin-Mohring, 1989]. Inductive types like Nat satisfy initiality—every algebra morphism
+   from Nat to another structure is uniquely defined—ensuring categorical universality [Dybjer, 1997].</p>
+            </div>
+
+        </section>
+
+        <section>
+            <h2>Announcement</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <pre class="code-snippet">
+$ mix frank.base
+Compiling Frank base library...
+  Compiling priv/frank/Prelude.frank... OK
+  Compiling priv/frank/Data/Unit.frank... OK
+  Compiling priv/frank/Data/Bool.frank... OK
+  Compiling priv/frank/Data/Nat.frank... OK
+  Compiling priv/frank/Data/List.frank... OK
+  Compiling priv/frank/Data/Tree.frank... OK
+  Compiling priv/frank/Data/Fin.frank... OK
+  Compiling priv/frank/Data/Vec.frank... OK
+  Compiling priv/frank/Data/W.frank... OK
+Frank base library compilation finished.
+
+$ mix frank.repl
+Frank REPL (simplified)
+frank> test_W
+Result: (Sup True (\u -> wplus ((\u -> succ_w zero_w) tt) wOne))
+frank> test_foldr
+Result: (Succ ((Succ ((Succ ((Zero (\m -> \n -> ind_Nat(m)) Zero
+((Zero (\m -> \n -> ind_Nat(m)) Zero)))) ((Zero (\m -> \n ->
+ind_Nat(m)) Zero)))) (\m -> \n -> ind_Nat(m)) Zero ((Succ ((Succ
+((Zero (\m -> \n -> ind_Nat(m)) Zero ((Zero (\m -> \n ->
+ind_Nat(m)) Zero)))) ((Zero (\m -> \n -> ind_Nat(m)) Zero))))
+(\m -> \n -> ind_Nat(m)) Zero)))))
+</pre>
+
+</div>
+
+        </section>
+
+    <section class="section-standards">
+        <h2>Open Source</h2>
+        <center>
+          <a href="https://github.com/groupoid/frank">
+          <img style="width:150px;" src="https://n2o.dev/img/github.svg"/></a>
+         </center>
+    </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-columns">
+            <div>
+                <h4>Christine</h4>
+                <p>Coq written in Elixir for Erlang/OTP</p>
+            </div>
+            <div>
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://groupoid.space/books/vol3/frank.pdf">Issue XII: Calculus of Inductive Constructions</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+Universe Consistency PASSED
+Pi Eta-expansion PASSED.
+Positivity check caught: Negative occurrence in constructor 1
+Positivity Checking PASSED.
+Caught unbound type: Unbound variable Y
+Unboundness Checking PASSED.
+Identity: Π (x : Nat), Nat
+Constant: Π (x : Nat), Nat
+Apply: Π (f : Π (y : Nat), Nat), Nat
+Caught requires Pi: Application requires a Pi type
+Π (x : Π (y : Nat), Nat), Nat
+Lambda Typing PASSED
+eval absurd = λ (e), Empty.Ind Π (_ : Empty), Nat [] e
+eval Tree.leaf = Tree.1 Nat
+eval Nat.plus(3,2) = Nat.2 Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
+eval List.length(list) = Nat.2 Nat.2 Nat.1 
+Nat.Ind = Nat.Ind Π (x : Nat), U_0 [Nat;λ (n), λ (ih), ih;] Nat.1 
+Nat.succ : Π (n : Nat), Nat
+Nat.plus : Π (m : Nat), Π (n : Nat), Nat
+Nat.Ind : U_0
+false_val type: Bool
+Caught wrong infinite Induction
+Caught under-applied constructor
+Robustness PASSED
+Fin 1: Fin
+Vec Nat 0: Vec
+Vec Nat 1: Vec
+Fin and Vec PASSED
+bool_elim : Π (s : Bool), Nat
+eval plus4w 4 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
+eval plus6w 6 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
+eval four4w 4 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
+eval conv4  4 = Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
+zero_w : N
+succ_w : Π (d : N), N
+w_nat : U_0
+Four4 : Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
+plus_w : Π (n : N), Π (m : N), N
+W Checking PASSED
+REALITY CHECK PASSED
+

@@ -1,0 +1,23 @@
+-- Christine Prelude
+
+module Prelude where
+
+data Empty =
+
+data Unit = tt
+
+data Bool = False | True
+
+data Nat = Zero | Succ Nat
+
+id x = x
+
+plus m n = case n of
+    Zero -> m
+    Succ k -> Succ (plus m k)
+
+data List A = Nil | Cons A (List A)
+
+length l = case l of
+    Nil -> Zero
+    Cons x xs -> Succ (length xs)

@@ -1,0 +1,5 @@
+-- Tree datatype for Christine
+
+module Data.Tree where
+
+data Tree A = Leaf | Node A (Tree A) (Tree A)

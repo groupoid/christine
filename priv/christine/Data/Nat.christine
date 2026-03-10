@@ -1,0 +1,23 @@
+-- Natural numbers (Peano) for Christine
+
+module Data.Nat where
+
+data Nat = Zero | Succ Nat
+
+plus m n = case m of
+    Zero -> n
+    Succ k -> Succ (plus k n)
+
+minus m n = case n of
+    Zero -> m
+    Succ k -> case m of
+        Zero   -> Zero
+        Succ j -> minus j k
+
+mult m n = case m of
+    Zero -> Zero
+    Succ k -> plus n (mult k n)
+
+isZero n = case n of
+    Zero -> True
+    Succ _ -> False

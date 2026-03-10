@@ -1,0 +1,7 @@
+-- Unit datatype for Christine
+
+module Data.Unit where
+
+data Unit = tt
+
+unit = tt
