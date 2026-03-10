@@ -4,7 +4,7 @@ defmodule Christine.MixProject do
   def project do
     [
       app: :christine,
-      version: "0.3.10",
+      version: "0.3.11",
       description: "The Christine Programming Language",
       deps: deps(),
       package: package()
