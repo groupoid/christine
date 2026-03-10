@@ -1,41 +1,6014 @@
+Infer result: U_1
+Normalized: U_1
+Checking Term: U_0
+Against Type: U_1
+Checking Term: U_0
+Against Type: U_0
+Checking Term: U_1
+Against Type: U_0
 Universe Consistency PASSED
+Syntactic Equality PASSED.
+Looking up f in context: [(f, Π(x : U_0).U_0); ]
+Infer result: Π(x : U_0).U_0
+Normalized: Π(x : U_0).U_0
 Pi Eta-expansion PASSED.
+Sigma Eta-expansion PASSED.
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
 Positivity check caught: Negative occurrence in constructor 1
 Positivity Checking PASSED.
-Caught unbound type: Unbound variable Y
-Unboundness Checking PASSED.
-Identity: Π (x : Nat), Nat
-Constant: Π (x : Nat), Nat
-Apply: Π (f : Π (y : Nat), Nat), Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(y : Nat).Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up f in context: [(f, Π(y : Nat).Nat); ]
+Infer result: Π(y : Nat).Nat
+Normalized: Π(y : Nat).Nat
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(f : Π(y : Nat).Nat).Nat
+Normalized: Π(f : Π(y : Nat).Nat).Nat
+Identity: Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Π(x : Nat).Nat
+Constant: Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Π(x : Nat).Nat
+Apply: Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(y : Nat).Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up f in context: [(f, Π(y : Nat).Nat); ]
+Infer result: Π(y : Nat).Nat
+Normalized: Π(y : Nat).Nat
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(f : Π(y : Nat).Nat).Nat
+Normalized: Π(f : Π(y : Nat).Nat).Nat
+Π(f : Π(y : Nat).Nat).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Nat); ]
+Infer result: Nat
+Normalized: Nat
+App failed: inferred Nat
 Caught requires Pi: Application requires a Pi type
-Π (x : Π (y : Nat), Nat), Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(y : Nat).Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Π(y : Nat).Nat); ]
+Infer result: Π(y : Nat).Nat
+Normalized: Π(y : Nat).Nat
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Π(y : Nat).Nat).Nat
+Normalized: Π(x : Π(y : Nat).Nat).Nat
+Π(x : Π(y : Nat).Nat).Nat
 Lambda Typing PASSED
-eval absurd = λ (e), Empty.Ind Π (_ : Empty), Nat [] e
-eval Tree.leaf = Tree.1 Nat
-eval Nat.plus(3,2) = Nat.2 Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
-eval List.length(list) = Nat.2 Nat.2 Nat.1 
-Nat.Ind = Nat.Ind Π (x : Nat), U_0 [Nat;λ (n), λ (ih), ih;] Nat.1 
-Nat.succ : Π (n : Nat), Nat
-Nat.plus : Π (m : Nat), Π (n : Nat), Nat
-Nat.Ind : U_0
-false_val type: Bool
-Caught wrong infinite Induction
-Caught under-applied constructor
-Robustness PASSED
-Fin 1: Fin
-Vec Nat 0: Vec
-Vec Nat 1: Vec
+Infer result: U_0
+Normalized: U_0
+Looking up Y in context: []
+Caught unbound type: Unbound
+Unboundness Checking PASSED.
+eval absurd = λ (e), Empty.Ind Π(_ : Empty).Nat [] e
+eval Tree.leaf = Tree.1
+eval Nat.add(3,2) = Nat.2 Nat.2 Nat.2 Nat.2 Nat.2 Nat.1
+eval List.length(list) = Nat.2 Nat.2 Nat.1
+Nat.Ind = Nat.Ind Π(x : Nat).U_0 [Nat; λ (n), λ (ih), ih; ] Nat.1
+Nat.succ : Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: n
+Against Type: Nat
+Looking up n in context: [(n, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(n : Nat).Nat
+Normalized: Π(n : Nat).Nat
+Π(n : Nat).Nat
+Nat.plus : Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up n in context: [(n, Nat); (m, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: m
+Against Type: Nat
+Looking up m in context: [(n, Nat); (m, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Checking Term: λ (k), λ (ih), Nat.2 ih
+Against Type: Π(n : Nat).Π(ih : (Π(_ : Nat).Nat n)).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (ih), Nat.2 ih
+Against Type: Π(ih : (Π(_ : Nat).Nat k)).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat.2 ih
+Against Type: Nat
+Checking Term: ih
+Against Type: Nat
+Looking up ih in context: [(ih, Nat); (k, Nat); (n, Nat); (m, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(n : Nat).Nat
+Normalized: Π(n : Nat).Nat
+Infer result: Π(m : Nat).Π(n : Nat).Nat
+Normalized: Π(m : Nat).Π(n : Nat).Nat
+Π(m : Nat).Π(n : Nat).Nat
+Nat.Ind : Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+U_0
+bool_elim : Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(s : Bool).Nat
+Normalized: Π(s : Bool).Nat
+Π(s : Bool).Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: λ (k), λ (ih), ih
+Against Type: Π(n : Nat).Π(ih : (Π(_ : Nat).Nat n)).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (ih), ih
+Against Type: Π(ih : (Π(_ : Nat).Nat k)).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: ih
+Against Type: Nat
+Looking up ih in context: [(ih, Nat); (k, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Fin 1: Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Infer result: Fin
+Normalized: Fin
+Fin
+Vec Nat 0: Infer result: Vec
+Normalized: Vec
+Vec
+Vec Nat 1: Checking Term: Nat.1
+Against Type: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: Vec.1
+Against Type: Vec
+Infer result: Vec
+Normalized: Vec
+Infer result: Vec
+Normalized: Vec
+Vec
 Fin and Vec PASSED
-bool_elim : Π (s : Bool), Nat
-eval plus4w 4 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
-eval plus6w 6 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
-eval four4w 4 = N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.2 λ (y), N.1 ; Bool.1 λ (y), Empty.Ind Π (_ : Empty), N [] y
-eval conv4  4 = Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: (f x)
+Against Type: Nat
+Looking up f in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Checking Term: x
+Against Type: Nat
+Looking up x in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: (g x)
+Against Type: Nat
+Looking up g in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Checking Term: x
+Against Type: Nat
+Looking up x in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Π(_ : Nat).Nat
+Against Type: Π(x : Nat).Π(y : Nat).Π(p : {x = y : Nat}).U_0
+Checking Term: Π(b : Nat).Π(_ : {a = b : Nat}).Π(_ : Nat).Nat
+Against Type: Π(y : Nat).Π(p : {a = y : Nat}).U_0
+Checking Term: Π(_ : {a = b : Nat}).Π(_ : Nat).Nat
+Against Type: Π(p : {a = b : Nat}).U_0
+Checking Term: Π(_ : Nat).Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (z), f
+Against Type: Π(x : Nat).(((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Π(_ : Nat).Nat x) x) Id.refl x)
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: f
+Against Type: (((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Π(_ : Nat).Nat z) z) Id.refl z)
+Looking up f in context: [(z, Nat); (x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Looking up eq in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, {(f x) = (g x) : Nat}); ]
+Infer result: {(f x) = (g x) : Nat}
+Normalized: {(f x) = (g x) : Nat}
+Infer result: (((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Π(_ : Nat).Nat (f x)) (g x)) eq)
+Normalized: Π(_ : Nat).Nat
+Inductive Eta-Equality PASSED.
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: (f x)
+Against Type: Nat
+Looking up f in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Checking Term: x
+Against Type: Nat
+Looking up x in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: (g x)
+Against Type: Nat
+Looking up g in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Checking Term: x
+Against Type: Nat
+Looking up x in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Nat
+Normalized: Nat
+Checking Term: Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Nat
+Against Type: Π(x : Nat).Π(y : Nat).Π(p : {x = y : Nat}).U_0
+Checking Term: Π(b : Nat).Π(_ : {a = b : Nat}).Nat
+Against Type: Π(y : Nat).Π(p : {a = y : Nat}).U_0
+Checking Term: Π(_ : {a = b : Nat}).Nat
+Against Type: Π(p : {a = b : Nat}).U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (z), z
+Against Type: Π(x : Nat).(((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Nat x) x) Id.refl x)
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: z
+Against Type: (((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Nat z) z) Id.refl z)
+Looking up z in context: [(z, Nat); (x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Looking up eq in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Π(x : Nat).{(f x) = (g x) : Nat}
+Normalized: Π(x : Nat).{(f x) = (g x) : Nat}
+Checking Term: x
+Against Type: Nat
+Looking up x in context: [(x, Nat); (f, Π(x : Nat).Nat); (g, Π(x : Nat).Nat); (eq, Π(x : Nat).{(f x) = (g x) : Nat}); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: {(f x) = (g x) : Nat}
+Normalized: {(f x) = (g x) : Nat}
+Infer result: (((Π(a : Nat).Π(b : Nat).Π(_ : {a = b : Nat}).Nat (f x)) (g x)) (eq x))
+Normalized: Nat
+Pointwise Equality Transport PASSED.
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Nat); ]
+Infer result: Nat
+Normalized: Nat
+Infer result: Π(x : Nat).Nat
+Normalized: Π(x : Nat).Nat
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Nat
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up x in context: [(x, Nat); ]
+Infer result: Nat
+Normalized: Nat
+App failed: inferred Nat
+Caught non-total lambda: Application requires a Pi type
+Lambda Totality PASSED.
+eval plus4w 4 = N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.1 λ (y), Empty.Ind Π(_ : Empty).N [] y
+eval plus6w 6 = N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.1 λ (y), Empty.Ind Π(_ : Empty).N [] y
+eval four4w 4 = N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.2 λ (y), N.1 Bool.1 λ (y), Empty.Ind Π(_ : Empty).N [] y
+eval conv4  4 = Nat.2 Nat.2 Nat.2 Nat.2 Nat.1
 zero_w : N
-succ_w : Π (d : N), N
-w_nat : U_0
-Four4 : Nat.2 Nat.2 Nat.2 Nat.2 Nat.1 
-plus_w : Π (n : N), Π (m : N), N
+succ_w : Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: N
+Against Type: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.2
+Against Type: Bool
+Infer result: Bool
+Normalized: Bool
+Checking Term: λ (y), d
+Against Type: Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: d
+Against Type: N
+Looking up d in context: [(y, Unit); (d, N); ]
+Infer result: N
+Normalized: N
+Infer result: N
+Normalized: N
+Infer result: Π(d : N).N
+Normalized: Π(d : N).N
+Π(d : N).N
+w_nat : Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+U_0
+Four4 : Nat.2 Nat.2 Nat.2 Nat.2 Nat.1
+plus_w    : Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: N
+Against Type: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: N
+Against Type: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up n in context: [(m, N); (n, N); ]
+Infer result: N
+Normalized: N
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (_, N); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (a), λ (f), λ (ih), Bool.Ind Π(z : Bool).N [m; (λ (d), N.1 Bool.2 λ (y), d (ih Unit.1)); ] a
+Against Type: Π(z : Bool).Π(f : Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)).N).Π(ih : Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)).(Π(_ : N).N (f _))).N
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (f), λ (ih), Bool.Ind Π(z : Bool).N [m; (λ (d), N.1 Bool.2 λ (y), d (ih Unit.1)); ] a
+Against Type: Π(f : Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N).Π(ih : Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).(Π(_ : N).N (f _))).N
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: a
+Against Type: Bool
+Looking up a in context: [(a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: a
+Against Type: Bool
+Looking up a in context: [(a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (ih), Bool.Ind Π(z : Bool).N [m; (λ (d), N.1 Bool.2 λ (y), d (ih Unit.1)); ] a
+Against Type: Π(ih : Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).(Π(_ : N).N (f _))).N
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: a
+Against Type: Bool
+Looking up a in context: [(f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: a
+Against Type: Bool
+Looking up a in context: [(f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (y, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(z : Bool).N [m; (λ (d), N.1 Bool.2 λ (y), d (ih Unit.1)); ] a
+Against Type: N
+Looking up a in context: [(ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s a)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: m
+Against Type: N
+Looking up m in context: [(ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.1)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.1)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: N
+Normalized: N
+Checking Term: (λ (d), N.1 Bool.2 λ (y), d (ih Unit.1))
+Against Type: N
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: N
+Against Type: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (f, Π(_ : Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z).N); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] z); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Looking up s in context: [(s, Bool); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: Π(s : Bool).U_0
+Normalized: Π(s : Bool).U_0
+Checking Term: z
+Against Type: Bool
+Looking up z in context: [(z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: Π(x : Bool).U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s
+Against Type: U_0
+Looking up s in context: [(s, Bool); (_, (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s z)); (z, Bool); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Bool
+Normalized: Bool
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: Empty
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Bool.2
+Against Type: Bool
+Infer result: Bool
+Normalized: Bool
+Checking Term: λ (y), d
+Against Type: Π(_ : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: Unit
+Against Type: U_0
+Infer result: U_0
+Normalized: U_0
+Infer result: U_0
+Normalized: U_0
+Checking Term: d
+Against Type: N
+Looking up d in context: [(y, Unit); (d, N); (ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: N
+Normalized: N
+Infer result: N
+Normalized: N
+Infer result: Π(d : N).N
+Normalized: Π(d : N).N
+Checking Term: (ih Unit.1)
+Against Type: N
+Looking up ih in context: [(ih, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (f, Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N); (a, Bool); (m, N); (n, N); ]
+Infer result: Π(y : (λ (s), Bool.Ind Π(_ : Bool).U_0 [Empty; Unit; ] s Bool.2)).N
+Normalized: Π(y : Unit).N
+Checking Term: Unit.1
+Against Type: Unit
+Infer result: Unit
+Normalized: Unit
+Infer result: N
+Normalized: N
+Infer result: N
+Normalized: N
+Infer result: N
+Normalized: N
+Infer result: Π(m : N).N
+Normalized: Π(m : N).N
+Infer result: Π(n : N).Π(m : N).N
+Normalized: Π(n : N).Π(m : N).N
+Π(n : N).Π(m : N).N
 W Checking PASSED
-REALITY CHECK PASSED
-
+Infer result: U_1
+Normalized: U_1
+Checking Term: U_0
+Against Type: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: U_0
+Against Type: U_1
+Checking Term: x
+Against Type: U_0
+Looking up x in context: [(y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Checking Term: y
+Against Type: U_0
+Looking up y in context: [(y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: {x = y : U_0}
+Against Type: U_1
+Checking Term: x
+Against Type: U_0
+Looking up x in context: [(y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Checking Term: y
+Against Type: U_0
+Looking up y in context: [(y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Checking Term: U_0
+Against Type: U_1
+Checking Term: x
+Against Type: U_0
+Looking up x in context: [(p, {x = y : U_0}); (y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Checking Term: y
+Against Type: U_0
+Looking up y in context: [(p, {x = y : U_0}); (y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Checking Term: Π(x : U_0).Π(y : U_0).Π(p : {x = y : U_0}).{y = x : U_0}
+Against Type: Π(x : U_0).Π(y : U_0).Π(p : {x = y : U_0}).U_0
+Checking Term: Π(y : U_0).Π(p : {x = y : U_0}).{y = x : U_0}
+Against Type: Π(y : U_0).Π(p : {x = y : U_0}).U_0
+Checking Term: Π(p : {x = y : U_0}).{y = x : U_0}
+Against Type: Π(p : {x = y : U_0}).U_0
+Checking Term: {y = x : U_0}
+Against Type: U_0
+Checking Term: y
+Against Type: U_0
+Looking up y in context: [(p, {x = y : U_0}); (y, U_0); (x, U_0); (p, {x = y : U_0}); (y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Checking Term: x
+Against Type: U_0
+Looking up x in context: [(p, {x = y : U_0}); (y, U_0); (x, U_0); (p, {x = y : U_0}); (y, U_0); (x, U_0); ]
+Infer result: U_0
+Normalized: U_0
+Infer result: U_1
+Normalized: U_1
+Infer result: U_1
+Normalized: U_1
+Mismatch detail: inferred=U_1, expected=U_0
+Fatal error: exception Christine.TypeError("Type Mismatch Error. Inferred: U_1. Expected: U_0.")

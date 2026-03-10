@@ -388,30 +388,27 @@ CIC [1], Section 4.5; Identity Type Elimination Rule).</p>
             <h2>Announcement</h2>
             <div style="max-width:720px;margin:0 auto;">
                 <pre class="code-snippet">
-$ mix frank.base
-Compiling Frank base library...
-  Compiling priv/frank/Prelude.frank... OK
-  Compiling priv/frank/Data/Unit.frank... OK
-  Compiling priv/frank/Data/Bool.frank... OK
-  Compiling priv/frank/Data/Nat.frank... OK
-  Compiling priv/frank/Data/List.frank... OK
-  Compiling priv/frank/Data/Tree.frank... OK
-  Compiling priv/frank/Data/Fin.frank... OK
-  Compiling priv/frank/Data/Vec.frank... OK
-  Compiling priv/frank/Data/W.frank... OK
-Frank base library compilation finished.
+https://christine.groupoid.space/
 
-$ mix frank.repl
-Frank REPL (simplified)
-frank> test_W
-Result: (Sup True (\u -> wplus ((\u -> succ_w zero_w) tt) wOne))
-frank> test_foldr
-Result: (Succ ((Succ ((Succ ((Zero (\m -> \n -> ind_Nat(m)) Zero
-((Zero (\m -> \n -> ind_Nat(m)) Zero)))) ((Zero (\m -> \n ->
-ind_Nat(m)) Zero)))) (\m -> \n -> ind_Nat(m)) Zero ((Succ ((Succ
-((Zero (\m -> \n -> ind_Nat(m)) Zero ((Zero (\m -> \n ->
-ind_Nat(m)) Zero)))) ((Zero (\m -> \n -> ind_Nat(m)) Zero))))
-(\m -> \n -> ind_Nat(m)) Zero)))))
+  🧊 Christine MLTT/CIC Theorem Prover version 0.3.11
+
+For help type `help`.
+Starting proof for: Π(n : Nat).Nat
+Goal 1:
+Context: []
+⊢ Π(n : Nat).Nat
+
+1 goals remaining
+> intro x
+Goal 1:
+Context: [(x : Nat); ]
+⊢ Nat
+
+1 goals remaining
+> assumption
+0 goals remaining
+Proof complete!
+Final term: x
 </pre>
 
 </div>
