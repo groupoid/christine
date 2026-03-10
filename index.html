@@ -178,7 +178,7 @@ type tactic =
             <p><b>Theorem 1</b>. Equality is reflexive, symmetric, and transitive modulo
             α-equivalence (cf. [1], Section 2). For `Pi (x, a, b)` and `Pi (y, a', b')`,
             equality holds if `a = a'` and `b[x := Var x] = b'[y := Var x]`,
-            ensuring capture-avoiding substitution preserves meaning.</p>
+            ensuring capture-avoiding substitution preserves meaning. ∎</p>
             </div>
 
             <div style="max-width:720px;margin:0 auto;margin-top:30px;">
@@ -190,7 +190,7 @@ type tactic =
 
             <p><b>Theorem 2</b>: Context lookup is well-defined under uniqueness
             of names (cf. [1], Section 3). If `ctx = Γ, x : A, Δ`,
-            then `lookup_var ctx x = Some A`.</p>
+            then `lookup_var ctx x = Some A`. ∎</p>
 
             </div>
 
@@ -212,7 +212,7 @@ type tactic =
 
             <p><b>Theorem 3</b>. Substitution preserves typing (cf. [13], Lemma 2.1).
             If `Γ ⊢ t : T` and `Γ ⊢ s : A`, then `Γ ⊢ t[x := s] : T[x := s]`
-            under suitable conditions on x.</p>
+            under suitable conditions on x. ∎</p>
             </div>
 
             <div style="max-width:720px;margin:0 auto;margin-top:30px;">
@@ -223,7 +223,7 @@ type tactic =
                1) Validates argument count against d.params.
             2) Substitutes each parameter into constructor types using subst_param.</p>
             <p><b>Theorem 4</b>. Parameter application preserves inductiveness (cf. [4], Section 4).
-               If D is an inductive type with parameters P, then D[P] is well-formed with substituted constructors.</p>
+               If D is an inductive type with parameters P, then D[P] is well-formed with substituted constructors. ∎</p>
             </div>
 
             <div style="max-width:720px;margin:0 auto;margin-top:30px;">
@@ -287,7 +287,7 @@ type tactic =
                if the function infer env ctx t returns Some T, then ctx ⊢ t : T holds in the present type
                theory. Moreover, if infer env ctx t = None, then there is no type T such that ctx ⊢ t : T is
                derivable (modulo the limitations coming from the syntactic equality algorithm and the absence
-               of full η-reduction, η-expansion or judgmental η-equality.</p>
+               of full η-reduction, η-expansion or judgmental η-equality. ∎</p>
             </div>
 
             <div style="max-width:720px;margin:0 auto;margin-top:30px;">
