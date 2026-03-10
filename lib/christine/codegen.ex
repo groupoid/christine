@@ -4,7 +4,10 @@ defmodule Christine.Codegen do
   """
   alias Christine.AST
 
-  def generate(%AST.Module{name: mod_name, declarations: decls}, env \\ %Christine.Typechecker.Env{}) do
+  def generate(
+        %AST.Module{name: mod_name, declarations: decls},
+        env \\ %Christine.Typechecker.Env{}
+      ) do
     current_mod = String.to_atom(mod_name)
     functions = Enum.flat_map(decls, &generate_decl(&1, env, current_mod))
 
@@ -25,8 +28,12 @@ defmodule Christine.Codegen do
   end
 
   defp generate_decl(%AST.DeclValue{name: name, expr: expr}, env, mod) do
-    clause = {:clause, 1, [], [], [generate_expr(expr, MapSet.new(), env, mod)]}
-    [{:function, 1, String.to_atom(name), 0, [clause]}]
+    if expr do
+      clause = {:clause, 1, [], [], [generate_expr(expr, MapSet.new(), env, mod)]}
+      [{:function, 1, String.to_atom(name), 0, [clause]}]
+    else
+      []
+    end
   end
 
   defp generate_decl(
@@ -66,16 +73,24 @@ defmodule Christine.Codegen do
       # Global call: check if it's local or remote
       case Map.get(env.name_to_mod, name) do
         nil ->
-          # Unknown, assume local 0-arity
-          {:call, 1, {:atom, 1, String.to_atom(name)}, []}
+          # Unknown, check if it's an inductive type or used as a type atom
+          {:atom, 1, String.to_atom(name)}
 
         mod_str ->
           mod = String.to_atom(mod_str)
 
           if mod == current_mod do
-            {:call, 1, {:atom, 1, String.to_atom(name)}, []}
+            if Map.has_key?(env.defs, name) do
+              {:call, 1, {:atom, 1, String.to_atom(name)}, []}
+            else
+              {:atom, 1, String.to_atom(name)}
+            end
           else
-            {:call, 1, {:remote, 1, {:atom, 1, mod}, {:atom, 1, String.to_atom(name)}}, []}
+            if Map.has_key?(env.defs, name) do
+              {:call, 1, {:remote, 1, {:atom, 1, mod}, {:atom, 1, String.to_atom(name)}}, []}
+            else
+              {:atom, 1, String.to_atom(name)}
+            end
           end
       end
     end
@@ -84,6 +99,8 @@ defmodule Christine.Codegen do
   defp generate_expr(%AST.Universe{level: i}, _local_env, _env, _mod) do
     {:integer, 1, i}
   end
+
+  defp generate_expr(%AST.Pi{}, _local_env, _env, _mod), do: {:atom, 1, :pi}
 
   defp generate_expr(%AST.Lam{name: x, body: body}, local_env, env, mod) do
     erl_x = {:var, 1, String.capitalize(x) |> String.to_atom()}
@@ -94,8 +111,20 @@ defmodule Christine.Codegen do
   end
 
   defp generate_expr(%AST.App{func: f, arg: arg}, local_env, env, mod) do
-    # f arg -> f(arg)
-    {:call, 1, generate_expr(f, local_env, env, mod), [generate_expr(arg, local_env, env, mod)]}
+    case generate_expr(f, local_env, env, mod) do
+      {:atom, _, _} = a ->
+        {:tuple, 1, [a | [generate_expr(arg, local_env, env, mod)]]}
+
+      {:tuple, _, elements} = t ->
+        if Enum.at(elements, 0) |> elem(0) == :atom do
+          {:tuple, 1, elements ++ [generate_expr(arg, local_env, env, mod)]}
+        else
+          {:call, 1, t, [generate_expr(arg, local_env, env, mod)]}
+        end
+
+      other ->
+        {:call, 1, other, [generate_expr(arg, local_env, env, mod)]}
+    end
   end
 
   defp generate_expr(%AST.Constr{index: j, args: args}, local_env, env, mod) do

@@ -33,30 +33,55 @@ defmodule Christine.Desugar do
   def desugar_decl(decl, env \\ %Christine.Typechecker.Env{})
 
   def desugar_decl(
-        %AST.DeclValue{name: name, binders: binders, expr: expr, where_decls: where_decls},
+        %AST.DeclValue{
+          name: name,
+          binders: binders,
+          expr: expr,
+          type: type,
+          where_decls: where_decls
+        },
         env
       ) do
     desugared_where = Enum.map(where_decls || [], &desugar_decl(&1, env))
 
-    expr_with_where =
-      if desugared_where == [] do
-        expr
-      else
-        decls_list = Enum.map(desugared_where, fn d -> {d.name, d.expr} end)
-        %AST.Let{decls: decls_list, body: expr}
-      end
+    if expr do
+      expr_with_where =
+        if desugared_where == [] do
+          expr
+        else
+          decls_list = Enum.map(desugared_where, fn d -> {d.name, d.expr} end)
+          %AST.Let{decls: decls_list, body: expr}
+        end
 
-    body =
-      Enum.reduce(Enum.reverse(binders), desugar_expression(expr_with_where, env, name), fn
-        {vn, vt}, acc ->
-          %AST.Lam{name: vn, domain: desugar_expression(vt, env), body: acc}
+      body =
+        Enum.reduce(
+          Enum.reverse(binders),
+          desugar_expression(expr_with_where, env, name),
+          fn
+            {vn, vt}, acc ->
+              %AST.Lam{name: vn, domain: desugar_expression(vt, env), body: acc}
 
-        %AST.Var{name: vn}, acc ->
-          # Fallback for simple binders if any
-          %AST.Lam{name: vn, domain: %AST.Universe{level: 0}, body: acc}
-      end)
+            %AST.Var{name: vn}, acc ->
+              %AST.Lam{name: vn, domain: %AST.Universe{level: 0}, body: acc}
+          end
+        )
 
-    %AST.DeclValue{name: name, binders: [], expr: body}
+      desugared_type = if type, do: desugar_expression(type, env), else: nil
+
+      %AST.DeclValue{name: name, binders: [], expr: body, type: desugared_type}
+    else
+      # Axiom case: expr is nil. We should fold binders into the type (Pi types).
+      final_type =
+        Enum.reduce(Enum.reverse(binders), desugar_expression(type, env), fn
+          {vn, vt}, acc ->
+            %AST.Pi{name: vn, domain: desugar_expression(vt, env), codomain: acc}
+
+          %AST.Var{name: vn}, acc ->
+            %AST.Pi{name: vn, domain: %AST.Universe{level: 0}, codomain: acc}
+        end)
+
+      %AST.DeclValue{name: name, binders: [], expr: nil, type: final_type}
+    end
   end
 
   def desugar_decl(%AST.DeclData{name: name, params: params, constructors: constructors}, env) do

@@ -221,12 +221,22 @@ defmodule Christine.Parser do
                           {:ok, expr, rest6} ->
                             case skip_virtual(rest6) do
                               [{:dot, _, _} | rest7] ->
-                                {:ok, %AST.DeclValue{name: name, binders: params, expr: expr},
-                                 rest7}
+                                {:ok,
+                                 %AST.DeclValue{
+                                   name: name,
+                                   binders: params,
+                                   expr: expr,
+                                   type: ty
+                                 }, rest7}
 
                               _ ->
-                                {:ok, %AST.DeclValue{name: name, binders: params, expr: expr},
-                                 rest6}
+                                {:ok,
+                                 %AST.DeclValue{
+                                   name: name,
+                                   binders: params,
+                                   expr: expr,
+                                   type: ty
+                                 }, rest6}
                             end
 
                           err ->
@@ -234,10 +244,31 @@ defmodule Christine.Parser do
                         end
 
                       [{:dot, _, _} | rest5] ->
-                        {:ok, %AST.DeclValue{name: name, binders: params, expr: ty}, rest5}
+                        case skip_virtual(rest5) do
+                          [{:proof_kw, _, _}, {:dot, _, _} | rest_p] ->
+                            case parse_tactics(rest_p, []) do
+                              {:ok, tactics, rest_qed} ->
+                                {:ok,
+                                 %AST.DeclValue{
+                                   name: name,
+                                   binders: params,
+                                   expr: nil,
+                                   type: ty,
+                                   tactics: tactics
+                                 }, rest_qed}
+
+                              err ->
+                                err
+                            end
+
+                          _ ->
+                            {:ok,
+                             %AST.DeclValue{name: name, binders: params, expr: nil, type: ty},
+                             rest5}
+                        end
 
                       _ ->
-                        {:error, :expected_assign_after_type}
+                        {:error, :expected_assign_after_type, Enum.at(rest4, 0)}
                     end
 
                   err ->
@@ -269,6 +300,49 @@ defmodule Christine.Parser do
 
       _ ->
         {:error, :invalid_definition_name}
+    end
+  end
+
+  defp parse_tactics(tokens, acc) do
+    case skip_virtual(tokens) do
+      [{:qed, _, _}, {:dot, _, _} | rest] ->
+        {:ok, Enum.reverse(acc), rest}
+
+      [{:qed, _, _} | rest] ->
+        {:ok, Enum.reverse(acc), rest}
+
+      [] ->
+        {:error, :unexpected_eof_in_proof}
+
+      _ ->
+        case parse_tactic(tokens) do
+          {:ok, tac, rest} -> parse_tactics(rest, [tac | acc])
+          err -> err
+        end
+    end
+  end
+
+  defp parse_tactic(tokens) do
+    # Simple tactic parsing: take until dot.
+    # We could make this more structured, but for now, we'll store the tactic as a string of its parts.
+    {t_tokens, rest} = Enum.split_while(tokens, fn t -> elem(t, 0) != :dot end)
+
+    case rest do
+      [{:dot, _, _} | rest2] ->
+        t_str =
+          t_tokens
+          |> Enum.map(fn
+            {:ident, _, _, s} -> s
+            {:operator, _, _, s} -> s
+            {k, _, _} -> Atom.to_string(k)
+            _ -> ""
+          end)
+          |> Enum.join(" ")
+
+        {:ok, t_str, rest2}
+
+      _ ->
+        {:error, :expected_dot_after_tactic}
     end
   end
 
@@ -364,44 +438,7 @@ defmodule Christine.Parser do
 
   defp parse_constructor(tokens), do: {:error, :no_constructor, Enum.take(tokens, 5)}
 
-  defp parse_type(tokens) do
-    case skip_virtual(tokens) do
-      [{:forall, _, _} | rest] ->
-        case parse_forall_binders(rest, []) do
-          {:ok, binders, [{:comma, _, _} | rest2]} ->
-            case parse_type(rest2) do
-              {:ok, body, rest3} ->
-                final =
-                  Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
-                    %AST.Pi{name: n, domain: d, codomain: acc}
-                  end)
-
-                {:ok, final, rest3}
-
-              err ->
-                err
-            end
-
-          _ ->
-            {:error, :expected_comma_in_forall}
-        end
-
-      _ ->
-        case parse_type_app(tokens) do
-          {:ok, t, [{:arrow, _, _} | rest]} ->
-            case parse_type(rest) do
-              {:ok, body, rest2} ->
-                {:ok, %AST.Pi{name: "_", domain: t, codomain: body}, rest2}
-
-              err ->
-                err
-            end
-
-          res ->
-            res
-        end
-    end
-  end
+  defp parse_type(tokens), do: parse_expr(tokens)
 
   defp parse_forall_binders(tokens, acc) do
     tokens = skip_virtual(tokens)
@@ -426,42 +463,6 @@ defmodule Christine.Parser do
     end
   end
 
-  defp parse_type_app(tokens) do
-    case parse_type_atom(tokens) do
-      {:ok, t, rest} -> parse_type_args(rest, t)
-      err -> err
-    end
-  end
-
-  defp parse_type_args(tokens, acc) do
-    case parse_type_atom(tokens) do
-      {:ok, t, rest} -> parse_type_args(rest, %AST.App{func: acc, arg: t})
-      _ -> {:ok, acc, tokens}
-    end
-  end
-
-  defp parse_type_atom(tokens) do
-    case skip_virtual(tokens) do
-      [{:ident, _, _, name} | rest] ->
-        {:ok, %AST.Var{name: name}, rest}
-
-      [{:type_kw, _, _} | rest] ->
-        {:ok, %AST.Universe{level: 0}, rest}
-
-      [{:prop_kw, _, _} | rest] ->
-        {:ok, %AST.Universe{level: -1}, rest}
-
-      [{:left_paren, _, _} | rest] ->
-        case parse_type(rest) do
-          {:ok, t, [{:right_paren, _, _} | rest2]} -> {:ok, t, rest2}
-          _ -> {:error, :expected_right_paren}
-        end
-
-      _ ->
-        {:error, :not_a_type_atom}
-    end
-  end
-
   defp parse_expr(tokens) do
     case skip_virtual(tokens) do
       [{:fun_kw, _, _} | rest] ->
@@ -477,6 +478,26 @@ defmodule Christine.Parser do
 
           _ ->
             {:error, :expected_arrow_in_lambda}
+        end
+
+      [{:forall, _, _} | rest] ->
+        case parse_forall_binders(rest, []) do
+          {:ok, binders, [{:comma, _, _} | rest2]} ->
+            case parse_expr(rest2) do
+              {:ok, body, rest3} ->
+                final =
+                  Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
+                    %AST.Pi{name: n, domain: d, codomain: acc}
+                  end)
+
+                {:ok, final, rest3}
+
+              err ->
+                err
+            end
+
+          _ ->
+            {:error, :expected_comma_in_forall}
         end
 
       [{:match_kw, _, _} | rest] ->
@@ -495,7 +516,19 @@ defmodule Christine.Parser do
         end
 
       _ ->
-        parse_expr_app(tokens)
+        case parse_expr_app(tokens) do
+          {:ok, t, [{:arrow, _, _} | rest]} ->
+            case parse_expr(rest) do
+              {:ok, body, rest2} ->
+                {:ok, %AST.Pi{name: "_", domain: t, codomain: body}, rest2}
+
+              err ->
+                err
+            end
+
+          res ->
+            res
+        end
     end
   end
 
@@ -517,6 +550,12 @@ defmodule Christine.Parser do
     case skip_virtual(tokens) do
       [{:ident, _, _, name} | rest] ->
         {:ok, %AST.Var{name: name}, rest}
+
+      [{:type_kw, _, _} | rest] ->
+        {:ok, %AST.Universe{level: 0}, rest}
+
+      [{:prop_kw, _, _} | rest] ->
+        {:ok, %AST.Universe{level: -1}, rest}
 
       [{:number, _, _, n} | rest] ->
         {:ok, %AST.Number{value: n}, rest}

@@ -87,21 +87,15 @@ defmodule Mix.Tasks.Christine.Repl do
   defp start_proof(input, env) do
     with {:ok, tokens} <- Lexer.lex(input),
          resolved <- Layout.resolve(tokens),
-         {:ok, %AST.DeclValue{name: name, binders: _params, expr: target}, _} <-
+         {:ok, %AST.DeclValue{name: name, binders: _params, type: target_syn}, _} <-
            Parser.parse_declaration(resolved) do
-      # For now, theorems are just type signatures
+      # In unified parser, theorems might result in a Pi directly or have params.
+      # parse_declaration forTheorem name : type. returns DeclValue with type=type.
+
       IO.puts("Proof started for #{name}")
       # Desugar target type
-      desugared_target = Desugar.desugar_expression(target, env)
-
-      {:ok,
-       %ProofState{
-         target: desugared_target,
-         ctx: [],
-         env: env,
-         solved: [],
-         goals: [desugared_target]
-       }}
+      desugared_target = Desugar.desugar_expression(target_syn, env)
+      {:ok, Christine.Tactics.start_proof(desugared_target, env)}
     else
       err -> {:error, err}
     end
@@ -120,50 +114,21 @@ defmodule Mix.Tasks.Christine.Repl do
           loop(env, ps)
         end
 
-      "intro " <> x ->
-        x = String.trim(x, ".") |> String.trim()
-        [current | rest] = ps.goals
-
-        case current do
-          %AST.Pi{name: _y, domain: a, codomain: b} ->
-            new_ctx = [{x, a} | ps.ctx]
-            # Replace bound var in b (simplified)
-            # TODO: proper subst
-            new_goal = b
-            loop(env, %{ps | goals: [new_goal | rest], ctx: new_ctx})
-
-          _ ->
-            IO.puts("Error: intro expects a forall")
-            loop(env, ps)
-        end
-
-      "exact " <> expr_str ->
-        expr_str = String.trim(expr_str, ".") |> String.trim()
-
-        case eval(expr_str, %{env | ctx: ps.ctx}) do
-          {:ok, term} ->
-            [current | rest] = ps.goals
-
-            term_ty = Typechecker.infer(%{env | ctx: ps.ctx}, term)
-
-            if Typechecker.equal?(env, term_ty, current) do
-              IO.puts("Goal solved!")
-              loop(env, %{ps | goals: rest})
+      _ ->
+        case Christine.Tactics.apply_tactic(ps, input) do
+          {:ok, new_ps} ->
+            if new_ps.goals == [] do
+              IO.puts("All goals solved!")
             else
-              IO.puts("Error: type mismatch")
-              IO.puts("  Expected: #{AST.to_string(current)}")
-              IO.puts("  Inferred: #{AST.to_string(term_ty)}")
-              loop(env, ps)
+              IO.puts("#{length(new_ps.goals)} goals remaining.")
             end
 
-          _ ->
-            IO.puts("Error: invalid expression")
+            loop(env, new_ps)
+
+          {:error, reason, _} ->
+            IO.puts("Error: #{inspect(reason)}")
             loop(env, ps)
         end
-
-      _ ->
-        IO.puts("Unknown tactic or proof command: #{input}")
-        loop(env, ps)
     end
   end
 

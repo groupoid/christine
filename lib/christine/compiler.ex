@@ -11,6 +11,7 @@ defmodule Christine.Compiler do
       env = resolve_imports(ast, %Christine.Typechecker.Env{}, opts)
       env = collect_local_names(ast, env)
       desugared = Desugar.desugar(ast, env)
+      # IO.inspect(desugared, label: "DESUGARED MODULE")
 
       final_env =
         populate_local_env(desugared, %{
@@ -24,8 +25,12 @@ defmodule Christine.Compiler do
       typecheck_res =
         if Keyword.get(opts, :typecheck, true) do
           case Christine.Typechecker.check_module(desugared, final_env) do
-            :ok -> :ok
-            {:error, reason} -> {:error, {:type_error, reason}}
+            :ok ->
+              :ok
+
+            {:error, reason} ->
+              IO.puts("TYPE ERROR: #{inspect(reason)}")
+              {:error, {:type_error, reason}}
           end
         else
           :ok
@@ -34,12 +39,19 @@ defmodule Christine.Compiler do
       if typecheck_res == :ok and Keyword.get(opts, :check_only, false) do
         {:ok, desugared.name, :check_only}
       else
-        with :ok <- typecheck_res,
-             {:ok, forms} <- Codegen.generate(desugared, env) do
-          case :compile.forms(forms, [:return_errors, :debug_info]) do
-            {:ok, mod, bin} -> {:ok, mod, bin}
-            {:error, errors, warnings} -> {:error, {:erl_compile, errors, warnings}}
+        try do
+          with :ok <- typecheck_res,
+               {:ok, forms} <- Codegen.generate(desugared, env) do
+            case :compile.forms(forms, [:return_errors, :debug_info]) do
+              {:ok, mod, bin} -> {:ok, mod, bin}
+              {:error, errors, warnings} -> {:error, {:erl_compile, errors, warnings}}
+            end
           end
+        rescue
+          e ->
+            IO.puts("COMPILER CRASH: #{inspect(e)}")
+            IO.puts(Exception.format(:error, e, __STACKTRACE__))
+            {:error, {:compiler_crash, e}}
         end
       end
     else
@@ -49,9 +61,26 @@ defmodule Christine.Compiler do
 
   defp populate_local_env(%AST.Module{name: _mod_name, declarations: decls}, env) do
     Enum.reduce(decls, env, fn
-      %AST.DeclValue{name: n, expr: e}, acc ->
-        ty = Christine.Typechecker.infer(acc, e)
-        %{acc | defs: Map.put(acc.defs, n, e), ctx: [{n, ty} | acc.ctx]}
+      %AST.DeclValue{name: n, expr: e, type: t, tactics: tacs}, acc ->
+        if tacs do
+          case Christine.Tactics.solve_with_tactics(t, tacs, acc) do
+            :ok ->
+              %{acc | ctx: [{n, t} | acc.ctx]}
+
+            {:error, reason} ->
+              IO.puts("Tactic error in #{n}: #{inspect(reason)}")
+              # Still add to ctx to continue
+              %{acc | ctx: [{n, t} | acc.ctx]}
+          end
+        else
+          if e do
+            ty = Christine.Typechecker.infer(acc, e)
+            %{acc | defs: Map.put(acc.defs, n, e), ctx: [{n, ty} | acc.ctx]}
+          else
+            # Axiom: has no expr, must have a desugared type in `type`
+            %{acc | ctx: [{n, t} | acc.ctx]}
+          end
+        end
 
       %AST.Inductive{} = ind, acc ->
         acc = %{acc | env: Map.put(acc.env, ind.name, ind)}
@@ -132,10 +161,34 @@ defmodule Christine.Compiler do
                   }
 
                   desugared_v = Desugar.desugar_decl(v, current_env)
-                  val_ty = Christine.Typechecker.infer(current_env, desugared_v.expr)
 
-                  {Map.put(d_acc, desugared_v.name, desugared_v.expr), t_acc,
-                   Map.put(n_acc, desugared_v.name, mod_name),
+                  {expr, val_ty} =
+                    cond do
+                      desugared_v.tactics ->
+                        case Christine.Tactics.solve_with_tactics(
+                               desugared_v.type,
+                               desugared_v.tactics,
+                               current_env
+                             ) do
+                          :ok ->
+                            {nil, desugared_v.type}
+
+                          {:error, reason} ->
+                            IO.puts("Tactic error in #{desugared_v.name}: #{inspect(reason)}")
+                            {nil, desugared_v.type}
+                        end
+
+                      desugared_v.expr ->
+                        {desugared_v.expr,
+                         Christine.Typechecker.infer(current_env, desugared_v.expr)}
+
+                      true ->
+                        {nil, desugared_v.type}
+                    end
+
+                  new_defs = if expr, do: Map.put(d_acc, desugared_v.name, expr), else: d_acc
+
+                  {new_defs, t_acc, Map.put(n_acc, desugared_v.name, mod_name),
                    [{desugared_v.name, val_ty} | c_acc]}
 
                 %AST.DeclData{} = data, {d_acc, t_acc, n_acc, c_acc} ->

@@ -23,10 +23,14 @@ defmodule Christine.Typechecker do
         infer(env, ind)
         {:cont, :ok}
 
-      %AST.DeclValue{name: _name, expr: expr}, _acc ->
+      %AST.DeclValue{name: name, expr: expr}, _acc ->
         case infer(env, expr) do
-          {:error, _} = err -> {:halt, err}
-          _ty -> {:cont, :ok}
+          {:error, reason} = err ->
+            IO.puts("Type error in #{name}: #{inspect(reason)}")
+            {:halt, err}
+
+          _ty ->
+            {:cont, :ok}
         end
 
       _, acc ->
@@ -34,13 +38,30 @@ defmodule Christine.Typechecker do
     end)
   end
 
+  def infer(_env, nil), do: %AST.Universe{level: 0}
+
   def infer(%Env{} = e, %AST.Var{name: name}) do
     if name == "Any" do
       %AST.Var{name: "Any"}
     else
       case List.keyfind(e.ctx, name, 0) do
-        {^name, ty} -> ty
-        nil -> {:error, {:unbound_variable, name}}
+        {^name, ty} ->
+          ty
+
+        nil ->
+          case Map.get(e.defs, name) do
+            term when not is_nil(term) ->
+              infer(e, term)
+
+            nil ->
+              case Map.get(e.env, name) do
+                %AST.Inductive{} = ind ->
+                  infer(e, ind)
+
+                _ ->
+                  {:error, {:unbound_variable, name}}
+              end
+          end
       end
     end
   end
@@ -92,9 +113,8 @@ defmodule Christine.Typechecker do
       %AST.Var{name: "Any"} ->
         %AST.Var{name: "Any"}
 
-      _other ->
-        # IO.inspect({f, other}, label: "APP INFER FAIL: NOT A PI")
-        {:error, :application_requires_pi}
+      other ->
+        {:error, {:application_requires_pi, other}}
     end
   end
 

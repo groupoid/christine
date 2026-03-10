@@ -12,7 +12,7 @@ defmodule Christine.AST do
   end
 
   defmodule DeclValue do
-    defstruct [:name, :binders, :expr, :guards, :where_decls]
+    defstruct [:name, :binders, :expr, :type, :guards, :where_decls, :tactics]
   end
 
   defmodule DeclTypeSignature do
