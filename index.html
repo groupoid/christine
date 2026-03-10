@@ -356,17 +356,17 @@ CIC [1], Section 4.5; Identity Type Elimination Rule).</p>
             <h2>Conclusion</h2>
 
             <div style="max-width:720px;margin:0 auto;">
-            Franks’s elegance rests on firm theoretical ground. Here, we reflect on key meta-theorems for Classical MLTT with
+            Christine’s elegance rests on firm theoretical ground. Here, we reflect on key meta-theorems for Classical MLTT with
             General Inductive Types, drawing from CIC’s lineage:
 
             <h3>Soundness and Completeness</h3>
-<p>Franks’s type checker is sound—every term it accepts has a type under MLTT’s rules [Paulin-Mohring, 1996].
+<p>Christine’s type checker is sound—every term it accepts has a type under MLTT’s rules [Paulin-Mohring, 1996].
    This ensures that every term accepted by Christineis typable in the underlying theory. Relative to the
    bidirectional type checking algorithm, context is appropriately managed [Harper & Licata, 2007].
    The interplay of inference and checking modes guarantees this property.</p>
             <h3>Canonicity, Normalization, and Totality</h3>
 <p>Canonicity guarantees that every closed term of type Nat normalizes to zero or succ n [Martin-Löf, 1984].
-   Franks’s normalize achieves strong normalization—every term reduces to a unique normal form—thanks to CIC’s
+   Christine’s normalize achieves strong normalization—every term reduces to a unique normal form—thanks to CIC’s
    strict positivity [Coquand & Paulin-Mohring, 1990]. Totality follows: all well-typed functions terminate,
    as seen in list_length reducing to succ (succ zero).</p>
             <h3>Consistency and Decidability</h3>
@@ -374,7 +374,7 @@ CIC [1], Section 4.5; Identity Type Elimination Rule).</p>
    like Girard’s [Girard, 1972]. Type checking is decidable in Per, as our algorithm terminates
    for well-formed inputs, leveraging CIC’s decidable equality [Asperti et al., 2009].</P>
             <h3>Conservativity and Initiality</h3>
-<p>Frank is conservative over simpler systems like System F, adding dependent types without altering propositional
+<p>Christine is conservative over simpler systems like System F, adding dependent types without altering propositional
    truths [Pfenning & Paulin-Mohring, 1989]. Inductive types like Nat satisfy initiality—every algebra morphism
    from Nat to another structure is uniquely defined—ensuring categorical universality [Dybjer, 1997].</p>
             </div>
@@ -406,7 +406,7 @@ Christine>
     <section class="section-standards">
         <h2>Open Source</h2>
         <center>
-          <a href="https://github.com/groupoid/frank">
+          <a href="https://github.com/groupoid/christine">
           <img style="width:150px;" src="https://n2o.dev/img/github.svg"/></a>
          </center>
     </section>
