@@ -1,6 +1,6 @@
 defmodule Christine.Lexer do
   @moduledoc """
-  Lexer for Christine (Coq 8.2-like syntax).
+  Lexer for Christine (Coq 6.3-like syntax).
   """
 
   def lex(input) do
