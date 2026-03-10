@@ -33,32 +33,29 @@
                totality for user-defined lambda terms via a positive occurrence check. Its mathematical properties,
                focusing on correctness, soundness, totality, canonicity, decidability and related attributes
                relevant to formal mathematics are being analyzed.</p>
-            <div style="float:inline;align:center;margin-left:-23px;" class="code-snippet">
-Definition one := (S O).
-Definition two : nat := S one.
-Definition three : nat := S two.
-Definition double (m:nat) := plus m m.
-Definition add_n (m:nat) := plus m n.
+            <div style="float:inline;align:center;margin-left:-23px;" class="code-snippet">Module Data.Eq.
 
-Goal (A -> B -> C) -> (A -> B) -> A -> C.
-  intro H.
-  intros H' HA.
-  apply H.
-  exact HA.
-  apply H'.
-  assumption.
-  Save trivial_lemma.
+Inductive Eq (A: Type) (x: A) (y: A) :=
+| Refl : Eq A x x.
 
-Lemma distr_impl : (A -> B -> C) -> (A -> B) -> A -> C.
-  intros.
-  Abort.
+Definition J (A: Type) (x: A)
+  (P: forall (y: A), forall (p: Eq A x y), Type)
+  (f: P x (Refl A x x)) (y: A) (p: Eq A x y) : P y p :=
+  match p with
+  | Refl => f
+  end.
 
-Lemma and_commutative : A /\ B -> B /\ A.
-  intro.
-  elim H.
-  split.
-  Restart.
-  Qed.
+Definition transport (A: Type) (P: forall (x: A), Type)
+  (x: A) (y: A) (p: Eq A x y) (u: P x) : P y :=
+  match p with
+  | Refl => u
+  end.
+
+Definition cong (A: Type) (B: Type) (f: forall (x: A), B)
+  (x: A) (y: A) (p: Eq A x y) : Eq B (f x) (f y) :=
+  match p with
+  | Refl => Refl B (f x) (f x)
+  end.
         </div>
         </div>
         </section>
