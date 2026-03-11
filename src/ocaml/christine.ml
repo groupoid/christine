@@ -815,7 +815,7 @@ let main () =
 let banner =
 "https://christine.groupoid.space/
 
-  🧊 Christine MLTT/CIC Theorem Prover version 0.3.11
+  🧊 Christine Theorem Prover version 0.3.11
 
 For help type `help`."
 

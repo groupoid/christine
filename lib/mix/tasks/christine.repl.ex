@@ -9,7 +9,10 @@ defmodule Mix.Tasks.Christine.Repl do
 
   @shortdoc "Christine interactive REPL with Tactics"
   def run(_) do
-    IO.puts("Christine REPL (Coq-like syntax)")
+    IO.puts("🧊 Christine Theorem Prover version 0.3.11 [Coq 6.3 Syntax]\n" <>
+            "Copyright (c) 2016-2026 Groupoid Infinity\n" <>
+            "https://groupoid.github.io/christine/\n"
+            )
     env = %Typechecker.Env{}
 
     paths = Path.wildcard("{priv,test}/christine/**/*.christine")
