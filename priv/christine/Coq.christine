@@ -126,3 +126,10 @@ Definition negb (b : bool) : bool :=
 Definition lt (n : nat) (m : nat) : Prop := le (Succ n) m.
 Definition ge (n : nat) (m : nat) : Prop := le m n.
 Definition gt (n : nat) (m : nat) : Prop := lt m n.
+
+Theorem beq_nat_refl : forall n, eq bool (beq_nat n n) true.
+Theorem beq_nat_true : forall n m, eq bool (beq_nat n m) true -> eq nat n m.
+Theorem mult_plus_distr_l : forall n m p, eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)).
+Theorem mult_assoc : forall n m p, eq nat (mult n (mult m p)) (mult (mult n m) p).
+Theorem plus_assoc : forall n m p, eq nat (plus n (plus m p)) (plus (plus n m) p).
+Theorem plus_comm : forall n m, eq nat (plus n m) (plus m n).

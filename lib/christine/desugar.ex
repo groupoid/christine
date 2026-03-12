@@ -296,6 +296,16 @@ defmodule Christine.Desugar do
                 arg: desugar_expression(r, env, func_name)
               }
 
+            "=" ->
+              # eq Any left right
+              %AST.App{
+                func: %AST.App{
+                  func: %AST.App{func: %AST.Var{name: "eq"}, arg: %AST.Var{name: "Any"}},
+                  arg: desugar_expression(l, env, func_name)
+                },
+                arg: desugar_expression(r, env, func_name)
+              }
+
             _ ->
               # Standard binary function application
               %AST.App{

@@ -19,7 +19,7 @@ Eval compute in let f := fun x => (x * 3, x) in f 3.
 
 Definition example1 := fun (x : nat) => x*x+2*x+1.
 
-Definition example2 (x : nat) := x*x+2*x+1.
+Definition example0 (x : nat) := x*x+2*x+1.
 
 Inductive bin : Set :=
 | L : bin
@@ -102,13 +102,6 @@ rewrite mult_1_l.
 rewrite mult_succ_l.
 rewrite mult_assoc.
 reflexivity.
-Qed.
-
-Require Import Omega.
-
-Lemma omega_example : forall f x y, 0 < x -> 0 < f x -> 3 * f x <= 2 * y -> f x <= y.
-Proof.
-intros; omega.
 Qed.
 
 Lemma sum_n_p : forall (n : nat), 2 * sum_n n + n = n * n.

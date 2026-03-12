@@ -6,17 +6,17 @@ Inductive Empty := .
 
 Inductive Unit := tt.
 
-Inductive Bool :=
-| False
-| True.
+Inductive bool :=
+| false
+| true.
 
-Inductive Nat :=
+Inductive nat :=
 | Zero
-| Succ (n: Nat).
+| Succ (n: nat).
 
 Definition id (A: Type) (x: A) : A := x.
 
-Definition plus (m: Nat) (n: Nat) : Nat :=
+Definition plus (m: nat) (n: nat) : nat :=
   match n with
   | Zero => m
   | Succ k => Succ (plus m k)
@@ -26,13 +26,13 @@ Inductive List (A: Type) :=
 | Nil
 | Cons (x: A) (xs: List A).
 
-Definition depth (A: Type) (t: Tree A) : Nat :=
+Definition depth (A: Type) (t: Tree A) : nat :=
   match t with
   | Leaf => Zero
   | Node l v r => Succ (max (depth A l) (depth A r))
   end.
 
-Definition max (m: Nat) (n: Nat) : Nat :=
+Definition max (m: nat) (n: nat) : nat :=
   match m with
   | Zero => n
   | Succ k =>

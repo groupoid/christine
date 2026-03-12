@@ -22,12 +22,16 @@ defmodule Christine.Tactics do
     }
   end
 
-  def apply_tactic(%ProofState{goals: []} = ps, _), do: {:error, :no_more_goals, ps}
+  def apply_tactic(ps, tactic_str) when is_binary(tactic_str) do
+    case parse_tactic(tactic_str) do
+      :unknown -> {:error, :unknown_tactic, ps}
+      tac -> apply_tactic(ps, tac)
+    end
+  end
 
-  def apply_tactic(%ProofState{goals: [{ctx, current} | rest], env: env} = ps, tactic_str) do
-    case parse_tactic_command(tactic_str) do
+  def apply_tactic(%ProofState{goals: [{ctx, current} | rest], env: env} = ps, tac) do
+    case tac do
       {:intro, x} ->
-        # IO.puts("DEBUG: intro #{x}. Current goal: #{AST.to_string(current)}")
         case Typechecker.normalize(env, current) do
           %AST.Pi{name: _y, domain: a, codomain: b} ->
             new_ctx = [{x, a} | ctx]
@@ -37,18 +41,15 @@ defmodule Christine.Tactics do
             end
             {:ok, %{ps | goals: [{new_ctx, b} | rest], reconstructor: new_rec}}
 
-          other ->
-            IO.puts("DEBUG: intro #{x} failed. Goal is not a Pi: #{inspect(other, limit: 5)}")
+          _other ->
             {:error, :not_a_pi, ps}
         end
 
       {:intros, names} ->
-        # IO.puts("DEBUG: intros #{inspect(names)}. Current goal: #{AST.to_string(current)}")
         # Handle intros without names by taking names from Pi
         case do_intros(ps, names) do
           {:ok, new_ps} -> {:ok, new_ps}
           err -> 
-            IO.puts("DEBUG: intros failed: #{inspect(err)}")
             err
         end
 
@@ -99,7 +100,6 @@ defmodule Christine.Tactics do
 
               if new_ps.goals == [] do
                 term = new_rec.([])
-                # IO.inspect(term, label: "CAPTURED PROOF TERM")
                 {:ok, %{new_ps | proof_term: term}}
               else
                 {:ok, new_ps}
@@ -176,16 +176,46 @@ defmodule Christine.Tactics do
                 # Zip constructors with partitioning of user_names if provided
                 constructor_user_names = user_names_by_constructor(ind, user_names)
 
+                # Extract parameters from the applied type (e.g. from `and a b`, we get `[a, b]`)
+                params = case Typechecker.normalize(env, ind_ty) do
+                  %AST.App{} = app -> extract_app_args(app)
+                  _ -> []
+                end
+
                 new_goals =
                   Enum.zip(ind.constrs, constructor_user_names)
-                  |> Enum.map(fn {{_idx, _, cty}, c_user_names} ->
-                    # Extract binders for constructor cty: forall (a:A) (b:B)... -> Ind
+                  |> Enum.map(fn {{idx, _cname, cty}, c_user_names} ->
+                    # Specialized constructor type: strip params and substitute their names
+                    cty_subst = Enum.reduce(Enum.zip(Enum.map(ind.params, &elem(&1, 0)), params), cty, fn {_p_name, p_val}, acc_ty ->
+                       # Strip one Pi and substitute
+                       case Typechecker.normalize(env, acc_ty) do
+                          %AST.Pi{name: n, codomain: cod} ->
+                             # Subst n with p_val in cod
+                             Christine.Typechecker.subst(n, p_val, cod)
+                          _ -> acc_ty # Should not happen if inductive is well-formed
+                       end
+                    end)
+
                     # These will be the new hypotheses in the context
-                    binders = extract_constructor_binders(env, cty, ind.name, motive)
+                    binders = extract_constructor_binders(env, cty_subst, ind, motive)
                     renamed_binders = rename_binders(binders, c_user_names)
-                    # IO.inspect(renamed_binders, label: "INDUCTION ADDING BINDERS")
-                    new_ctx = renamed_binders ++ ctx
-                    {new_ctx, current}
+                    
+                    num_ihs = Enum.count(binders, fn {_, bty} -> 
+                      case bty do
+                         %AST.App{func: ^motive} -> true
+                         _ -> false
+                      end
+                    end)
+
+                    num_args = length(binders) - num_ihs
+                    constr_args = Enum.map(Enum.take(renamed_binders, num_args), fn {bn, _} -> %AST.Var{name: bn} end)
+                    constr_term = %AST.Constr{index: idx, inductive: ind, args: constr_args}
+                    
+                    # Substitute x -> constr_term in ctx and current
+                    new_ctx = for {n, ty} <- (renamed_binders ++ ctx), do: {n, Christine.Typechecker.subst(x, constr_term, ty)}
+                    new_goal = Christine.Typechecker.subst(x, constr_term, current)
+
+                    {new_ctx, new_goal}
                   end)
 
                 n_constrs = length(ind.constrs)
@@ -198,7 +228,14 @@ defmodule Christine.Tactics do
                   wrapped_cases =
                     Enum.zip(Enum.zip(ind.constrs, constructor_user_names), case_proofs)
                     |> Enum.map(fn {{{_idx, _, cty}, c_user_names}, proof} ->
-                      binders = extract_constructor_binders(env, cty, ind.name, motive)
+                      # Specialized constructor type needed for lambda names
+                      cty_subst = Enum.reduce(Enum.zip(Enum.map(ind.params, &elem(&1, 0)), params), cty, fn {_pn, pv}, acc_ty ->
+                         case Typechecker.normalize(env, acc_ty) do
+                            %AST.Pi{name: n, codomain: cod} -> Christine.Typechecker.subst(n, pv, cod)
+                            _ -> acc_ty
+                         end
+                      end)
+                      binders = extract_constructor_binders(env, cty_subst, ind, motive)
                       renamed_binders = rename_binders(binders, c_user_names)
 
                       Enum.reduce(renamed_binders, proof, fn {name, ty}, acc ->
@@ -221,8 +258,26 @@ defmodule Christine.Tactics do
               _ ->
                 {:error, {:not_an_inductive_type, inspect(ind_ty)}, ps}
             end
-          
+        end
+
+      {:exists, witness_str} ->
+        case Typechecker.normalize(env, current) do
+          %AST.App{func: %AST.App{func: %AST.Var{name: ex_name}}} when ex_name in ["ex", "Exists"] ->
+            # Full application like (Exists A (fun x => P x))
+            %AST.App{func: %AST.App{arg: ty}, arg: motive} = Typechecker.normalize(env, current)
+            case parse_and_eval(witness_str, %{env | ctx: ctx}) do
+              {:ok, witness} ->
+                new_goal = Typechecker.normalize(env, %AST.App{func: motive, arg: witness})
+                old_rec = ps.reconstructor
+                new_rec = fn [p | res] ->
+                  ex_intro = %AST.App{func: %AST.App{func: %AST.App{func: %AST.App{func: %AST.Var{name: "ex_intro"}, arg: ty}, arg: motive}, arg: witness}, arg: p}
+                  old_rec.([ex_intro | res])
+                end
+                {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
+              err -> err
             end
+          _ -> {:error, :not_an_exists, ps}
+        end
 
       {:reflexivity, _} ->
         # Placeholder: assume it's Eq n x x and solve with Refl
@@ -257,11 +312,21 @@ defmodule Christine.Tactics do
 
       {:destruct, target} ->
         # Similar to induction but without IHs
-        {x, _} = case target do
-          {v, ns} -> {v, ns}
-          v -> {v, []}
+        case target do
+          {x, user_names} ->
+            # user_names is a list of lists (one per constructor)
+            # Convert back to "[H1 H2 | H3]" format
+            names_str = case user_names do
+              [] -> ""
+              _ -> 
+                inner = Enum.map(user_names, fn ns -> Enum.join(ns, " ") end)
+                        |> Enum.join(" | ")
+                " as [" <> inner <> "]"
+            end
+            apply_tactic(ps, "induction #{x}#{names_str}")
+          x -> 
+            apply_tactic(ps, "induction #{x}")
         end
-        apply_tactic(ps, "induction #{x}")
 
       {:rewrite, h_name} ->
         # Placeholder for rewrite using h_name
@@ -283,15 +348,28 @@ defmodule Christine.Tactics do
 
       {:discriminate, _} ->
         case Typechecker.normalize(env, current) do
-          %AST.App{func: %AST.App{func: %AST.Var{name: eq_name}, arg: left}, arg: right}
-          when eq_name in ["Eq", "eq"] ->
-            case {Typechecker.normalize(env, left), Typechecker.normalize(env, right)} do
-              {%AST.App{func: %AST.Var{name: c1}}, %AST.App{func: %AST.Var{name: c2}}} when c1 != c2 ->
-                solve_goal(ps, %AST.Var{name: "discriminate_solved"})
+          %AST.App{} = app ->
+             # Handle eq A l r
+             case unwrap_eq(app) do
+               {l, r} ->
+                 if impossible_eq?(env, l, r) do
+                   solve_goal(ps, %AST.Var{name: "discriminate_refl"})
+                 else
+                   {:error, :not_a_contradiction, ps}
+                 end
+               _ -> {:error, :not_an_equation, ps}
+             end
 
-              _ ->
-                {:error, :not_discriminated, ps}
-            end
+          %AST.Pi{domain: %AST.App{} = domain} ->
+             case unwrap_eq(domain) do
+               {l, r} ->
+                 if impossible_eq?(env, l, r) do
+                    solve_goal(ps, %AST.Lam{name: "H", domain: domain, body: %AST.Var{name: "False"}})
+                 else
+                    {:error, :not_a_contradiction, ps}
+                 end
+               _ -> {:error, :not_an_equation, ps}
+             end
 
           _ ->
             {:error, :not_an_equation, ps}
@@ -366,7 +444,6 @@ defmodule Christine.Tactics do
         case parse_and_eval(expr_str, %{env | ctx: ctx}) do
           {:ok, witness} ->
             norm_current = Typechecker.normalize(env, current)
-            # IO.inspect(norm_current, label: "NORMALIZED GOAL FOR EXISTS")
             
             case norm_current do
               %AST.App{func: %AST.App{func: %AST.Var{name: ex_name}, arg: a_type}, arg: p_lambda}
@@ -389,8 +466,6 @@ defmodule Christine.Tactics do
                 {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
 
               _ ->
-                # IO.puts("DEBUG: not_an_existential. Goal normalized to: #{inspect(norm_current, limit: 5)}")
-                # IO.inspect(norm_current, label: "RAW NORMALIZED GOAL FOR EXISTS", structs: false)
                 {:error, :not_an_existential, ps}
             end
 
@@ -403,7 +478,7 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp parse_tactic_command(str) do
+  defp parse_tactic(str) do
     str = String.trim(str)
 
     cond do
@@ -450,8 +525,11 @@ defmodule Christine.Tactics do
       String.starts_with?(str, "rewrite ") ->
         {:rewrite, String.slice(str, 8..-1//1) |> String.trim() |> String.trim_trailing(".")}
 
-      str == "discriminate" or str == "discriminate." ->
-        {:discriminate, nil}
+      str =~ ~r/^\s*discriminate\b/ ->
+        case Regex.run(~r/discriminate\s+([^\s\.]+)/, str) do
+          [_, h] -> {:discriminate, h}
+          _ -> {:discriminate, nil}
+        end
 
       String.starts_with?(str, "inversion ") ->
         {:inversion, String.slice(str, 10..-1//1) |> String.trim() |> String.trim_trailing(".")}
@@ -602,7 +680,6 @@ defmodule Christine.Tactics do
   def solve_with_tactics(name, target_type, tactics, env) do
     ps = start_proof(name, target_type, env)
 
-    # Split tactics if it's a single string, or use as is if it's a list
     tactic_list =
       if is_list(tactics) do
         tactics
@@ -614,11 +691,11 @@ defmodule Christine.Tactics do
       |> Enum.reject(&(&1 == ""))
 
     Enum.reduce_while(tactic_list, ps, fn tactic_str, acc ->
-      case process_semicolons(acc, tactic_str) do
+      case apply_to_all_goals(acc, tactic_str) do
         {:ok, nps} -> {:cont, nps}
+        {:error, reason, _failed_ps, failed_tac} -> {:halt, {:error, reason, acc, failed_tac}}
+        {:error, reason, _failed_ps} -> {:halt, {:error, reason, acc, tactic_str}}
         {:error, reason} -> {:halt, {:error, reason, acc, tactic_str}}
-        {:error, reason, _ps} -> {:halt, {:error, reason, acc, tactic_str}}
-        {:error, reason, _ps, failed_tac} -> {:halt, {:error, reason, acc, failed_tac}}
       end
     end)
     |> case do
@@ -640,8 +717,8 @@ defmodule Christine.Tactics do
         end
     end
   end
-
-  defp process_semicolons(ps, tactic_str) do
+  def apply_to_all_goals(ps, tactic_str) do
+    for {ctx, g} <- ps.goals, do: IO.puts("DEBUG GOAL CTX: #{inspect(Enum.map(ctx, &elem(&1, 0)))} |- #{AST.to_string(g)}")
     case String.split(tactic_str, ~r/;\s*/, trim: true) do
       [tac] ->
         apply_tactic(ps, tac)
@@ -649,17 +726,13 @@ defmodule Christine.Tactics do
       [first | rest] ->
         case apply_tactic(ps, first) do
           {:ok, %{goals: new_goals} = nps} ->
-            # Identify which goals were actually added by 'first'
-            # (Subgoals are always at the head of ps.goals)
             n_new = length(new_goals) - length(ps.goals) + 1
             {subgoals, others} = Enum.split(new_goals, n_new)
-            
-            # Apply rest of tactics to each subgoal produced by first
-            # We must be careful to combine them correctly
+
             results = Enum.map(subgoals, fn g ->
               temp_ps = %{nps | goals: [g]}
               Enum.reduce_while(rest, {:ok, temp_ps}, fn tac, {:ok, curr_ps} ->
-                case apply_to_all_goals(curr_ps, tac) do
+                case apply_tactic(curr_ps, tac) do
                   {:ok, next_ps} -> {:cont, {:ok, next_ps}}
                   err -> {:halt, err}
                 end
@@ -670,10 +743,8 @@ defmodule Christine.Tactics do
               all_subgoals = Enum.flat_map(results, fn {:ok, r} -> r.goals end)
               {:ok, %{nps | goals: all_subgoals ++ others}}
             else
-              error = Enum.find(results, fn {:ok, _} -> false; _ -> true end)
-              error
+              Enum.find(results, fn {:ok, _} -> false; _ -> true end)
             end
-
           err -> err
         end
     end
@@ -686,16 +757,10 @@ defmodule Christine.Tactics do
 
   defp user_names_by_constructor(ind, user_names) do
     if is_list(user_names) and length(user_names) > 0 and is_list(hd(user_names)) do
-      # Already segmented by |
       n = length(ind.constrs)
       user_names ++ List.duplicate([], n) |> Enum.take(n)
     else
-      # Simple logic: if multiple constructors (like or), split names by pipe
-      # If one constructor (like and), use all names.
       if length(ind.constrs) > 1 do
-        # For now, just a heuristic: partition names if possible or repeat
-        # Real Coq uses [ a b | c ] syntax which we should parse better.
-        # For now, if user provided names, just repeat or partition.
         Enum.map(ind.constrs, fn _ -> user_names end)
       else
         [user_names]
@@ -703,27 +768,7 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp apply_to_all_goals(ps, tactic_str) do
-    # In Coq, tac1 ; tac2 applies tac2 to ALL goals produced by tac1.
-    # Here we apply to all goals currently open in the ProofState.
-    if ps.goals == [] do
-      {:ok, ps}
-    else
-      # ACTUAL Simple Implementation: Apply to ALL goals one by one.
-      Enum.reduce_while(ps.goals, {:ok, %{ps | goals: []}}, fn {ctx, target}, {:ok, acc_ps} ->
-        # Goal-specific ProofState
-        temp_ps = %{acc_ps | goals: [{ctx, target}]}
-        case apply_tactic(temp_ps, tactic_str) do
-          {:ok, next_ps} ->
-            # Accumulate subgoals and preserve proof_term if solved
-            {:cont, {:ok, %{next_ps | goals: acc_ps.goals ++ next_ps.goals}}}
-          {:error, reason, _failed_ps} ->
-            # If it fails on ONE goal, Coq usually errors out.
-            {:halt, {:error, reason, ps}}
-        end
-      end)
-    end
-  end
+
 
   defp get_inductive_head(env, ty) do
     case Typechecker.normalize(env, ty) do
@@ -753,34 +798,35 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp extract_constructor_binders(env, cty, ind_name, motive, acc \\ []) do
+  defp extract_constructor_binders(env, cty, ind, motive, acc \\ []) do
     case Typechecker.normalize(env, cty) do
       %AST.Pi{name: name, domain: domain, codomain: codomain} ->
         # Check if domain is the inductive type (recursive argument)
         is_recursive =
-          case Typechecker.normalize(env, domain) do
-            %AST.Ind{inductive: %{name: ^ind_name}} -> true
-            _ ->
-              case domain do
-                %AST.Var{name: ^ind_name} -> true
-                _ -> false
-              end
+          case domain do
+            %AST.Var{name: d_name} -> d_name == ind.name
+            %AST.Inductive{name: d_name} -> d_name == ind.name
+            %AST.App{func: f} -> 
+               case unwrap_constr(f) do
+                 {_, d_name} -> d_name == ind.name
+                 _ -> false
+               end
+            _ -> false
           end
-
-        new_acc = acc ++ [{name, domain}]
 
         new_acc =
           if is_recursive do
-            ih_name = "IH#{name}"
-            ih_ty = %AST.App{func: motive, arg: %AST.Var{name: name}}
-            new_acc ++ [{ih_name, ih_ty}]
+            acc ++ [{name, domain}, {"IH#{name}", %AST.App{func: motive, arg: %AST.Var{name: name}}}]
           else
-            new_acc
+            acc ++ [{name, domain}]
           end
 
-        extract_constructor_binders(env, codomain, ind_name, motive, new_acc)
+        # Update environment with the new binder for recursive call
+        env_with_binder = %{env | ctx: [{name, domain} | env.ctx]}
+        extract_constructor_binders(env_with_binder, codomain, ind, motive, new_acc)
 
       _ ->
+        # IO.puts("DEBUG EXTRACTED BINDERS FOR #{ind.name}: #{inspect(Enum.map(acc, &elem(&1, 0)))}")
         acc
     end
   end
@@ -810,37 +856,59 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp do_intros(ps, names \\ [])
-  
-  defp do_intros(ps, []) do
-    case ps.goals do
-      [{ctx, current} | _] ->
-        case Typechecker.normalize(ps.env, current) do
-          %AST.Pi{name: name} ->
-            name = if name == "_", do: "x#{length(ctx)}", else: name
-            case apply_tactic(ps, "intro #{name}") do
-              {:ok, nps} -> do_intros(nps, [])
-              _ -> {:ok, ps}
-            end
-
-          _ ->
-            {:ok, ps}
-        end
-
-      _ ->
-        {:ok, ps}
-    end
-  end
-
+  defp do_intros(ps, []), do: apply_all_intros(ps)
   defp do_intros(ps, [name | rest]) do
     case apply_tactic(ps, "intro #{name}") do
-      {:ok, nps} -> 
-        if rest == [] do
-          {:ok, nps} # STOP HERE if we consumed all requested names
-        else
-          do_intros(nps, rest)
-        end
-      err -> err
+      {:ok, nps} -> do_intros(nps, rest)
+      {:error, _reason, _} = err -> 
+         # Try auto-intro until we can name it
+         case apply_tactic(ps, "intro") do
+           {:ok, nps} -> do_intros(nps, [name | rest])
+           _ -> err
+         end
     end
   end
+
+  defp impossible_eq?(env, l, r) do
+    nl = Typechecker.normalize(env, l)
+    nr = Typechecker.normalize(env, r)
+    vl = unwrap_constr(nl)
+    vr = unwrap_constr(nr)
+    IO.puts("DEBUG IMPOSSIBLE EQ CHECK: #{inspect(vl)} vs #{inspect(vr)}")
+    case {vl, vr} do
+      {{i1, name}, {i2, name}} when i1 != i2 ->
+        true
+
+      _ ->
+        false
+    end
+  end
+
+  defp unwrap_constr(%AST.Constr{index: i, inductive: %{name: name}}), do: {i, name}
+  defp unwrap_constr(%AST.App{func: f}), do: unwrap_constr(f)
+  defp unwrap_constr(_), do: nil
+
+  defp unwrap_eq(app) do
+    res = case app do
+      %AST.App{func: %AST.App{func: %AST.App{func: %AST.Var{name: n}, arg: _}, arg: l}, arg: r} 
+        when n in ["eq", "Eq", "Coq.eq", "Coq.Eq"] -> {l, r}
+      %AST.App{func: %AST.App{func: %AST.Var{name: n}, arg: l}, arg: r}
+        when n in ["eq", "Eq", "Coq.eq", "Coq.Eq"] -> {l, r}
+      _ -> nil
+    end
+    IO.puts("DEBUG UNWRAP EQ: #{AST.to_string(app)} -> #{inspect(res != nil)}")
+    res
+  end
+
+  defp apply_all_intros(ps) do
+    case apply_tactic(ps, "intro") do
+      {:ok, nps} -> apply_all_intros(nps)
+      _ -> {:ok, ps}
+    end
+  end
+
+  defp extract_app_args(%AST.App{func: f, arg: a}) do
+    extract_app_args(f) ++ [a]
+  end
+  defp extract_app_args(_), do: []
 end
