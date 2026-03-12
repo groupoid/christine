@@ -3,9 +3,6 @@ defmodule Mix.Tasks.Christine.Repl do
 
   alias Christine.{Lexer, Layout, Parser, Desugar, Typechecker, AST}
 
-  defmodule ProofState do
-    defstruct [:target, :ctx, :env, :solved, :goals]
-  end
 
   @shortdoc "Christine interactive REPL with Tactics"
   def run(_) do
@@ -60,10 +57,10 @@ defmodule Mix.Tasks.Christine.Repl do
         input = String.trim(input)
 
         cond do
-          String.starts_with?(input, ~w[Theorem Lemma Corollary]) |> Enum.any? ->
+          String.starts_with?(input, ~w[Theorem Lemma Corollary]) ->
             case start_proof(input, env) do
-              {:ok, ps} ->
-                loop(env, ps)
+              {:ok, ps, new_env} ->
+                loop(new_env, ps)
 
               {:error, err} ->
                 IO.puts("Error: #{inspect(err)}")
@@ -73,19 +70,21 @@ defmodule Mix.Tasks.Christine.Repl do
           # Print name. — show stored term and type (Coq 6.3 style)
           Regex.match?(~r/^Print\s+\S+\.?$/, input) ->
             name = input |> String.replace_prefix("Print", "") |> String.trim() |> String.trim_trailing(".")
-            ty = List.keyfind(env.ctx, name, 0)
-            term = Map.get(env.defs, name)
 
-            case {ty, term} do
-              {nil, nil} ->
-                IO.puts("#{name} : <unknown>")
-              {{_, ty_val}, nil} ->
-                IO.puts("#{name} : #{AST.to_string(ty_val)}")
-              {nil, t} ->
-                IO.puts("#{name} := #{AST.to_string(t)}")
-              {{_, ty_val}, t} ->
-                IO.puts("#{name} : #{AST.to_string(ty_val)}")
-                IO.puts("     := #{AST.to_string(t)}")
+            # Check active proof session first
+            if proof_state && proof_state.name == name do
+              ty_val = if proof_state.goals == [], do: proof_state.target, else: proof_state.target
+              Christine.AST.print_declaration(name, ty_val, proof_state.proof_term)
+            else
+              # Check env
+              case List.keyfind(env.ctx, name, 0) do
+                {_, ty} ->
+                  term = Map.get(env.defs, name)
+                  Christine.AST.print_declaration(name, ty, term)
+
+                _ ->
+                  IO.puts("#{name} is not defined")
+              end
             end
 
             loop(env, proof_state)
@@ -94,15 +93,27 @@ defmodule Mix.Tasks.Christine.Repl do
             handle_tactic(input, env, proof_state)
 
           true ->
-            case eval(input, env) do
-              {:ok, result} ->
-                IO.puts("Result: #{AST.to_string(result)}")
-                loop(env, nil)
+            try do
+              case eval(input, env) do
+                {:ok, result} ->
+                  str = try do
+                    AST.to_string(result)
+                  rescue
+                    _ -> inspect(result, limit: 10, pretty: false)
+                  end
+                  IO.puts("Result: #{str}")
 
-              {:error, err} ->
-                IO.puts("Error: #{inspect(err)}")
-                loop(env, nil)
+                {:error, {:eval_crash, msg}} ->
+                  IO.puts("Error: #{msg}")
+
+                {:error, err} ->
+                  IO.puts("Error: #{inspect(err, limit: 5)}")
+              end
+            rescue
+              e ->
+                IO.puts("Error: #{Exception.message(e)}")
             end
+            loop(env, nil)
         end
     end
   end
@@ -116,7 +127,10 @@ defmodule Mix.Tasks.Christine.Repl do
 
       IO.puts("Proof started for #{name}")
       desugared_target = Desugar.desugar_expression(target_syn, env)
-      {:ok, Christine.Tactics.start_proof(desugared_target, env)}
+      ps = Christine.Tactics.start_proof(name, desugared_target, env)
+      # Register the theorem in the context immediately so it is visible to Print.
+      new_env = %{env | ctx: [{name, desugared_target} | env.ctx]}
+      {:ok, ps, new_env}
     else
       err -> {:error, err}
     end
@@ -129,7 +143,13 @@ defmodule Mix.Tasks.Christine.Repl do
       "Qed." ->
         if ps.goals == [] do
           IO.puts("Proof complete!")
-          loop(env, nil)
+          # Persist the proof term if we have one.
+          new_env = if ps.proof_term do
+            %{env | defs: Map.put(env.defs, ps.name, ps.proof_term)}
+          else
+            env
+          end
+          loop(new_env, nil)
         else
           IO.puts("Error: Proof not finished. Remaining goals: #{length(ps.goals)}")
           loop(env, ps)
@@ -170,13 +190,17 @@ defmodule Mix.Tasks.Christine.Repl do
     if input == "" do
       {:error, :empty_input}
     else
-      with {:ok, tokens} <- Lexer.lex(input),
-           resolved <- Layout.resolve(tokens),
-           {:ok, expr, _} <- Parser.parse_expression(resolved) do
-        desugared = Desugar.desugar_expression(expr, env)
-        {:ok, Typechecker.normalize(env, desugared)}
-      else
-        err -> {:error, err}
+      try do
+        with {:ok, tokens} <- Lexer.lex(input),
+             resolved <- Layout.resolve(tokens),
+             {:ok, expr, _} <- Parser.parse_expression(resolved) do
+          desugared = Desugar.desugar_expression(expr, env)
+          {:ok, Typechecker.normalize(env, desugared)}
+        else
+          err -> {:error, err}
+        end
+      rescue
+        e -> {:error, {:eval_crash, Exception.message(e)}}
       end
     end
   end

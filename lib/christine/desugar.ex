@@ -38,6 +38,9 @@ defmodule Christine.Desugar do
 
   def desugar_decl({:module_start, name}, _env), do: {:module_start, name}
   def desugar_decl({:section_start, name}, _env), do: {:section_start, name}
+  def desugar_decl({:proof, tacs}, _env), do: {:proof, tacs}
+  def desugar_decl({:proof_skipped} = d, _env), do: d
+  def desugar_decl({:tactic_skipped, _} = d, _env), do: d
 
   def desugar_decl(
         %AST.DeclValue{
@@ -69,7 +72,7 @@ defmodule Christine.Desugar do
               %AST.Lam{name: vn, domain: desugar_expression(vt, env), body: acc}
 
             %AST.Var{name: vn}, acc ->
-              %AST.Lam{name: vn, domain: %AST.Universe{level: 0}, body: acc}
+              %AST.Lam{name: vn, domain: %AST.Var{name: "Any"}, body: acc}
           end
         )
 
@@ -84,7 +87,7 @@ defmodule Christine.Desugar do
             %AST.Pi{name: vn, domain: desugar_expression(vt, env), codomain: acc}
 
           %AST.Var{name: vn}, acc ->
-            %AST.Pi{name: vn, domain: %AST.Universe{level: 0}, codomain: acc}
+            %AST.Pi{name: vn, domain: %AST.Var{name: "Any"}, codomain: acc}
         end)
 
       %AST.DeclValue{name: name, binders: [], expr: nil, type: final_type}
@@ -149,9 +152,13 @@ defmodule Christine.Desugar do
 
             case first_pat do
               %AST.BinderConstructor{name: cname} ->
-                Enum.find_value(Map.values(env.env), fn ind ->
-                  if Enum.any?(ind.constrs, fn {_, name, _} -> name == cname or (cname == "::" and name == "cons") end),
-                    do: ind
+                Enum.find_value(Map.values(env.env), fn
+                  %AST.Inductive{} = ind ->
+                    if Enum.any?(ind.constrs, fn {_, name, _} ->
+                         name == cname or (cname == "::" and name == "cons")
+                       end),
+                       do: ind
+                  _ -> nil
                 end)
 
               _ ->
@@ -302,8 +309,12 @@ defmodule Christine.Desugar do
 
         mapped_expr
 
-      %AST.Pi{name: "_", domain: d, codomain: c} ->
-        %AST.Pi{name: "_", domain: desugar_expression(d, env, func_name), codomain: desugar_expression(c, env, func_name)}
+      %AST.Pi{name: name, domain: d, codomain: c} ->
+        %AST.Pi{
+          name: name,
+          domain: desugar_expression(d, env, func_name),
+          codomain: desugar_expression(c, env, func_name)
+        }
 
       %AST.App{func: f, arg: arg} ->
         %AST.App{

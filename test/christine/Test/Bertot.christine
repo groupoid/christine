@@ -17,9 +17,13 @@ Check (let f := fun x => (x * 3,x) in f 3).
 
 Eval compute in let f := fun x => (x * 3, x) in f 3.
 
-Definition example1 := fun x : nat => x*x+2*x+1.
+Definition example1 := fun (x : nat) => x*x+2*x+1.
 
 Definition example2 (x : nat) := x*x+2*x+1.
+
+Inductive bin : Set :=
+| L : bin
+| N : bin -> bin -> bin.
 
 Require Import Bool.
 
@@ -27,27 +31,32 @@ Eval compute in if true then 3 else 5.
 
 Search bool.
 
-Definition head_evb l := match l with
+Definition head_evb (l : list nat) := match l with
 | nil => false
 | a::tl => evenb a
 end.
 
-Fixpoint sum_list l := match l with
+Fixpoint sum_n (n : nat) : nat := match n with
+| Zero => Zero
+| Succ p => plus (Succ p) (sum_n p)
+end.
+
+Fixpoint sum_list (l : list nat) : nat := match l with
 | nil => 0
 | n::tl => n + sum_list tl
 end.
 
-Fixpoint insert n l := match l with
+Fixpoint insert (n : nat) (l : list nat) : list nat := match l with
 | nil => n::nil
 | a::tl => if leb n a then n::l else a::insert n tl
 end.
 
-Fixpoint sort l := match l with
+Fixpoint sort (l : list nat) : list nat := match l with
 | nil => nil
 | a::tl => insert a (sort tl)
 end.
 
-Eval compute in sort (1::4::3::22::5::16::7::nil).
+Eval compute in sort (1::4::3::22::5::16::7::nil Nat).
 
 Lemma example2 : forall a b:Prop, a /\ b -> b /\ a.
 Proof.
@@ -102,7 +111,7 @@ Proof.
 intros; omega.
 Qed.
 
-Lemma sum_n_p : forall n, 2 * sum_n n + n = n * n.
+Lemma sum_n_p : forall (n : nat), 2 * sum_n n + n = n * n.
 Proof.
   induction n.
   reflexivity.
@@ -114,9 +123,9 @@ Proof.
   ring.
 Qed.
 
-Lemma evenb_p : forall n, evenb n = true -> exists x, n = 2 * x.
+Lemma evenb_p : forall (n : nat), evenb n = true -> exists x, n = 2 * x.
 Proof.
-  assert (Main: forall n, (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
+  assert (Main: forall (n : nat), (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
   {
     induction n.
     split.
@@ -145,7 +154,7 @@ Fixpoint count n l := match l with
 if beq_nat n a then 1+r else r
 end.
 
-Lemma insert_incr : forall n l, count n (insert n l) = 1 + count n l.
+Lemma insert_incr : forall (n : nat) (l : list nat), count n (insert n l) = 1 + count n l.
 Proof.
 intros n l; induction l.
 simpl.
@@ -162,7 +171,7 @@ rewrite IHl; reflexivity.
 rewrite IHl; reflexivity.
 Qed.
 
-Lemma example7_size : forall t, example7 t = false -> size t = 3.
+Lemma example7_size : forall (t : bin), example7 t = false -> size t = 3.
 Proof.
 intros t; destruct t.
 simpl.
@@ -191,7 +200,7 @@ Fixpoint size (t:bin) : nat := match t with
 | N t1 t2 => 1 + size t1 + size t2
 end.
 
-Lemma flatten_aux_size : forall t1 t2, size (flatten_aux t1 t2) = size t1 + size t2 + 1.
+Lemma flatten_aux_size : forall (t1 t2:bin), size (flatten_aux t1 t2) = size t1 + size t2 + 1.
 Proof.
 induction t1.
 intros t2; simpl; ring.
@@ -203,7 +212,7 @@ Qed.
 
 Print flatten_aux_size.
 
-Lemma not_subterm_self_l : forall x y, ~ x = N x y.
+Lemma not_subterm_self_l : forall (x y : bin), ~ x = N x y.
 Proof.
 intros x y abs.
 induction x.

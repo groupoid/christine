@@ -39,6 +39,11 @@ Inductive le : nat -> nat -> Prop :=
 | le_n : forall n, le n n
 | le_S : forall n m, le n m -> le n (Succ m).
 
+Inductive ex (A : Type) (P : A -> Prop) : Prop :=
+| ex_intro : forall x : A, P x -> ex A P.
+
+Definition Exists := ex.
+
 Inductive Empty_set : Set :=.
 
 Definition not (A : Prop) := A -> False.

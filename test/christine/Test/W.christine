@@ -1,5 +1,4 @@
 (* W-defined Nat addition for Christine *)
-(* Test for 2 + 1 *)
 
 Module Test.W.
 
@@ -32,5 +31,4 @@ Definition wplus (m: W Bool B_nat) (n: W Bool B_nat) : W Bool B_nat :=
     end
   end.
 
-(* Test case: 2 + 1 *)
 Definition test_W : W Bool B_nat := wplus wTwo wOne.

@@ -9,7 +9,7 @@ defmodule Christine.Typechecker do
   - deadline: monotonic time limit in ms
   """
   defmodule Env do
-    defstruct env: %{}, ctx: [], defs: %{}, name_to_mod: %{}, deadline: nil
+    defstruct env: %{}, ctx: [], defs: %{}, name_to_mod: %{}, deadline: nil, last_decl: nil
   end
 
   # Checks all declarations in a module.
@@ -182,7 +182,6 @@ defmodule Christine.Typechecker do
         %AST.App{func: normalize(e, f), arg: normalize(e, arg)}
 
       %AST.Lam{name: x, domain: a, body: b} ->
-        # Use WHNF: don't normalize the body to avoid infinite recursion
         %AST.Lam{name: x, domain: normalize(e, a), body: b}
 
       %AST.Pi{name: x, domain: a, codomain: b} ->

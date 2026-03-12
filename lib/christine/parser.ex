@@ -97,15 +97,72 @@ defmodule Christine.Parser do
         end
 
       [{:proof_kw, _, _} | rest] ->
-        # Skip until Qed.
-        rest2 = Enum.drop_while(rest, fn
+        # Collect until Qed.
+        {tactic_tokens, rest_after_qed} = Enum.split_while(rest, fn
           {:qed, _, _} -> false
           _ -> true
         end)
-        case skip_virtual(rest2) do
-           [{:qed, _, _}, {:dot, _, _} | rest3] -> {:ok, {:proof_skipped}, rest3}
-           [{:qed, _, _} | rest3] -> {:ok, {:proof_skipped}, rest3}
-           _ -> {:ok, {:proof_skipped}, rest2}
+
+        # Extract tactics as strings for now (basic extraction)
+        tactics = tactic_tokens
+          |> Enum.chunk_by(fn t -> elem(t, 0) == :dot end)
+          |> Enum.reject(fn chunk -> match?([{:dot, _, _} | _], chunk) end)
+          |> Enum.map(fn chunk ->
+              chunk
+              |> Enum.map(fn t ->
+                  case t do
+                    {:ident, _, _, val} -> val
+                    {:operator, _, _, val} -> val
+                    {type, _, _, val} when is_atom(type) -> to_string(val)
+                    {type, _, _} ->
+                      case type do
+                        :dot -> "."
+                        :colon -> ":"
+                        :assign -> ":="
+                        :fat_arrow -> "=>"
+                        :arrow -> "->"
+                        :left_paren -> "("
+                        :right_paren -> ")"
+                        :comma -> ","
+                        :pipe -> "|"
+                        :plus -> "+"
+                        :minus -> "-"
+                        :star -> "*"
+                        :slash -> "/"
+                        :equal -> "="
+                        :tilde -> "~"
+                        :and_kw -> "/\\"
+                        :or_kw -> "\\/"
+                        :not_equal -> "<>"
+                        :left_bracket -> "["
+                        :right_bracket -> "]"
+                        # Keywords
+                        :forall -> "forall"
+                        :exists -> "exists"
+                        :fun_kw -> "fun"
+                        :match_kw -> "match"
+                        :with_kw -> "with"
+                        :end_kw -> "end"
+                        :if_kw -> "if"
+                        :then_kw -> "then"
+                        :else_kw -> "else"
+                        :prop_kw -> "Prop"
+                        :type_kw -> "Type"
+                        :semicolon -> ";"
+                        _ -> ""
+                      end
+                    _ -> ""
+                  end
+                end)
+              |> Enum.join(" ")
+              |> String.trim()
+            end)
+          |> Enum.reject(&(&1 == ""))
+
+        case skip_virtual(rest_after_qed) do
+           [{:qed, _, _}, {:dot, _, _} | rest3] -> {:ok, {:proof, tactics}, rest3}
+           [{:qed, _, _} | rest3] -> {:ok, {:proof, tactics}, rest3}
+           _ -> {:ok, {:proof, tactics}, rest_after_qed}
         end
 
       [{:ident, _, _, name}, {:dot, _, _} | rest]
@@ -570,13 +627,24 @@ defmodule Christine.Parser do
     tokens = skip_virtual(tokens)
 
     case tokens do
-      [{:left_paren, _, _}, {:ident, _, _, name}, {:colon, _, _} | rest] ->
-        case parse_type(rest) do
-          {:ok, ty, [{:right_paren, _, _} | rest2]} ->
-            parse_forall_binders(rest2, [{name, ty} | acc])
-
-          _ ->
-            {:error, :invalid_forall_param}
+      [{:left_paren, _, _} | rest] ->
+        case parse_binder_names(rest, []) do
+          {:ok, names, rest2} ->
+            case skip_virtual(rest2) do
+              [{:colon, _, _} | rest3] ->
+                case parse_type(rest3) do
+                  {:ok, ty, rest4} ->
+                    case skip_virtual(rest4) do
+                      [{:right_paren, _, _} | rest5] ->
+                        new_acc = Enum.reduce(names, acc, fn n, a -> [{n, ty} | a] end)
+                        parse_forall_binders(rest5, new_acc)
+                      _ -> {:ok, Enum.reverse(acc), tokens}
+                    end
+                  _ -> {:ok, Enum.reverse(acc), tokens}
+                end
+              _ -> {:ok, Enum.reverse(acc), tokens}
+            end
+          _ -> {:ok, Enum.reverse(acc), tokens}
         end
 
       [{:ident, _, _, name} | rest] ->
@@ -625,45 +693,57 @@ defmodule Christine.Parser do
 
       [{:forall, _, _} | rest] ->
         case parse_forall_binders(rest, []) do
-          {:ok, binders, [{:comma, _, _} | rest2]} ->
-            case parse_expr(rest2, get_precedence("forall")) do
-              {:ok, body, rest3} ->
-                final =
-                  Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
-                    %AST.Pi{name: n, domain: d, codomain: acc}
-                  end)
+          {:ok, binders, rest_f} ->
+            case skip_virtual(rest_f) do
+              [{:comma, _, _} | rest2] ->
+                case parse_expr(rest2, get_precedence("forall")) do
+                  {:ok, body, rest3} ->
+                    final =
+                      Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
+                        %AST.Pi{name: n, domain: d, codomain: acc}
+                      end)
 
-                {:ok, final, rest3}
+                    {:ok, final, rest3}
 
-              err ->
-                err
+                  err ->
+                    err
+                end
+
+              _ ->
+                {:error, :expected_comma_in_forall}
             end
 
-          _ ->
-            {:error, :expected_comma_in_forall}
+          err ->
+            err
         end
 
       [{:exists, _, _} | rest] ->
         case parse_forall_binders(rest, []) do
-          {:ok, binders, [{:comma, _, _} | rest2]} ->
-            case parse_expr(rest2, get_precedence("exists")) do
-              {:ok, body, rest3} ->
-                final =
-                  Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
-                    %AST.App{
-                      func: %AST.App{func: %AST.Var{name: "Exists"}, arg: d},
-                      arg: %AST.Lambda{binders: [{n, d}], body: acc}
-                    }
-                  end)
+          {:ok, binders, rest_e} ->
+            case skip_virtual(rest_e) do
+              [{:comma, _, _} | rest2] ->
+                case parse_expr(rest2, get_precedence("exists")) do
+                  {:ok, body, rest3} ->
+                    final =
+                      Enum.reduce(Enum.reverse(binders), body, fn {n, d}, acc ->
+                        %AST.App{
+                          func: %AST.App{func: %AST.Var{name: "Exists"}, arg: d},
+                          arg: %AST.Lambda{binders: [{n, d}], body: acc}
+                        }
+                      end)
 
-                {:ok, final, rest3}
+                    {:ok, final, rest3}
 
-              err ->
-                err
+                  err ->
+                    err
+                end
+
+              _ ->
+                {:error, :expected_comma_in_exists}
             end
 
-          _ ->
-            {:error, :expected_comma_in_exists}
+          err ->
+            err
         end
 
       [{:operator, _, _, "~"} | rest] ->

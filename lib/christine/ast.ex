@@ -141,8 +141,9 @@ defmodule Christine.AST do
           "(#{name} #{args_str})"
         end
 
-      %Ind{inductive: d, term: t} ->
-        "ind_#{d.name}(#{to_string(t)})"
+      %Ind{inductive: d, motive: m, cases: cases, term: t} ->
+        cases_str = Enum.map_join(cases, ", ", &to_string/1)
+        "ind_#{d.name}(motive=#{to_string(m)}, cases=[#{cases_str}], term=#{to_string(t)})"
 
       %Let{decls: decls, body: body} ->
         decls_str =
@@ -156,7 +157,7 @@ defmodule Christine.AST do
         "#{v}"
 
       %String{value: s} ->
-        inspect(s)
+        Kernel.inspect(s)
 
       %Lambda{binders: binders, body: body} ->
         params_str =
@@ -196,13 +197,23 @@ defmodule Christine.AST do
         "error(#{reason})"
 
       {:error, reason} ->
-        "error(#{inspect(reason)})"
+        "error(#{Kernel.inspect(reason)})"
 
       {:ok, val} ->
         to_string(val)
 
       _ ->
-        inspect(term)
+        Kernel.inspect(term)
+    end
+  end
+
+  def print_declaration(name, type, term \\ nil) do
+    type_str = if type, do: to_string(type), else: "<unknown>"
+    IO.puts("#{name} : #{type_str}")
+
+    if term do
+      term_str = to_string(term)
+      IO.puts("     := #{term_str}")
     end
   end
 
