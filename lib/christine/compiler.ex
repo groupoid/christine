@@ -181,6 +181,7 @@ defmodule Christine.Compiler do
               desugared_v = Desugar.desugar_decl(v, acc)
               {expr, val_ty} = cond do
                 desugared_v.tactics ->
+                  # IO.puts("Solving theorem: #{desugared_v.name}")
                   case Christine.Tactics.solve_with_tactics(desugared_v.name, desugared_v.type, desugared_v.tactics, acc) do
                     {:ok, term} -> {term, desugared_v.type}
                     {:error, reason} ->

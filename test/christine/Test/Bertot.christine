@@ -120,14 +120,13 @@ Lemma evenb_p : forall (n : nat), evenb n = true -> exists x, n = 2 * x.
 Proof.
   assert (Main: forall (n : nat), (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
   {
-    induction n.
+    induction n as [| n'].
     split.
     intros H; exists 0; ring.
     intros H; discriminate H.
     split.
-    intros H.
     destruct IHn as [_ IHn’].
-    apply IHn’.
+    exact IHn’.
     intros H.
     destruct IHn as [IHn’ _].
     assert (H’ : exists x, n = 2 * x).

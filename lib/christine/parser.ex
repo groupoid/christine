@@ -181,7 +181,7 @@ defmodule Christine.Parser do
 
       [{kw, _, _} | rest]
       when kw in [:definition, :theorem, :lemma, :fact, :remark, :fixpoint, :hypothesis, :variable] ->
-        parse_def_theorem(rest)
+        parse_def_theorem(rest, kw == :fixpoint)
 
       [{:ident, _, _, name} | rest] when name in ["Variables", "End"] ->
         # Skip until dot
@@ -356,7 +356,7 @@ defmodule Christine.Parser do
     end
   end
 
-  defp parse_def_theorem(tokens) do
+  defp parse_def_theorem(tokens, is_fixpoint) do
     # Strategy:
     # 1. Take the FIRST identifier as the function/lemma name.
     # 2. Parse zero or more bare identifiers as untyped binders (for Coq 6.3: `f x y :=`).
@@ -384,18 +384,55 @@ defmodule Christine.Parser do
                           {:ok, expr, rest6} ->
                             case skip_virtual(rest6) do
                               [{:dot, _, _} | rest7] ->
-                                {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr, type: ty}], rest7}
+                                {:ok,
+                                 [
+                                   %AST.DeclValue{
+                                     name: func_name,
+                                     binders: all_binders,
+                                     expr: expr,
+                                     type: ty,
+                                     is_fixpoint: is_fixpoint
+                                   }
+                                 ], rest7}
+
                               _ ->
-                                {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr, type: ty}], rest6}
+                                {:ok,
+                                 [
+                                   %AST.DeclValue{
+                                     name: func_name,
+                                     binders: all_binders,
+                                     expr: expr,
+                                     type: ty,
+                                     is_fixpoint: is_fixpoint
+                                   }
+                                 ], rest6}
                             end
                           err -> err
                         end
 
                       [{:dot, _, _} | rest5] ->
-                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: nil, type: ty}], rest5}
+                        {:ok,
+                         [
+                           %AST.DeclValue{
+                             name: func_name,
+                             binders: all_binders,
+                             expr: nil,
+                             type: ty,
+                             is_fixpoint: is_fixpoint
+                           }
+                         ], rest5}
 
                       _ ->
-                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: nil, type: ty}], rest4}
+                        {:ok,
+                         [
+                           %AST.DeclValue{
+                             name: func_name,
+                             binders: all_binders,
+                             expr: nil,
+                             type: ty,
+                             is_fixpoint: is_fixpoint
+                           }
+                         ], rest4}
                     end
 
                   err -> err
@@ -406,15 +443,15 @@ defmodule Christine.Parser do
                   {:ok, expr, rest4} ->
                     case skip_virtual(rest4) do
                       [{:dot, _, _} | rest5] ->
-                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr}], rest5}
+                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr, is_fixpoint: is_fixpoint}], rest5}
                       _ ->
-                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr}], rest4}
+                        {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: expr, is_fixpoint: is_fixpoint}], rest4}
                     end
                   err -> err
                 end
 
               [{:dot, _, _} | rest3] ->
-                {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: nil}], rest3}
+                {:ok, [%AST.DeclValue{name: func_name, binders: all_binders, expr: nil, is_fixpoint: is_fixpoint}], rest3}
 
               _ ->
                 # Check if this is a multi-name hypothesis: H1 H2 ... : T.

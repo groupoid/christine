@@ -222,7 +222,8 @@ defmodule Christine.Tactics do
             {:error, :not_an_inductive_type, ps}
         end
 
-      {:induction, target} ->
+      {tag, target} when tag in [:induction, :destruct] ->
+        gen_ih? = (tag == :induction)
         {x, user_names} = case target do
           {v, ns} -> {v, ns}
           v -> {v, []}
@@ -230,13 +231,16 @@ defmodule Christine.Tactics do
 
         case List.keyfind(ctx, x, 0) do
           nil ->
+            IO.puts("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
             case Typechecker.normalize(env, current) do
               %AST.Pi{name: ^x} ->
                 case apply_tactic(ps, "intro #{x}") do
                   {:ok, nps} -> apply_tactic(nps, {:induction, target})
                   err -> err
                 end
-              _ -> {:error, {:variable_not_found, x}, ps}
+              _ -> 
+                # IO.puts("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
+                {:error, {:variable_not_found, x}, ps}
             end
 
           {_, ind_ty} ->
@@ -262,7 +266,7 @@ defmodule Christine.Tactics do
                       end
                     end)
 
-                    binders = extract_constructor_binders(env, cty_subst, ind, motive, [], x)
+                    binders = extract_constructor_binders(env, cty_subst, ind, motive, [], x, gen_ih?)
                     renamed_binders = rename_binders(binders, c_user_names)
                     
                     num_ihs = Enum.count(binders, fn {_, bty} -> 
@@ -274,7 +278,7 @@ defmodule Christine.Tactics do
 
                     num_args = length(binders) - num_ihs
                     constr_args = Enum.map(Enum.take(renamed_binders, num_args), fn {bn, _} -> %AST.Var{name: bn} end)
-                    constr_term = %AST.Constr{index: idx, inductive: ind, args: constr_args}
+                    constr_term = %AST.Constr{index: idx, inductive: ind, args: params ++ constr_args}
                     
                     new_ctx = for {n, ty} <- (renamed_binders ++ ctx), do: {n, Christine.Typechecker.subst(x, constr_term, ty)}
                     new_goal = Christine.Typechecker.subst(x, constr_term, current)
@@ -297,7 +301,7 @@ defmodule Christine.Tactics do
                           _ -> acc_ty
                         end
                       end)
-                      binders = extract_constructor_binders(env, cty_subst, ind, motive, [], x)
+                      binders = extract_constructor_binders(env, cty_subst, ind, motive, [], x, true)
                       renamed_binders = rename_binders(binders, c_user_names)
 
                       Enum.reduce(Enum.reverse(renamed_binders), proof, fn {name, ty}, acc ->
@@ -340,20 +344,7 @@ defmodule Christine.Tactics do
           _ -> {:error, :not_an_exists, ps}
         end
 
-      {:destruct, target} ->
-        case target do
-          {x, user_names} ->
-            names_str = case user_names do
-              [] -> ""
-              _ -> 
-                inner = Enum.map(user_names, fn ns -> Enum.join(ns, " ") end)
-                        |> Enum.join(" | ")
-                " as [" <> inner <> "]"
-            end
-            apply_tactic(ps, "induction #{x}#{names_str}")
-          x -> 
-            apply_tactic(ps, "induction #{x}")
-        end
+
 
       {:rewrite, arg} ->
         {h_name, dir} = case arg do
@@ -365,8 +356,14 @@ defmodule Christine.Tactics do
             case unwrap_eq_from_pi_raw(env, h_ty) do
               {:ok, l_raw, r_raw, pi_args} ->
                 {l, r} = if dir == :backward, do: {r_raw, l_raw}, else: {l_raw, r_raw}
+                # IO.puts("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
+                # IO.puts("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
+                # IO.puts("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
                 new_goal = replace_expression(current, l, r, env, pi_args)
                 if Typechecker.equal?(env, current, new_goal) do
+                   if h_name == "beq_nat_refl" do
+                      IO.puts("REWRITE FAILED: #{h_name}\nTarget Pattern:\n#{AST.to_string(l)}\nGoal:\n#{AST.to_string(current)}")
+                   end
                    {:error, :nothing_to_rewrite, ps}
                 else
                    old_rec = ps.reconstructor
@@ -673,6 +670,7 @@ defmodule Christine.Tactics do
   end
 
   defp unwrap_eq(app) do
+    IO.puts("DEBUG UNWRAP_EQ: #{AST.to_string(app)}")
     case extract_app_args_full(app) do
       [f | args] ->
         if is_eq?(f) do
@@ -688,8 +686,8 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp is_eq?(%AST.Var{name: n}), do: String.ends_with?(n, "eq") or String.ends_with?(n, "Eq")
-  defp is_eq?(%AST.Ind{inductive: %AST.Inductive{name: n}}), do: String.ends_with?(n, "eq") or String.ends_with?(n, "Eq")
+  defp is_eq?(%AST.Var{name: n}), do: names_match?("eq", n) or names_match?("Eq", n)
+  defp is_eq?(%AST.Ind{inductive: %AST.Inductive{name: n}}), do: names_match?("eq", n) or names_match?("Eq", n)
   defp is_eq?(%AST.App{func: f}), do: is_eq?(f)
   defp is_eq?(_), do: false
 
@@ -698,12 +696,24 @@ defmodule Christine.Tactics do
   end
   defp extract_app_args_full(f), do: [f]
 
-  defp replace_expression(target, old, new, env, params \\ []) do
-    case try_match(env, target, old, params) do
+  defp replace_expression(target, old, new, env, params) do
+    # Normalize the pattern as well, because the target might be normalized/unfolded
+    old_norm = if is_map(old), do: Typechecker.normalize(env, old), else: old
+    res = try_match(env, target, old_norm, params)
+    if Enum.member?(params, "n") and target == Typechecker.normalize(env, target) do
+       if res == :error do
+         # IO.puts("REPLACE EXPR FAILED MATCH:\nTarget:\n#{inspect(target, limit: 100)}\nPattern:\n#{inspect(old, limit: 100)}")
+       else
+         IO.puts("REPLACE EXPR SUCCEEDED MATCH on target!!")
+       end
+    end
+    case res do
       {:ok, bindings} ->
-        Enum.reduce(bindings, new, fn {name, val}, acc ->
+        res = Enum.reduce(bindings, new, fn {name, val}, acc ->
           Christine.Typechecker.subst(name, val, acc)
         end)
+        IO.puts("REPLACE EXPR SUCCEEDED MATCH: target=#{AST.to_string(target)} result=#{AST.to_string(res)}")
+        res
       :error ->
         case target do
           %AST.App{func: f, arg: arg} ->
@@ -746,7 +756,11 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp try_match(env, target, pattern, params, bindings \\ %{}) do
+  def try_match(env, target, pattern, params, bindings \\ %{}) do
+    pattern_str = AST.to_string(pattern)
+    if String.contains?(pattern_str, "beq_nat") or String.contains?(pattern_str, "plus") do
+       # IO.puts("DEBUG TRY_MATCH (FIX):\nTarget:\n#{AST.to_string(target)}\nPattern:\n#{pattern_str}")
+    end
     case pattern do
       %AST.Var{name: n} ->
         if Enum.member?(params, n) do
@@ -760,10 +774,23 @@ defmodule Christine.Tactics do
               end
           end
         else
-          if Typechecker.equal?(env, target, pattern) do
-            {:ok, bindings}
-          else
-            :error
+          case target do
+            %AST.Var{name: n2} ->
+              if names_match?(n, n2) do
+                {:ok, bindings}
+              else
+                if Typechecker.equal?(env, target, pattern) do
+                  {:ok, bindings}
+                else
+                  :error
+                end
+              end
+            _ ->
+              if Typechecker.equal?(env, target, pattern) do
+                {:ok, bindings}
+              else
+                :error
+              end
           end
         end
 
@@ -785,21 +812,27 @@ defmodule Christine.Tactics do
 
       %AST.Ind{inductive: i1, term: t1, motive: m1, cases: c1} ->
         case target do
-          %AST.Ind{inductive: i2, term: t2, motive: m2, cases: c2} when i1.name == i2.name ->
-            with {:ok, b1} <- try_match(env, t2, t1, params, bindings),
-                 {:ok, b2} <- try_match(env, m2, m1, params, b1) do
+          %AST.Ind{inductive: i2, term: t2, motive: m2, cases: c2} ->
+            if names_match?(i1.name, i2.name) do
+              with {:ok, b1} <- try_match(env, t2, t1, params, bindings),
+                   {:ok, b2} <- try_match(env, m2, m1, params, b1) do
                Enum.zip(c2, c1) |> Enum.reduce_while({:ok, b2}, fn {tc, pc}, {:ok, acc} ->
                  case try_match(env, tc, pc, params, acc) do
                    {:ok, new_acc} -> {:cont, {:ok, new_acc}}
-                   :error -> {:halt, :error}
+                   :error -> 
+                     if Enum.member?(params, "n") do
+                       IO.puts("IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}")
+                     end
+                     {:halt, :error}
                  end
                end)
-            else
-               _ -> :error
             end
-          _ ->
-            if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
-        end
+          else
+            :error
+          end
+        _ ->
+          if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
+      end
 
       %AST.Lam{domain: d1, body: body1} ->
         case target do
@@ -840,20 +873,58 @@ defmodule Christine.Tactics do
             if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
         end
 
-      _ ->
+      %AST.Fixpoint{name: n1} = pattern_fix ->
         case target do
-          %AST.Number{value: v} ->
-            unfolded = unfold_number(env, v)
-            if Typechecker.equal?(env, unfolded, pattern) do
-              {:ok, bindings}
-            else
-              :error
-            end
-          _ ->
-            if Typechecker.equal?(env, target, pattern) do
-              {:ok, bindings}
-            else
-              :error
+          %AST.Fixpoint{name: n2} ->
+             if names_match?(n1, n2) do
+                {:ok, bindings}
+             else
+                if Typechecker.equal?(env, target, pattern_fix) do {:ok, bindings} else :error end
+             end
+          %AST.Var{name: n2} ->
+             if names_match?(n1, n2) do
+                {:ok, bindings}
+             else
+                if Typechecker.equal?(env, target, pattern_fix) do {:ok, bindings} else :error end
+             end
+          _ -> if Typechecker.equal?(env, target, pattern_fix) do {:ok, bindings} else :error end
+        end
+
+      _ ->
+        should_expand = case pattern do
+          %AST.App{} -> true
+          %AST.Var{name: p_name} -> not (p_name in params)
+          _ -> false
+        end
+
+        res = if should_expand do
+          expanded_pattern = Typechecker.normalize(env, pattern)
+          if expanded_pattern != pattern do
+            try_match(env, target, expanded_pattern, params, bindings)
+          else
+            :error
+          end
+        else
+          :error
+        end
+
+        case res do
+          {:ok, _} = ok_res -> ok_res
+          :error ->
+            case target do
+              %AST.Number{value: v} ->
+                unfolded = unfold_number(env, v)
+                if Typechecker.equal?(env, unfolded, pattern) do
+                  {:ok, bindings}
+                else
+                  :error
+                end
+              _ ->
+                if Typechecker.equal?(env, target, pattern) do
+                  {:ok, bindings}
+                else
+                  :error
+                end
             end
         end
     end
@@ -880,7 +951,7 @@ defmodule Christine.Tactics do
       {^name, ty} -> {:ok, %AST.Var{name: name}, ty}
       _ ->
         case Enum.find(env.env, fn {n, _} -> n == name or String.ends_with?(n, "." <> name) end) do
-          {full_name, %AST.Constr{inductive: ind, index: idx}} ->
+          {_full_name, %AST.Constr{inductive: ind, index: idx}} ->
             {_idx, _cname, c_ty} = Enum.at(ind.constrs, idx - 1)
             {:ok, %AST.Constr{inductive: ind, index: idx}, c_ty}
           {full_name, %AST.DeclValue{type: t}} ->
@@ -1040,6 +1111,7 @@ defmodule Christine.Tactics do
         apply_tactic(ps, tac)
 
       [first | rest] ->
+        IO.puts("DEBUG SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}")
         case apply_tactic(ps, first) do
           {:ok, %{goals: new_goals} = nps} ->
             # Number of new goals generated by 'first'
@@ -1115,7 +1187,12 @@ defmodule Christine.Tactics do
     case Typechecker.normalize(env, ty) do
       %AST.Ind{inductive: ind} -> ind
       %AST.App{func: f} -> get_inductive_head(env, f)
-      %AST.Var{name: name} -> Map.get(env.env, name)
+      %AST.Var{name: name} -> 
+        # Search for namespaced match
+        case Map.get(env.env, name) || Enum.find_value(env.env, fn {n, ind} -> if String.ends_with?(n, "." <> name), do: ind end) do
+          %AST.Inductive{} = ind -> ind
+          _ -> nil
+        end
       _ -> nil
     end
   end
@@ -1137,7 +1214,7 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp extract_constructor_binders(env, cty, ind, motive, acc \\ [], base_name \\ nil) do
+  defp extract_constructor_binders(env, cty, ind, motive, acc, base_name, gen_ih?) do
     case Typechecker.normalize(env, cty) do
       %AST.Pi{name: name, domain: domain, codomain: codomain} ->
         is_recursive =
@@ -1153,15 +1230,25 @@ defmodule Christine.Tactics do
           end
 
         new_acc =
-          if is_recursive do
-            ih_name = if base_name, do: "IH#{base_name}", else: "IH#{name}"
+          if is_recursive and gen_ih? do
+            name = if name == "_" or is_nil(name) do
+              if length(acc) == 0, do: base_name, else: "#{base_name}#{length(acc)}"
+            else
+              name
+            end
+            ih_name = "IH#{name}"
             acc ++ [{name, domain}, {ih_name, %AST.App{func: motive, arg: %AST.Var{name: name}}}]
           else
+            name = if name == "_" or is_nil(name) do
+              if length(acc) == 0, do: base_name, else: "#{base_name}#{length(acc)}"
+            else
+              name
+            end
             acc ++ [{name, domain}]
           end
 
         env_with_binder = %{env | ctx: [{name, domain} | env.ctx]}
-        extract_constructor_binders(env_with_binder, codomain, ind, motive, new_acc, base_name)
+        extract_constructor_binders(env_with_binder, codomain, ind, motive, new_acc, base_name, gen_ih?)
 
       _ -> acc
     end
@@ -1234,5 +1321,9 @@ defmodule Christine.Tactics do
       %AST.Var{name: name} -> {:ok, name}
       _ -> :error
     end
+  end
+
+  defp names_match?(n1, n2) do
+    n1 == n2 or n2 == "Coq." <> n1 or n1 == "Coq." <> n2
   end
 end

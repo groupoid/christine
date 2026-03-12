@@ -48,7 +48,8 @@ defmodule Christine.Desugar do
           binders: binders,
           expr: expr,
           type: type,
-          where_decls: where_decls
+          where_decls: where_decls,
+          is_fixpoint: is_fixpoint
         },
         env
       ) do
@@ -78,7 +79,13 @@ defmodule Christine.Desugar do
 
       desugared_type = if type, do: desugar_expression(type, env), else: nil
 
-      %AST.DeclValue{name: name, binders: [], expr: body, type: desugared_type}
+      final_body = if is_fixpoint do
+         %AST.Fixpoint{name: name, domain: desugared_type, body: body}
+      else
+         body
+      end
+
+      %AST.DeclValue{name: name, binders: [], expr: final_body, type: desugared_type}
     else
       # Axiom case: expr is nil. We should fold binders into the type (Pi types).
       final_type =

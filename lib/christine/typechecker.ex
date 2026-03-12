@@ -104,6 +104,14 @@ defmodule Christine.Typechecker do
     %AST.Pi{name: x, domain: domain, codomain: infer(%{e | ctx: [{x, domain} | e.ctx]}, body)}
   end
 
+  def infer(%Env{} = e, %AST.Fixpoint{name: _n, domain: ty, body: body}) do
+    # Check that body has type ty (or is compatible)
+    # Note: when checking body, the fixpoint name itself might be used recursively.
+    # But desugarer already handles that by putting the fixpoint in defs.
+    check(e, body, ty)
+    ty
+  end
+
   def infer(%Env{} = e, %AST.App{func: f, arg: arg}) do
     case infer(e, f) do
       %AST.Pi{name: x, domain: a, codomain: b} ->
@@ -169,7 +177,11 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
-    normalize(e, t1) == normalize(e, t2)
+    n1 = normalize(e, t1)
+    n2 = normalize(e, t2)
+    res = (n1 == n2)
+    # IO.puts("DEBUG EQUAL?: #{AST.to_string(n1)} == #{AST.to_string(n2)} -> #{res}")
+    res
   end
 
   def normalize(e, t) do
@@ -194,6 +206,9 @@ defmodule Christine.Typechecker do
           cases: Enum.map(cases, &normalize(e, &1)),
           term: normalize(e, t_val)
         }
+
+      %AST.Fixpoint{name: n, domain: d, body: b} ->
+        %AST.Fixpoint{name: n, domain: normalize(e, d), body: normalize(e, b)}
 
       %AST.Constr{index: i, inductive: d, args: args} ->
         %AST.Constr{index: i, inductive: d, args: Enum.map(args, &normalize(e, &1))}
@@ -225,6 +240,25 @@ defmodule Christine.Typechecker do
       %AST.Lam{name: x, body: body} ->
         reduce(e, subst(x, arg, body), fuel - 1)
 
+      %AST.Fixpoint{body: body, args: applied_args} = fix ->
+        # Accumulate the argument
+        all_args = applied_args ++ [arg]
+        
+        # Try to unfold: beta-reduce arguments into body and see if it can reduce an Ind
+        case try_unfold_fixpoint(e, body, all_args, fuel - 1) do
+          {:ok, unfolded} -> 
+            if fix.name in ["plus", "beq_nat", "insert", "count"] do
+               IO.puts("DEBUG REDUCE FIX OK: #{fix.name} unfolded")
+            end
+            unfolded
+          :blocked -> 
+            if fix.name in ["plus", "beq_nat", "insert", "count"] do
+               IO.puts("DEBUG REDUCE FIX BLOCKED: #{fix.name} with args #{Enum.map_join(all_args, " ", &AST.to_string/1)}")
+            end
+            # Reconstruct as App nodes so matching works better
+            Enum.reduce(all_args, %{fix | args: []}, fn a, acc -> %AST.App{func: acc, arg: a} end)
+        end
+
       %AST.Constr{index: i, inductive: d, args: args} ->
         arg_red = reduce(e, arg, fuel - 1)
         %AST.Constr{index: i, inductive: d, args: args ++ [arg_red]}
@@ -234,10 +268,15 @@ defmodule Christine.Typechecker do
     end
   end
 
+  defp do_reduce(_e, %AST.Fixpoint{name: _name, body: _body} = f, _fuel) do
+    # A standalone fixpoint is already in reduced form
+    f
+  end
+
   defp do_reduce(e, %AST.Ind{inductive: ind_def, motive: _p, cases: cases, term: t} = ind, fuel) do
     case reduce(e, t, fuel - 1) do
       %AST.Constr{index: j, args: args} ->
-        IO.puts("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
+        # IO.puts("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
         # Find the constructor's Pi type signature to trace which arguments are recursive
         case Enum.find(ind_def.constrs, fn {idx, _, _} -> idx == j end) do
           {^j, _cname, c_sig} ->
@@ -245,7 +284,7 @@ defmodule Christine.Typechecker do
             res = apply_args(e, case_val, args, c_sig, ind)
             reduce(e, res, fuel - 1)
           _ ->
-            IO.puts("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
+            # IO.puts("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
             ind
         end
 
@@ -381,5 +420,56 @@ defmodule Christine.Typechecker do
     %AST.Constr{index: i, inductive: d, args: Enum.map(args, &subst(x, s, &1))}
   end
 
+  def subst(x, s, %AST.Fixpoint{name: n, domain: d, body: b}) do
+    # Fixpoint name might shadow x, but usually it's a global name.
+    if n == x do
+      %AST.Fixpoint{name: n, domain: subst(x, s, d), body: b}
+    else
+      %AST.Fixpoint{name: n, domain: subst(x, s, d), body: subst(x, s, b)}
+    end
+  end
+
   def subst(_, _, t), do: t
+
+  defp try_unfold_fixpoint(e, body, args, fuel) do
+    # 1. Beta-reduce all current args into the body as much as possible
+    unfolded = 
+      Enum.reduce(args, body, fn arg, acc ->
+        case acc do
+          %AST.Lam{name: x, body: b} -> subst(x, arg, b)
+          _ -> %AST.App{func: acc, arg: arg}
+        end
+      end)
+    
+    # 2. Check if the resulting term can "progress" its reduction.
+    # We look for the first Ind node. If its term is a constructor, we succeed.
+    IO.puts("DEBUG FIX UNFOLD: Unfolded = #{AST.to_string(unfolded)}")
+    case find_first_ind(unfolded) do
+      {:ok, %AST.Ind{term: t} = ind} ->
+        IO.puts("DEBUG FIX UNFOLD: Found Ind for #{ind.inductive.name}, term = #{AST.to_string(t)}")
+        case reduce(e, t, fuel) do
+           %AST.Constr{} = c -> 
+             IO.puts("DEBUG FIX UNFOLD: OK (matched constructor #{inspect(c.index)})")
+             {:ok, reduce(e, unfolded, fuel)}
+           other -> 
+             IO.puts("DEBUG FIX UNFOLD: BLOCKED (term reduces to non-constructor: #{AST.to_string(other)})")
+             :blocked
+        end
+      {:ok, _} -> :blocked 
+      :none -> 
+        # IO.puts("DEBUG FIX UNFOLD: OK (no ind found, simple def?)")
+        {:ok, reduce(e, unfolded, fuel)}
+    end
+  end
+
+  defp find_first_ind(term) do
+    case term do
+      %AST.Ind{} = ind -> {:ok, ind}
+      %AST.App{func: f} -> find_first_ind(f)
+      %AST.Lam{body: b} -> find_first_ind(b)
+      %AST.Pi{codomain: b} -> find_first_ind(b)
+      %AST.Let{body: b} -> find_first_ind(b)
+      _ -> :none
+    end
+  end
 end

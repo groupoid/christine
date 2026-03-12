@@ -12,7 +12,7 @@ defmodule Christine.AST do
   end
 
   defmodule DeclValue do
-    defstruct [:name, :binders, :expr, :type, :guards, :where_decls, :tactics]
+    defstruct [:name, :binders, :expr, :type, :guards, :where_decls, :tactics, :is_fixpoint]
   end
 
   defmodule DeclTypeSignature do
@@ -75,6 +75,11 @@ defmodule Christine.AST do
     defstruct [:inductive, :motive, :cases, :term]
   end
 
+  # Fixpoint operator: name, domain, body, and partially applied args
+  defmodule Fixpoint do
+    defstruct [:name, :domain, :body, args: []]
+  end
+
   # Helper for surface binders
   defmodule BinderVar do
     defstruct [:name]
@@ -121,6 +126,17 @@ defmodule Christine.AST do
         else
           params_str = Enum.map_join(params, " ", fn {n, _} -> n end)
           "(#{name} #{params_str})"
+        end
+
+      %Ind{} ->
+        "match ..."
+
+      %Fixpoint{name: name, args: args} ->
+        if args == [] do
+          "fix #{name}"
+        else
+          args_str = Enum.map_join(args, " ", &to_string/1)
+          "(fix #{name} #{args_str})"
         end
 
       %Constr{index: i, inductive: d, args: args} ->

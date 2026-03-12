@@ -39,8 +39,8 @@ Inductive eq (A : Set) (x : A) : A -> Prop :=
 | eq_refl : eq A x x.
 
 Inductive le : nat -> nat -> Prop :=
-| le_n : forall n, le n n
-| le_S : forall n m, le n m -> le n (Succ m).
+| le_n : forall (n : nat), le n n
+| le_S : forall (n m : nat), le n m -> le n (Succ m).
 
 Inductive ex (A : Type) (P : A -> Prop) : Prop :=
 | ex_intro : forall x : A, P x -> ex A P.
@@ -84,7 +84,7 @@ Fixpoint leb (n : nat) (m : nat) : bool :=
 
 Fixpoint ltb (n : nat) (m : nat) : bool := leb (Succ n) m.
 
-Fixpoint eqb (n : nat) (m : nat) : bool :=
+Fixpoint beq_nat (n : nat) (m : nat) : bool :=
   match n with
   | Zero => match m with
     | Zero => true
@@ -92,11 +92,9 @@ Fixpoint eqb (n : nat) (m : nat) : bool :=
     end
   | Succ k => match m with
     | Zero => false
-    | Succ j => eqb k j
+    | Succ j => beq_nat k j
     end
   end.
-
-Definition beq_nat (n : nat) (m : nat) : bool := eqb n m.
 
 Fixpoint evenb (n : nat) : bool :=
   match n with
@@ -123,14 +121,14 @@ Definition negb (b : bool) : bool :=
   | false => true
   end.
 
-Theorem beq_nat_refl : forall n, eq bool true (beq_nat n n).
+Theorem beq_nat_refl : forall (n : nat), eq bool true (beq_nat n n).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem beq_nat_true : forall n m, eq bool (beq_nat n m) true -> eq nat n m.
+Theorem beq_nat_true : forall (n m : nat), eq bool (beq_nat n m) true -> eq nat n m.
 Proof.
 induction n.
  destruct m.
@@ -141,42 +139,42 @@ induction n.
   simpl. intros H. rewrite IHn with (m := m). reflexivity. exact H.
 Qed.
 
-Theorem plus_0_r : forall n, eq nat (plus n Zero) n.
+Theorem plus_0_r : forall (n : nat), eq nat (plus n Zero) n.
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem plus_S_r : forall n m, eq nat (plus n (Succ m)) (Succ (plus n m)).
+Theorem plus_S_r : forall (n m : nat), eq nat (plus n (Succ m)) (Succ (plus n m)).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem plus_assoc : forall n m p, eq nat (plus n (plus m p)) (plus (plus n m) p).
+Theorem plus_assoc : forall (n m p : nat), eq nat (plus n (plus m p)) (plus (plus n m) p).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem plus_comm : forall n m, eq nat (plus n m) (plus m n).
+Theorem plus_comm : forall (n m : nat), eq nat (plus n m) (plus m n).
 Proof.
 induction n.
  simpl. rewrite plus_0_r. reflexivity.
  simpl. rewrite IHn. rewrite plus_S_r. reflexivity.
 Qed.
 
-Theorem mult_0_r : forall n, eq nat (mult n Zero) Zero.
+Theorem mult_0_r : forall (n : nat), eq nat (mult n Zero) Zero.
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem mult_S_r : forall n m, eq nat (mult n (Succ m)) (plus n (mult n m)).
+Theorem mult_S_r : forall (n m : nat), eq nat (mult n (Succ m)) (plus n (mult n m)).
 Proof.
 induction n.
  reflexivity.
@@ -186,21 +184,21 @@ induction n.
  rewrite H. reflexivity.
 Qed.
 
-Theorem mult_plus_distr_l : forall n m p, eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)).
+Theorem mult_plus_distr_l : forall (n m p : nat), eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. rewrite plus_assoc. reflexivity.
 Qed.
 
-Theorem mult_plus_distr_r : forall n m p, eq nat (mult (plus n m) p) (plus (mult n p) (mult m p)).
+Theorem mult_plus_distr_r : forall (n m p : nat), eq nat (mult (plus n m) p) (plus (mult n p) (mult m p)).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
-Theorem mult_assoc : forall (n m p : nat), eq nat (mult n (mult m p)) (mult (mult n m) p).
+Theorem mult_assoc : forall (n : nat) (m p : nat), eq nat (mult n (mult m p)) (mult (mult n m) p).
 Proof.
 intros n m p.
 induction n.
@@ -208,7 +206,7 @@ induction n.
  simpl. rewrite IHn. rewrite mult_plus_distr_r. reflexivity.
 Qed.
 
-Theorem mult_comm : forall n m, eq nat (mult n m) (mult m n).
+Theorem mult_comm : forall (n m : nat), eq nat (mult n m) (mult m n).
 Proof.
 induction n.
  simpl. rewrite mult_0_r. reflexivity.
