@@ -247,12 +247,12 @@ defmodule Christine.Typechecker do
         # Try to unfold: beta-reduce arguments into body and see if it can reduce an Ind
         case try_unfold_fixpoint(e, body, all_args, fuel - 1) do
           {:ok, unfolded} -> 
-            if fix.name in ["plus", "beq_nat", "insert", "count"] do
-               Christine.Debug.log("DEBUG REDUCE FIX OK: #{fix.name} unfolded")
+            if fix.name in ["plus", "beq_nat", "insert", "count", "mult"] do
+               Christine.Debug.log("DEBUG REDUCE FIX OK: #{fix.name} unfolded with #{length(all_args)} args")
             end
-            unfolded
+            reduce(e, unfolded, fuel - 1)
           :blocked -> 
-            if fix.name in ["plus", "beq_nat", "insert", "count"] do
+            if fix.name in ["plus", "beq_nat", "insert", "count", "mult"] do
                Christine.Debug.log("DEBUG REDUCE FIX BLOCKED: #{fix.name} now has #{length(all_args)} args")
             end
             %{fix | args: all_args}
@@ -276,7 +276,7 @@ defmodule Christine.Typechecker do
           if name in ["plus", "beq_nat", "insert", "count"] do
              Christine.Debug.log("DEBUG REDUCE FIX OK (standalone): #{name} unfolded")
           end
-          unfolded
+          reduce(e, unfolded, fuel - 1)
         :blocked -> 
           if name in ["plus", "beq_nat", "insert", "count"] do
              # Christine.Debug.log("DEBUG REDUCE FIX BLOCKED (standalone): #{name} with #{length(args)} args")
@@ -331,54 +331,63 @@ defmodule Christine.Typechecker do
 
   defp do_reduce(_e, t, _fuel), do: t
 
-  defp apply_args(_e, f, [], _ty_sig, _ind), do: f
+  defp apply_args(e, f, args, c_sig, %AST.Ind{inductive: info} = ind) do
+    do_apply_args(e, f, args, c_sig, ind, length(info.params))
+  end
 
-  defp apply_args(e, f, [arg | rest], ty_sig, %AST.Ind{} = ind) do
-    # Extract domain of current argument from constructor signature
-    {arg_domain, next_sig} =
+  defp do_apply_args(_e, f, [], _ty_sig, _ind, _n_skip), do: f
+
+  defp do_apply_args(e, f, [arg | rest], ty_sig, %AST.Ind{} = ind, n_skip) do
+    # Extract domain and update ty_sig via substitution if it's a Pi
+    {arg_name, arg_domain, next_sig} =
       case ty_sig do
-        %AST.Pi{domain: d, codomain: c} -> {d, c}
-        _ -> {nil, ty_sig}
+        %AST.Pi{name: n, domain: d, codomain: c} -> {n, d, c}
+        _ -> {nil, nil, ty_sig}
       end
 
-    ind_name = ind.inductive.name
+    # Substitute current arg into the rest of the signature (important for dependent types)
+    updated_next_sig = if arg_name && next_sig, do: subst(arg_name, arg, next_sig), else: next_sig
 
-    is_inductive =
-      case arg_domain do
-        %AST.Var{name: ^ind_name} -> true
-        %AST.App{func: %AST.Var{name: ^ind_name}} -> true
-        %AST.Pi{codomain: %AST.Var{name: ^ind_name}} -> true
-        %AST.Pi{codomain: %AST.App{func: %AST.Var{name: ^ind_name}}} -> true
-        _ -> false
-      end
+    if n_skip > 0 do
+      # It's a parameter of the inductive type (e.g. 'A' in 'list A').
+      # Skip applying to f (as desugarer patterns only bind constructor-specific args),
+      # but still continue to process rest of the args.
+      do_apply_args(e, f, rest, updated_next_sig, ind, n_skip - 1)
+    else
+      # Real constructor argument.
+      ind_name = ind.inductive.name
 
-    f_next = %AST.App{func: f, arg: arg}
-
-    ih =
-      if is_inductive do
+      is_inductive =
         case arg_domain do
-          %AST.Pi{name: x, domain: a} ->
-            # Functional induction: \x -> Ind(ind.term = arg x)
-            %AST.Lam{
-              name: x,
-              domain: a,
-              body: %AST.Ind{ind | term: %AST.App{func: arg, arg: %AST.Var{name: x}}}
-            }
-
-          _ ->
-            # Basic induction
-            %AST.Ind{ind | term: arg}
+          %AST.Var{name: ^ind_name} -> true
+          %AST.App{func: %AST.Var{name: ^ind_name}} -> true
+          %AST.Pi{codomain: %AST.Var{name: ^ind_name}} -> true
+          %AST.Pi{codomain: %AST.App{func: %AST.Var{name: ^ind_name}}} -> true
+          _ -> false
         end
-      else
-        # Not an inductive argument, but Desugarer might still expect a placeholder binder?
-        # Actually, Christine Desugarer only generates IH binders for identified recursive calls.
-        # Wait, the Desugarer: Enum.reduce(binders, body, ...) wraps EVERYTHING in Lam(k, Lam(ih, ...))
-        # if the constructor was defined with args.
-        # So we MUST pass an IH placeholder if it's not inductive.
-        %AST.Var{name: "unused_ih"}
-      end
 
-    apply_args(e, %AST.App{func: f_next, arg: ih}, rest, next_sig, ind)
+      ih =
+        if is_inductive do
+          case arg_domain do
+            %AST.Pi{name: x, domain: a} ->
+              # Functional induction: \x -> Ind(ind.term = arg x)
+              %AST.Lam{
+                name: x,
+                domain: a,
+                body: %AST.Ind{ind | term: %AST.App{func: arg, arg: %AST.Var{name: x}}}
+              }
+
+            _ ->
+              # Basic induction
+              %AST.Ind{ind | term: arg}
+          end
+        else
+          %AST.Var{name: "unused_ih"}
+        end
+
+      f_next = %AST.App{func: f, arg: arg}
+      do_apply_args(e, %AST.App{func: f_next, arg: ih}, rest, updated_next_sig, ind, 0)
+    end
   end
 
   def subst_many(params, ty) do
@@ -451,34 +460,32 @@ defmodule Christine.Typechecker do
   defp count_lams(_), do: 0
 
   defp try_unfold_fixpoint(e, body, args, fuel) do
-    Christine.Debug.log("DEBUG FIX UNFOLD: Body has #{count_lams(body)} Lams, calling with #{length(args)} args")
-    # 1. Beta-reduce all current args into the body as much as possible
-    unfolded = 
-      Enum.reduce(args, body, fn arg, acc ->
+    num_lams = count_lams(body)
+    if length(args) < num_lams do
+      :blocked
+    else
+      {unfold_args, extra_args} = Enum.split(args, num_lams)
+      
+      unfolded_inner = Enum.reduce(unfold_args, body, fn arg, acc ->
         case acc do
           %AST.Lam{name: x, body: b} -> subst(x, arg, b)
           _ -> %AST.App{func: acc, arg: arg}
         end
       end)
-    
-    # 2. Check if the resulting term can "progress" its reduction.
-    # We look for the first Ind node. If its term is a constructor, we succeed.
-    Christine.Debug.log("DEBUG FIX UNFOLD: Unfolded = #{AST.to_string(unfolded)}")
-    case find_first_ind(unfolded) do
-      {:ok, %AST.Ind{term: t} = ind} ->
-        Christine.Debug.log("DEBUG FIX UNFOLD: Found Ind for #{ind.inductive.name}, term = #{AST.to_string(t)}")
-        case reduce(e, t, fuel) do
-           %AST.Constr{} = c -> 
-             Christine.Debug.log("DEBUG FIX UNFOLD: OK (matched constructor #{inspect(c.index)})")
-             {:ok, reduce(e, unfolded, fuel)}
-           other -> 
-             Christine.Debug.log("DEBUG FIX UNFOLD: BLOCKED (term reduces to non-constructor: #{AST.to_string(other)})")
-             :blocked
-        end
-      {:ok, _} -> :blocked 
-      :none -> 
-        # Christine.Debug.log("DEBUG FIX UNFOLD: OK (no ind found, simple def?)")
-        {:ok, reduce(e, unfolded, fuel)}
+      
+      unfolded = Enum.reduce(extra_args, unfolded_inner, fn arg, acc ->
+        %AST.App{func: acc, arg: arg}
+      end)
+
+      case find_first_ind(unfolded) do
+        {:ok, %AST.Ind{term: t} = _ind} ->
+          case reduce(e, t, fuel) do
+             %AST.Constr{} -> {:ok, unfolded}
+             _other -> :blocked
+          end
+        :none -> 
+          {:ok, unfolded}
+      end
     end
   end
 

@@ -168,41 +168,27 @@ defmodule Christine.Tactics do
         end
 
       {:reflexivity, _} ->
-        case Typechecker.normalize(env, current) do
-          goal ->
-            case unwrap_eq(goal) do
-              {l, r} ->
-                if Typechecker.equal?(env, l, r) do
-                  a_type = case extract_app_args_full(goal) do
-                     [_, a, _, _] -> a
-                     [_, a, _] -> a
-                     _ -> %AST.Var{name: "Any"}
-                  end
+        case unwrap_eq_from_pi_raw(env, current) do
+          {:ok, l, r, pi_params, new_env} ->
+            if Typechecker.equal?(new_env, l, r) do
+               # We need to wrap the proof in Lambdas for the pi_params
+               a_type = %AST.Var{name: "Any"} # For simplicity, but could be better
+               
+               base_term = %AST.App{
+                 func: %AST.App{func: %AST.Var{name: "eq_refl"}, arg: a_type},
+                 arg: l
+               }
+               
+               term = Enum.reduce(Enum.reverse(pi_params), base_term, fn {n, d}, acc ->
+                 %AST.Lam{name: n, domain: d, body: acc}
+               end)
 
-                  term = %AST.App{
-                    func: %AST.App{func: %AST.Var{name: "eq_refl"}, arg: a_type},
-                    arg: l
-                  }
-
-                  solve_goal(ps, term)
-                else
-                  # Try one more time with full normalization of sides
-                  nl = Typechecker.normalize(env, l)
-                  nr = Typechecker.normalize(env, r)
-                  if Typechecker.equal?(env, nl, nr) do
-                    a_type = %AST.Var{name: "Any"}
-                    term = %AST.App{
-                      func: %AST.App{func: %AST.Var{name: "eq_refl"}, arg: a_type},
-                      arg: nl
-                    }
-                    solve_goal(ps, term)
-                  else
-                    {:error, {:not_reflexive, l, r}, ps}
-                  end
-                end
-              _ ->
-                {:error, :not_an_equality, ps}
+               solve_goal(ps, term)
+            else
+               {:error, {:not_reflexive, l, r}, ps}
             end
+          _ ->
+            {:error, :not_an_equality, ps}
         end
 
       {:split, _} ->
@@ -233,8 +219,8 @@ defmodule Christine.Tactics do
         case List.keyfind(ctx, x, 0) do
           nil ->
             Christine.Debug.log("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
-            case Typechecker.normalize(env, current) do
-              %AST.Pi{name: ^x} ->
+            case Typechecker.reduce(env, current) do
+              %AST.Pi{name: n_pi} when n_pi == x ->
                 case apply_tactic(ps, "intro #{x}") do
                   {:ok, nps} -> apply_tactic(nps, {:induction, target})
                   err -> err
@@ -355,7 +341,7 @@ defmodule Christine.Tactics do
         case find_variable(ps, h_name) do
           {:ok, _term, h_ty} ->
             case unwrap_eq_from_pi_raw(env, h_ty) do
-              {:ok, l_raw, r_raw, pi_args} ->
+              {:ok, l_raw, r_raw, pi_args, _new_env} ->
                 {l, r} = if dir == :backward, do: {r_raw, l_raw}, else: {l_raw, r_raw}
                 # Christine.Debug.log("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
                 # Christine.Debug.log("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
@@ -657,13 +643,17 @@ defmodule Christine.Tactics do
 
   defp unwrap_eq_from_pi_raw(env, ty, params \\ []) do
     case ty do
-      %AST.Pi{name: name, domain: _d, codomain: cod} -> unwrap_eq_from_pi_raw(env, cod, [name | params])
+      %AST.Pi{name: name, domain: d, codomain: cod} -> 
+        new_env = %{env | ctx: [{name, d} | env.ctx]}
+        unwrap_eq_from_pi_raw(new_env, cod, [{name, d} | params])
       _ ->
-        case Typechecker.normalize(env, ty) do
-           %AST.Pi{name: name, domain: _d, codomain: cod} -> unwrap_eq_from_pi_raw(env, cod, [name | params])
+        case Typechecker.reduce(env, ty) do
+           %AST.Pi{name: name, domain: d, codomain: cod} -> 
+             new_env = %{env | ctx: [{name, d} | env.ctx]}
+             unwrap_eq_from_pi_raw(new_env, cod, [{name, d} | params])
            app ->
              case unwrap_eq(app) do
-               {l, r} -> {:ok, l, r, Enum.reverse(params)}
+               {l, r} -> {:ok, l, r, Enum.reverse(params), env}
                _ -> :error
              end
         end
@@ -821,6 +811,15 @@ defmodule Christine.Tactics do
             if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
         end
 
+
+      %AST.Inductive{name: n1} ->
+        case target do
+          %AST.Inductive{name: n2} ->
+            if AST.names_match?(n1, n2) do {:ok, bindings} else :error end
+          _ ->
+            if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
+        end
+
       %AST.Ind{inductive: i1, term: t1, motive: m1, cases: c1} ->
         case target do
           %AST.Ind{inductive: i2, term: t2, motive: m2, cases: c2} ->
@@ -871,15 +870,18 @@ defmodule Christine.Tactics do
             if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
         end
 
-      %AST.Constr{index: idx1, args: a1} ->
+      %AST.Constr{index: i1, args: a1} ->
         case target do
-          %AST.Constr{index: idx2, args: a2} when idx1 == idx2 ->
-            Enum.zip(a2, a1) |> Enum.reduce_while({:ok, bindings}, fn {ta, pa}, {:ok, acc} ->
-              case try_match(env, ta, pa, params, acc) do
-                {:ok, new_acc} -> {:cont, {:ok, new_acc}}
-                :error -> {:halt, :error}
-              end
-            end)
+          %AST.Constr{index: i2, args: a2} when i1 == i2 ->
+             Enum.zip(a2, a1)
+             |> Enum.reduce_while({:ok, bindings}, fn {ta, pa}, {:ok, acc} ->
+               case try_match(env, ta, pa, params, acc) do
+                 {:ok, next} -> {:cont, {:ok, next}}
+                 _ -> {:halt, :error}
+               end
+             end)
+          %AST.Number{value: v} ->
+             try_match(env, unfold_number(env, v), pattern, params, bindings)
           _ ->
             if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
         end

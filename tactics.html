@@ -126,9 +126,9 @@ Qed.</pre>
             <h2>ring</h2>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>ring</b> normalizes the goal to an equality, converts both sides
-                to polynomials via <code>to_poly</code> and <code>poly_normalize</code>,
+                to polynomials via to_poly and poly_normalize,
                 and solves if the polynomials are identical. It closes the goal with a
-                placeholder term <code>ring_solved</code>.</p>
+                placeholder term ring_solved.</p>
                 <pre class="code-snippet">Theorem ring_example : (x + 2*y) + (3*x + y) = 4*x + 3*y.
 Proof.
   ring.
@@ -140,7 +140,7 @@ Qed.</pre>
             <h2>apply</h2>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>apply H</b> or <b>apply H with x:=t</b> looks up hypothesis H,
-                   matches its type against the goal using <code>match_goal</code>, generates
+                   matches its type against the goal using match_goal, generates
                    subgoals for missing arguments, and builds an App node in the reconstructor.
                    Named with bindings are evaluated and substituted.</p>
                 <pre class="code-snippet">Theorem plus_comm : ∀ n m : Nat, plus n m = plus m n.
@@ -152,12 +152,128 @@ Qed.</pre>
         </section>
 
         <section>
+            <h2>split</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>split</b> works when the current goal normalizes to an inductive type with exactly one constructor (e.g. conjunction A ∧ B with constructor conj). It applies that constructor, generating subgoals for each of its arguments and updating the reconstructor with the appropriate constructor application.</p>
+                <pre class="code-snippet">Theorem and_intro : ∀ A B : Prop, A → B → A ∧ B.
+Proof.
+  intros A B Ha Hb.
+  split.
+  - exact Ha.
+  - exact Hb.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>left / right</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>left</b> (resp. <b>right</b>) works when the goal normalizes to a disjunction A ∨ B. It replaces the goal with the left (resp. right) disjunct and updates the reconstructor with or_introl (resp. or_intror).</p>
+                <pre class="code-snippet">Theorem left_example : ∀ A B : Prop, A → A ∨ B.
+Proof.
+  intros A B Ha.
+  left.
+  exact Ha.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>exists</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>exists t</b> works when the current goal normalizes to an existential ∃ x : A, P x (or ex). It provides witness t, replaces the goal with P t, and updates the reconstructor to build the ex_intro constructor.</p>
+                <pre class="code-snippet">Theorem exists_plus : ∃ n : Nat, plus n O = n.
+Proof.
+  exists O.
+  reflexivity.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>assumption</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>assumption</b> scans the current context for a hypothesis whose type exactly matches the goal (after normalization) and closes the goal with that hypothesis variable if found.</p>
+                <pre class="code-snippet">Theorem assumption_example : ∀ A : Prop, A → A.
+Proof.
+  intro A.
+  assumption.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>assert</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>assert (H : T)</b> (or assert H : T) creates a new subgoal to prove T, then adds H : T to the context of the original goal (implemented via a let-binding in the proof term).</p>
+                <pre class="code-snippet">Theorem assert_example : ∀ n : Nat, n = n.
+Proof.
+  intro n.
+  assert (H : n = n).
+  - reflexivity.
+  - exact H.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>rewrite</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>rewrite H</b> or <b>rewrite &lt;- H</b> (where H has type l = r) matches l (or r if backward) in the goal and replaces it with r (or l), keeping the original goal type unchanged otherwise. The reconstructor wraps the sub-proof with a rewrite placeholder.</p>
+                <pre class="code-snippet">Theorem rewrite_demo : ∀ n : Nat, plus (plus O n) O = n.
+Proof.
+  intro n.
+  rewrite plus_O_n.  -- assuming plus_O_n : ∀ n, plus O n = n is in scope
+  reflexivity.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>induction / destruct</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>induction x</b> (or <b>induction x as [c1_names | …]</b>) performs case analysis + induction on inductive variable x, generating one subgoal per constructor with induction hypotheses (IH) for recursive arguments. <b>destruct x</b> does the same but without generating IHs. The reconstructor builds a full Ind (match) node.</p>
+                <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
+Proof.
+  intro n.
+  induction n.
+  - reflexivity.
+  - simpl. rewrite IHn_0. reflexivity.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>discriminate</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>discriminate H</b> (or without argument on an equality goal) solves the goal with a contradiction
+                term when H (or the goal) equates terms built from different constructors of the same inductive type.</p>
+                <pre class="code-snippet">Theorem no_confusion : ∀ n : Nat, O = S n → False.
+Proof.
+  intros n H.
+  discriminate H.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>intuition</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Tactic <b>intuition</b> attempts to solve the current goal using basic logical tautologies and rules (in this prototype it closes the goal with an intuition_placeholder term).</p>
+                <pre class="code-snippet">Theorem intuition_example : ∀ P : Prop, P ∨ ¬P.
+Proof.
+  intuition.
+Qed.</pre>
+            </div>
+        </section>
+
+        <section>
             <h2>Implementation</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p>All tactics are defined in <a href="https://github.com/groupoid/christine/blob/main/lib/christine/tactics.ex">
-                  <code>lib/christine/tactics.ex</code></a>. The dispatcher is the <code>apply_tactic</code>
+                <p>All tactics are defined in <a href="https://github.com/groupoid/christine/blob/main/lib/christine/tactics.ex">tactics.ex</a>.
+                The dispatcher is the apply_tactic
                   function with pattern matching on the parsed tactic tuple. New tactics are added by
-                  extending <code>parse_tactic</code> and the main case clause.</p>
+                  extending parse_tactic and the main case clause.</p>
             </div>
         </section>
     </main>
