@@ -127,7 +127,7 @@ Proof.
     split.
     intros H.
     destruct IHn as [_ IHn’].
-    exact IHn’.
+    apply IHn’.
     intros H.
     destruct IHn as [IHn’ _].
     assert (H’ : exists x, n = 2 * x).
@@ -149,13 +149,12 @@ end.
 
 Lemma insert_incr : forall (n : nat) (l : list nat), count n (insert n l) = 1 + count n l.
 Proof.
-intros n l; induction l.
+intros n l; induction l as [| a l].
 simpl.
 rewrite <- beq_nat_refl.
 reflexivity.
 simpl.
 case (leb n a).
-simpl.
 rewrite <- beq_nat_refl.
 reflexivity.
 simpl.
@@ -166,7 +165,7 @@ Qed.
 
 Lemma example7_size : forall (t : bin), example7 t = false -> size t = 3.
 Proof.
-intros t; destruct t.
+intros t; destruct t as [| t1 t2].
 simpl.
 intros H; discriminate H.
 destruct t1; destruct t2.
@@ -195,7 +194,7 @@ end.
 
 Lemma flatten_aux_size : forall (t1 t2:bin), size (flatten_aux t1 t2) = size t1 + size t2 + 1.
 Proof.
-induction t1.
+induction t1 as [| t1_1 t1_2].
 intros t2; simpl; ring.
 intros t2; simpl.
 rewrite IHt1_1.

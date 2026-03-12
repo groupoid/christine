@@ -97,66 +97,16 @@ defmodule Christine.Parser do
         end
 
       [{:proof_kw, _, _} | rest] ->
-        # Collect until Qed.
         {tactic_tokens, rest_after_qed} = Enum.split_while(rest, fn
           {:qed, _, _} -> false
           _ -> true
         end)
 
-        # Extract tactics as strings for now (basic extraction)
         tactics = tactic_tokens
+          |> Enum.reject(fn t -> elem(t, 0) in [:left_brace, :right_brace] end)
           |> Enum.chunk_by(fn t -> elem(t, 0) == :dot end)
           |> Enum.reject(fn chunk -> match?([{:dot, _, _} | _], chunk) end)
-          |> Enum.map(fn chunk ->
-              chunk
-              |> Enum.map(fn t ->
-                  case t do
-                    {:ident, _, _, val} -> val
-                    {:operator, _, _, val} -> val
-                    {type, _, _, val} when is_atom(type) -> to_string(val)
-                    {type, _, _} ->
-                      case type do
-                        :dot -> "."
-                        :colon -> ":"
-                        :assign -> ":="
-                        :fat_arrow -> "=>"
-                        :arrow -> "->"
-                        :left_paren -> "("
-                        :right_paren -> ")"
-                        :comma -> ","
-                        :pipe -> "|"
-                        :plus -> "+"
-                        :minus -> "-"
-                        :star -> "*"
-                        :slash -> "/"
-                        :equal -> "="
-                        :tilde -> "~"
-                        :and_kw -> "/\\"
-                        :or_kw -> "\\/"
-                        :not_equal -> "<>"
-                        :left_bracket -> "["
-                        :right_bracket -> "]"
-                        # Keywords
-                        :forall -> "forall"
-                        :exists -> "exists"
-                        :fun_kw -> "fun"
-                        :match_kw -> "match"
-                        :with_kw -> "with"
-                        :end_kw -> "end"
-                        :if_kw -> "if"
-                        :then_kw -> "then"
-                        :else_kw -> "else"
-                        :prop_kw -> "Prop"
-                        :type_kw -> "Type"
-                        :semicolon -> ";"
-                        _ -> ""
-                      end
-                    _ -> ""
-                  end
-                end)
-              |> Enum.join(" ")
-              |> String.trim()
-            end)
+          |> Enum.map(&tokens_to_string/1)
           |> Enum.reject(&(&1 == ""))
 
         case skip_virtual(rest_after_qed) do
@@ -1120,5 +1070,62 @@ defmodule Christine.Parser do
       _ ->
         {:ok, acc, tokens}
     end
+  end
+
+  defp tokens_to_string(tokens) do
+    tokens
+    |> Enum.map(fn t ->
+      case t do
+        {:ident, _, _, val} -> val
+        {:number, _, _, val} -> to_string(val)
+        {:operator, _, _, val} -> val
+        {:string, _, _, val} -> "\"#{val}\""
+        {type, _, _, val} when is_atom(type) -> to_string(val)
+        {type, _, _} ->
+          case type do
+            :dot -> "."
+            :colon -> ":"
+            :assign -> ":="
+            :fat_arrow -> "=>"
+            :arrow -> "->"
+            :back_arrow -> "<-"
+            :iff -> "<->"
+            :cons -> "::"
+            :left_paren -> "("
+            :right_paren -> ")"
+            :left_bracket -> "["
+            :right_bracket -> "]"
+            :left_brace -> "{"
+            :right_brace -> "}"
+            :comma -> ","
+            :pipe -> "|"
+            :plus -> "+"
+            :minus -> "-"
+            :star -> "*"
+            :slash -> "/"
+            :equal -> "="
+            :tilde -> "~"
+            :and_kw -> "/\\"
+            :or_kw -> "\\/"
+            :not_equal -> "<>"
+            :semicolon -> ";"
+            :forall -> "forall"
+            :exists -> "exists"
+            :fun_kw -> "fun"
+            :match_kw -> "match"
+            :with_kw -> "with"
+            :end_kw -> "end"
+            :if_kw -> "if"
+            :then_kw -> "then"
+            :else_kw -> "else"
+            :prop_kw -> "Prop"
+            :type_kw -> "Type"
+            _ -> ""
+          end
+        _ -> ""
+      end
+    end)
+    |> Enum.join(" ")
+    |> String.trim()
   end
 end

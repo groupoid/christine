@@ -237,12 +237,17 @@ defmodule Christine.Typechecker do
   defp do_reduce(e, %AST.Ind{inductive: ind_def, motive: _p, cases: cases, term: t} = ind, fuel) do
     case reduce(e, t, fuel - 1) do
       %AST.Constr{index: j, args: args} ->
+        IO.puts("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
         # Find the constructor's Pi type signature to trace which arguments are recursive
-        {^j, _cname, c_sig} = Enum.find(ind_def.constrs, fn {idx, _, _} -> idx == j end)
-
-        case_val = Enum.at(cases, j - 1)
-        res = apply_args(e, case_val, args, c_sig, ind)
-        reduce(e, res, fuel - 1)
+        case Enum.find(ind_def.constrs, fn {idx, _, _} -> idx == j end) do
+          {^j, _cname, c_sig} ->
+            case_val = Enum.at(cases, j - 1)
+            res = apply_args(e, case_val, args, c_sig, ind)
+            reduce(e, res, fuel - 1)
+          _ ->
+            IO.puts("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
+            ind
+        end
 
       _ ->
         ind
@@ -256,8 +261,19 @@ defmodule Christine.Typechecker do
 
   defp do_reduce(e, %AST.Var{name: name}, fuel) do
     case Map.get(e.defs, name) do
-      nil -> %AST.Var{name: name}
-      term -> reduce(e, term, fuel - 1)
+      nil ->
+        case Map.get(e.env, name) do
+          %AST.Constr{} = c -> c
+          _ -> %AST.Var{name: name}
+        end
+
+      term ->
+        # Only expand Fixpoints (represented as Ind in defs) if they might reduce?
+        # For now, let's try to expand only if we are in an App and the arg is a Constr
+        # but reduce/2 doesn't know about context.
+        # Actually, let's keep it simple: always expand if it's in defs, 
+        # BUT Ind reduction itself will handle the blocking if term is not Constr.
+        reduce(e, term, fuel - 1)
     end
   end
 
