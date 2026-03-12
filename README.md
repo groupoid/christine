@@ -322,19 +322,36 @@ This is upheld by normalization and the absence of paradoxes such as Girard's [G
 ## Artefact
 
 ```
-https://christine.groupoid.space/
+$ mix christine.repl
+🧊 Christine Theorem Prover version 0.3.11 [Coq 6.3 Syntax]
+Copyright (c) 2016-2026 Groupoid Infinity
+https://groupoid.github.io/christine/
 
-  🧊 Christine MLTT/CIC Theorem Prover version 0.5 (c) 2025 Groupoїd Infinity
-
-For help type `help`.
-
-Starting proof for: Π(n : Nat).Nat
-Goal 1:
-Context: []
-⊢ Π(n : Nat).Nat
-
-1 goals remaining
->
+Loaded: Data.Bool
+Loaded: Data.Eq
+Loaded: Data.Fin
+Loaded: Data.List
+Loaded: Data.Nat
+Loaded: Data.Sigma
+Loaded: Data.Tree
+Loaded: Data.Unit
+Loaded: Data.Vec
+Loaded: Data.W
+Loaded: Prelude
+Loaded: Samples
+Loaded: Test.List
+Loaded: Test.Pythagorean
+Loaded: Test.W
+Christine> Theorem plus_0_n : forall (n: Nat), Eq Nat (plus Zero n) n.
+Proof started for plus_0_n
+Proof> intro n.
+Proof> exact (Refl Nat n n).
+Goal solved!
+Proof> Qed.
+Proof complete!
+Christine> test_W
+Result: (ind_Bool(Bool)) True unused_ih (\u -> succ_w zero_w) unused_ih
+Christine>
 ```
 
 ## CIC
