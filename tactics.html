@@ -47,7 +47,7 @@
     :reconstructor  # fn([subproofs]) -> term
   ]
 end</pre>
-                <p>The reconstructor is updated by every tactic to wrap the sub-proof(s) into the correct constructor (<code>Lam</code>, <code>App</code>, etc.).</p>
+                <p>The reconstructor is updated by every tactic to wrap the sub-proof into the correct constructor.</p>
             </div>
         </section>
 
@@ -56,7 +56,7 @@ end</pre>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>intro x</b> works only when the current goal normalizes to a Pi type ∀ x : A, B.
                    It adds the binding x : A to the context, replaces the goal with B, and updates the
-                   reconstructor to wrap the sub-proof in Lam x A body. Error: :not_a_pi if the goal is not a dependent function type.</p>
+                   reconstructor to wrap the sub-proof in Lam x A body.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
@@ -68,7 +68,8 @@ Qed.</pre>
         <section>
             <h2>intros</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>intros x y z</code> repeats <code>intro</code> for each name. Implemented via the helper <code>do_intros</code>. It chains the reconstructor updates so the final term has nested <code>Lam</code> binders.</p>
+                <p>Tactic <b>intros x y z</b> repeats <b>intro</b> for each name.
+                It chains the reconstructor updates so the final term has nested Lam binders.</p>
                 <pre class="code-snippet">Theorem app_nil : ∀ A (l : List A), app l nil = l.
 Proof.
   intros A l.
@@ -82,8 +83,9 @@ Qed.</pre>
         <section>
             <h2>exact</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>exact t</code> parses the expression <code>t</code> in the current context, infers its type, and checks that it equals the goal (or is <code>Any</code>). If successful, it closes the goal and updates the reconstructor to insert the term directly.</p>
-                <p>Error: <code>:type_mismatch</code> with the inferred and required types.</p>
+                <p>Tactic <b>exact t</b> parses the expression t in the current context, infers its type,
+                   and checks that it equals the goal (or is Any). If successful, it closes the goal and
+                   updates the reconstructor to insert the term directly.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
@@ -95,7 +97,8 @@ Qed.</pre>
         <section>
             <h2>simpl</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>simpl</code> replaces the current goal with its βι-normal form using <code>Typechecker.normalize</code>. It does not change the proof term — only the goal presentation.</p>
+                <p>Tactic <b>simpl</b> replaces the current goal with its βι-normal form using Typechecker.normalize.
+                It does not change the proof term — only the goal presentation.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
@@ -108,7 +111,9 @@ Qed.</pre>
         <section>
             <h2>reflexivity</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>reflexivity</code> normalizes the goal. If it is an equality <code>a = a</code>, it closes the goal with <code>Refl</code> and updates the reconstructor accordingly. The equality check uses syntactic <code>Typechecker.equal?</code> after normalization.</p>
+                <p>Tactic <b>reflexivity</b> normalizes the goal. If it is an equality a = a,
+                it closes the goal with Refl and updates the reconstructor accordingly.
+                The equality check uses syntactic Typechecker.equal? after normalization.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
@@ -120,8 +125,10 @@ Qed.</pre>
         <section>
             <h2>ring</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>ring</code> normalizes the goal to an equality, converts both sides to polynomials via <code>to_poly</code> + <code>poly_normalize</code>, and solves if the polynomials are identical. It closes the goal with a placeholder term <code>ring_solved</code>.</p>
-                <p>Error: <code>:not_an_equation</code> or <code>:ring_mismatch</code>.</p>
+                <p>Tactic <b>ring</b> normalizes the goal to an equality, converts both sides
+                to polynomials via <code>to_poly</code> and <code>poly_normalize</code>,
+                and solves if the polynomials are identical. It closes the goal with a
+                placeholder term <code>ring_solved</code>.</p>
                 <pre class="code-snippet">Theorem ring_example : (x + 2*y) + (3*x + y) = 4*x + 3*y.
 Proof.
   ring.
@@ -132,8 +139,10 @@ Qed.</pre>
         <section>
             <h2>apply</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>apply H</code> or <code>apply H with x:=t</code> looks up hypothesis <code>H</code>, matches its type against the goal using <code>match_goal</code>, generates subgoals for missing arguments, and builds an <code>App</code> node in the reconstructor. Named <code>with</code> bindings are evaluated and substituted.</p>
-                <p>Error: <code>:variable_not_found</code>, <code>:cannot_apply</code>.</p>
+                <p>Tactic <b>apply H</b> or <b>apply H with x:=t</b> looks up hypothesis H,
+                   matches its type against the goal using <code>match_goal</code>, generates
+                   subgoals for missing arguments, and builds an App node in the reconstructor.
+                   Named with bindings are evaluated and substituted.</p>
                 <pre class="code-snippet">Theorem plus_comm : ∀ n m : Nat, plus n m = plus m n.
 Proof.
   intros n m.
@@ -143,29 +152,18 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>Example Full Session</h2>
-            <div style="max-width:720px;margin:0 auto;">
-                <pre class="code-snippet">Christine&gt; Theorem plus_O_n : ∀ n : Nat, plus O n = n.
-Proof started for plus_O_n
-Proof&gt; intro n.
-Proof&gt; simpl.
-Proof&gt; reflexivity.
-Goal solved!
-Proof&gt; Qed.
-Proof complete. Term registered: plus_O_n</pre>
-            </div>
-        </section>
-
-        <section>
             <h2>Implementation</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p>All tactics are defined in <a href="https://github.com/groupoid/christine/blob/main/lib/christine/tactics.ex"><code>lib/christine/tactics.ex</code></a>. The dispatcher is the <code>apply_tactic</code> function with pattern matching on the parsed tactic tuple. New tactics are added by extending <code>parse_tactic</code> and the main case clause.</p>
+                <p>All tactics are defined in <a href="https://github.com/groupoid/christine/blob/main/lib/christine/tactics.ex">
+                  <code>lib/christine/tactics.ex</code></a>. The dispatcher is the <code>apply_tactic</code>
+                  function with pattern matching on the parsed tactic tuple. New tactics are added by
+                  extending <code>parse_tactic</code> and the main case clause.</p>
             </div>
         </section>
     </main>
 
     <footer style="text-align:center;padding:3rem;color:#666;">
-        <p>Christine Theorem Prover — Groupoid Infinity • 2026</p>
+        <p>Christine Theorem Proving System • Groupoid Infinity • 2026</p>
     </footer>
 </body>
 </html>

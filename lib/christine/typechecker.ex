@@ -267,9 +267,23 @@ defmodule Christine.Typechecker do
     end
   end
 
-  defp do_reduce(_e, %AST.Fixpoint{name: _name, body: _body} = f, _fuel) do
-    # A standalone fixpoint is already in reduced form
-    f
+  defp do_reduce(e, %AST.Fixpoint{name: name, body: body, args: args} = f, fuel) do
+    if args == [] do
+      f
+    else
+      case try_unfold_fixpoint(e, body, args, fuel - 1) do
+        {:ok, unfolded} -> 
+          if name in ["plus", "beq_nat", "insert", "count"] do
+             Christine.Debug.log("DEBUG REDUCE FIX OK (standalone): #{name} unfolded")
+          end
+          unfolded
+        :blocked -> 
+          if name in ["plus", "beq_nat", "insert", "count"] do
+             # Christine.Debug.log("DEBUG REDUCE FIX BLOCKED (standalone): #{name} with #{length(args)} args")
+          end
+          f
+      end
+    end
   end
 
   defp do_reduce(e, %AST.Ind{inductive: ind_def, motive: _p, cases: cases, term: t} = ind, fuel) do

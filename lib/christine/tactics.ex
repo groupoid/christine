@@ -22,7 +22,8 @@ defmodule Christine.Tactics do
     }
   end
 
-  def apply_tactic(ps, tactic_str) when is_binary(tactic_str) do
+  def apply_tactic(%ProofState{goals: [{_ctx, current} | _rest]} = ps, tactic_str) when is_binary(tactic_str) do
+    Christine.Debug.log("DEBUG TACTIC: #{tactic_str} on goal: #{AST.to_string(current)}")
     case parse_tactic(tactic_str) do
       :unknown -> {:error, :unknown_tactic, ps}
       tac -> apply_tactic(ps, tac)
@@ -32,7 +33,7 @@ defmodule Christine.Tactics do
   def apply_tactic(%ProofState{goals: [{ctx, current} | rest], env: env} = ps, tac) do
     case tac do
       {:intro, x} ->
-        case Typechecker.normalize(env, current) do
+        case Typechecker.reduce(env, current) do
           %AST.Pi{domain: a, codomain: b} ->
             new_ctx = [{x, a} | ctx]
             old_rec = ps.reconstructor
