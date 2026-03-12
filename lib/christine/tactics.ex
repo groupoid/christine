@@ -231,7 +231,7 @@ defmodule Christine.Tactics do
 
         case List.keyfind(ctx, x, 0) do
           nil ->
-            IO.puts("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
+            Christine.Debug.log("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
             case Typechecker.normalize(env, current) do
               %AST.Pi{name: ^x} ->
                 case apply_tactic(ps, "intro #{x}") do
@@ -239,7 +239,7 @@ defmodule Christine.Tactics do
                   err -> err
                 end
               _ -> 
-                # IO.puts("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
+                # Christine.Debug.log("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
                 {:error, {:variable_not_found, x}, ps}
             end
 
@@ -356,13 +356,13 @@ defmodule Christine.Tactics do
             case unwrap_eq_from_pi_raw(env, h_ty) do
               {:ok, l_raw, r_raw, pi_args} ->
                 {l, r} = if dir == :backward, do: {r_raw, l_raw}, else: {l_raw, r_raw}
-                # IO.puts("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
-                # IO.puts("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
-                # IO.puts("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
+                # Christine.Debug.log("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
+                # Christine.Debug.log("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
+                # Christine.Debug.log("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
                 new_goal = replace_expression(current, l, r, env, pi_args)
                 if Typechecker.equal?(env, current, new_goal) do
                    if h_name == "beq_nat_refl" do
-                      IO.puts("REWRITE FAILED: #{h_name}\nTarget Pattern:\n#{AST.to_string(l)}\nGoal:\n#{AST.to_string(current)}")
+                      Christine.Debug.log("REWRITE FAILED: #{h_name}\nTarget Pattern:\n#{AST.to_string(l)}\nGoal:\n#{AST.to_string(current)}")
                    end
                    {:error, :nothing_to_rewrite, ps}
                 else
@@ -642,7 +642,7 @@ defmodule Christine.Tactics do
   defp wrap_goals(types, ctx), do: Enum.map(types, fn t -> {ctx, t} end)
 
   defp match_goal(env, goal, type, params \\ [], acc_args \\ []) do
-    IO.puts("DEBUG MATCH_GOAL: goal #{AST.to_string(goal)} vs type #{AST.to_string(type)}")
+    Christine.Debug.log("DEBUG MATCH_GOAL: goal #{AST.to_string(goal)} vs type #{AST.to_string(type)}")
     case Typechecker.normalize(env, type) do
       %AST.Pi{name: n, domain: d, codomain: c} ->
         match_goal(env, goal, c, [n | params], [{n, d} | acc_args])
@@ -670,7 +670,7 @@ defmodule Christine.Tactics do
   end
 
   defp unwrap_eq(app) do
-    IO.puts("DEBUG UNWRAP_EQ: #{AST.to_string(app)}")
+    Christine.Debug.log("DEBUG UNWRAP_EQ: #{AST.to_string(app)}")
     case extract_app_args_full(app) do
       [f | args] ->
         if is_eq?(f) do
@@ -686,8 +686,8 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp is_eq?(%AST.Var{name: n}), do: names_match?("eq", n) or names_match?("Eq", n)
-  defp is_eq?(%AST.Ind{inductive: %AST.Inductive{name: n}}), do: names_match?("eq", n) or names_match?("Eq", n)
+  defp is_eq?(%AST.Var{name: n}), do: AST.names_match?("eq", n) or AST.names_match?("Eq", n)
+  defp is_eq?(%AST.Ind{inductive: %AST.Inductive{name: n}}), do: AST.names_match?("eq", n) or AST.names_match?("Eq", n)
   defp is_eq?(%AST.App{func: f}), do: is_eq?(f)
   defp is_eq?(_), do: false
 
@@ -704,7 +704,7 @@ defmodule Christine.Tactics do
        if res == :error do
          # IO.puts("REPLACE EXPR FAILED MATCH:\nTarget:\n#{inspect(target, limit: 100)}\nPattern:\n#{inspect(old, limit: 100)}")
        else
-         IO.puts("REPLACE EXPR SUCCEEDED MATCH on target!!")
+         Christine.Debug.log("DEBUG REPLACE EXPR SUCCEEDED MATCH on target!!")
        end
     end
     case res do
@@ -712,7 +712,7 @@ defmodule Christine.Tactics do
         res = Enum.reduce(bindings, new, fn {name, val}, acc ->
           Christine.Typechecker.subst(name, val, acc)
         end)
-        IO.puts("REPLACE EXPR SUCCEEDED MATCH: target=#{AST.to_string(target)} result=#{AST.to_string(res)}")
+        Christine.Debug.log("DEBUG REPLACE EXPR SUCCEEDED MATCH: target=#{AST.to_string(target)} result=#{AST.to_string(res)}")
         res
       :error ->
         case target do
@@ -759,7 +759,7 @@ defmodule Christine.Tactics do
   def try_match(env, target, pattern, params, bindings \\ %{}) do
     pattern_str = AST.to_string(pattern)
     if String.contains?(pattern_str, "beq_nat") or String.contains?(pattern_str, "plus") do
-       # IO.puts("DEBUG TRY_MATCH (FIX):\nTarget:\n#{AST.to_string(target)}\nPattern:\n#{pattern_str}")
+       # Christine.Debug.log("DEBUG TRY_MATCH (FIX):\nTarget:\n#{AST.to_string(target)}\nPattern:\n#{pattern_str}")
     end
     case pattern do
       %AST.Var{name: n} ->
@@ -776,7 +776,7 @@ defmodule Christine.Tactics do
         else
           case target do
             %AST.Var{name: n2} ->
-              if names_match?(n, n2) do
+              if AST.names_match?(n, n2) do
                 {:ok, bindings}
               else
                 if Typechecker.equal?(env, target, pattern) do
@@ -823,7 +823,7 @@ defmodule Christine.Tactics do
       %AST.Ind{inductive: i1, term: t1, motive: m1, cases: c1} ->
         case target do
           %AST.Ind{inductive: i2, term: t2, motive: m2, cases: c2} ->
-            if names_match?(i1.name, i2.name) do
+            if AST.names_match?(i1.name, i2.name) do
               with {:ok, b1} <- try_match(env, t2, t1, params, bindings),
                    {:ok, b2} <- try_match(env, m2, m1, params, b1) do
                Enum.zip(c2, c1) |> Enum.reduce_while({:ok, b2}, fn {tc, pc}, {:ok, acc} ->
@@ -831,7 +831,7 @@ defmodule Christine.Tactics do
                    {:ok, new_acc} -> {:cont, {:ok, new_acc}}
                    :error -> 
                      if Enum.member?(params, "n") do
-                       IO.puts("IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}")
+                       Christine.Debug.log("DEBUG IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}")
                      end
                      {:halt, :error}
                  end
@@ -886,13 +886,13 @@ defmodule Christine.Tactics do
       %AST.Fixpoint{name: n1} = pattern_fix ->
         case target do
           %AST.Fixpoint{name: n2} ->
-             if names_match?(n1, n2) do
+             if AST.names_match?(n1, n2) do
                 {:ok, bindings}
              else
                 if Typechecker.equal?(env, target, pattern_fix) do {:ok, bindings} else :error end
              end
           %AST.Var{name: n2} ->
-             if names_match?(n1, n2) do
+             if AST.names_match?(n1, n2) do
                 {:ok, bindings}
              else
                 if Typechecker.equal?(env, target, pattern_fix) do {:ok, bindings} else :error end
@@ -956,7 +956,7 @@ defmodule Christine.Tactics do
   defp do_unfold_number(n, succ, zero) when n > 0, do: %AST.App{func: %AST.Var{name: succ}, arg: do_unfold_number(n - 1, succ, zero)}
 
   defp find_variable(%ProofState{goals: [{ctx, _} | _], env: env}, name) do
-    # IO.puts("DEBUG FIND_VARIABLE: #{name}")
+    # Christine.Debug.log("DEBUG FIND_VARIABLE: #{name}")
     case Enum.find(ctx, fn {n, _} -> n == name end) || Enum.find(env.ctx, fn {n, _} -> n == name end) do
       {^name, ty} -> {:ok, %AST.Var{name: name}, ty}
       _ ->
@@ -1121,7 +1121,7 @@ defmodule Christine.Tactics do
         apply_tactic(ps, tac)
 
       [first | rest] ->
-        IO.puts("DEBUG SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}")
+        Christine.Debug.log("DEBUG SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}")
         case apply_tactic(ps, first) do
           {:ok, %{goals: new_goals} = nps} ->
             # Number of new goals generated by 'first'
@@ -1333,7 +1333,4 @@ defmodule Christine.Tactics do
     end
   end
 
-  defp names_match?(n1, n2) do
-    n1 == n2 or n2 == "Coq." <> n1 or n1 == "Coq." <> n2
-  end
 end

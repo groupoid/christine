@@ -3,11 +3,14 @@ defmodule Mix.Tasks.Christine.Test do
 
   @shortdoc "Run Christine tests"
   def run(args) do
+    {opts, remaining, _} = OptionParser.parse(args, switches: [verbose: :boolean])
+    if opts[:verbose], do: Application.put_env(:christine, :verbose, true)
+
     IO.puts("Running Christine tests...")
 
     test_files =
-      if args != [] do
-        Enum.flat_map(args, fn arg ->
+      if remaining != [] do
+        Enum.flat_map(remaining, fn arg ->
           if File.dir?(arg), do: Path.wildcard("#{arg}/**/*.christine"), else: [arg]
         end)
       else

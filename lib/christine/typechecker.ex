@@ -180,7 +180,7 @@ defmodule Christine.Typechecker do
     n1 = normalize(e, t1)
     n2 = normalize(e, t2)
     res = (n1 == n2)
-    # IO.puts("DEBUG EQUAL?: #{AST.to_string(n1)} == #{AST.to_string(n2)} -> #{res}")
+    # Christine.Debug.log("DEBUG EQUAL?: #{AST.to_string(n1)} == #{AST.to_string(n2)} -> #{res}")
     res
   end
 
@@ -207,8 +207,8 @@ defmodule Christine.Typechecker do
           term: normalize(e, t_val)
         }
 
-      %AST.Fixpoint{name: n, domain: d, body: b} ->
-        %AST.Fixpoint{name: n, domain: normalize(e, d), body: normalize(e, b)}
+      %AST.Fixpoint{name: _n, domain: d, body: b, args: args} = fix ->
+        %{fix | domain: normalize(e, d), body: normalize(e, b), args: Enum.map(args, &normalize(e, &1))}
 
       %AST.Constr{index: i, inductive: d, args: args} ->
         %AST.Constr{index: i, inductive: d, args: Enum.map(args, &normalize(e, &1))}
@@ -248,12 +248,12 @@ defmodule Christine.Typechecker do
         case try_unfold_fixpoint(e, body, all_args, fuel - 1) do
           {:ok, unfolded} -> 
             if fix.name in ["plus", "beq_nat", "insert", "count"] do
-               IO.puts("DEBUG REDUCE FIX OK: #{fix.name} unfolded")
+               Christine.Debug.log("DEBUG REDUCE FIX OK: #{fix.name} unfolded")
             end
             unfolded
           :blocked -> 
             if fix.name in ["plus", "beq_nat", "insert", "count"] do
-               IO.puts("DEBUG REDUCE FIX BLOCKED: #{fix.name} with args #{Enum.map_join(all_args, " ", &AST.to_string/1)}")
+               Christine.Debug.log("DEBUG REDUCE FIX BLOCKED: #{fix.name} now has #{length(all_args)} args")
             end
             %{fix | args: all_args}
         end
@@ -275,7 +275,7 @@ defmodule Christine.Typechecker do
   defp do_reduce(e, %AST.Ind{inductive: ind_def, motive: _p, cases: cases, term: t} = ind, fuel) do
     case reduce(e, t, fuel - 1) do
       %AST.Constr{index: j, args: args} ->
-        # IO.puts("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
+        # Christine.Debug.log("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
         # Find the constructor's Pi type signature to trace which arguments are recursive
         case Enum.find(ind_def.constrs, fn {idx, _, _} -> idx == j end) do
           {^j, _cname, c_sig} ->
@@ -283,7 +283,7 @@ defmodule Christine.Typechecker do
             res = apply_args(e, case_val, args, c_sig, ind)
             reduce(e, res, fuel - 1)
           _ ->
-            # IO.puts("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
+            # Christine.Debug.log("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
             ind
         end
 
@@ -384,7 +384,9 @@ defmodule Christine.Typechecker do
     end)
   end
 
-  def subst(x, s, %AST.Var{name: name}), do: if(name == x, do: s, else: %AST.Var{name: name})
+  def subst(x, s, %AST.Var{name: name}) do
+    if AST.names_match?(x, name), do: s, else: %AST.Var{name: name}
+  end
 
   def subst(x, s, %AST.Pi{name: n, domain: a, codomain: b}) do
     if n == x,
@@ -419,18 +421,23 @@ defmodule Christine.Typechecker do
     %AST.Constr{index: i, inductive: d, args: Enum.map(args, &subst(x, s, &1))}
   end
 
-  def subst(x, s, %AST.Fixpoint{name: n, domain: d, body: b}) do
+  def subst(x, s, %AST.Fixpoint{name: n, domain: d, body: b, args: args} = f) do
+    new_args = Enum.map(args, &subst(x, s, &1))
     # Fixpoint name might shadow x, but usually it's a global name.
     if n == x do
-      %AST.Fixpoint{name: n, domain: subst(x, s, d), body: b}
+      %{f | domain: subst(x, s, d), args: new_args}
     else
-      %AST.Fixpoint{name: n, domain: subst(x, s, d), body: subst(x, s, b)}
+      %{f | domain: subst(x, s, d), body: subst(x, s, b), args: new_args}
     end
   end
 
   def subst(_, _, t), do: t
 
+  defp count_lams(%AST.Lam{body: b}), do: 1 + count_lams(b)
+  defp count_lams(_), do: 0
+
   defp try_unfold_fixpoint(e, body, args, fuel) do
+    Christine.Debug.log("DEBUG FIX UNFOLD: Body has #{count_lams(body)} Lams, calling with #{length(args)} args")
     # 1. Beta-reduce all current args into the body as much as possible
     unfolded = 
       Enum.reduce(args, body, fn arg, acc ->
@@ -442,21 +449,21 @@ defmodule Christine.Typechecker do
     
     # 2. Check if the resulting term can "progress" its reduction.
     # We look for the first Ind node. If its term is a constructor, we succeed.
-    IO.puts("DEBUG FIX UNFOLD: Unfolded = #{AST.to_string(unfolded)}")
+    Christine.Debug.log("DEBUG FIX UNFOLD: Unfolded = #{AST.to_string(unfolded)}")
     case find_first_ind(unfolded) do
       {:ok, %AST.Ind{term: t} = ind} ->
-        IO.puts("DEBUG FIX UNFOLD: Found Ind for #{ind.inductive.name}, term = #{AST.to_string(t)}")
+        Christine.Debug.log("DEBUG FIX UNFOLD: Found Ind for #{ind.inductive.name}, term = #{AST.to_string(t)}")
         case reduce(e, t, fuel) do
            %AST.Constr{} = c -> 
-             IO.puts("DEBUG FIX UNFOLD: OK (matched constructor #{inspect(c.index)})")
+             Christine.Debug.log("DEBUG FIX UNFOLD: OK (matched constructor #{inspect(c.index)})")
              {:ok, reduce(e, unfolded, fuel)}
            other -> 
-             IO.puts("DEBUG FIX UNFOLD: BLOCKED (term reduces to non-constructor: #{AST.to_string(other)})")
+             Christine.Debug.log("DEBUG FIX UNFOLD: BLOCKED (term reduces to non-constructor: #{AST.to_string(other)})")
              :blocked
         end
       {:ok, _} -> :blocked 
       :none -> 
-        # IO.puts("DEBUG FIX UNFOLD: OK (no ind found, simple def?)")
+        # Christine.Debug.log("DEBUG FIX UNFOLD: OK (no ind found, simple def?)")
         {:ok, reduce(e, unfolded, fuel)}
     end
   end

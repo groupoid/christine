@@ -128,16 +128,16 @@ defmodule Christine.AST do
           "(#{name} #{params_str})"
         end
 
-      %Ind{} ->
-        "match ..."
-
-      %Fixpoint{name: name, args: args} ->
+      %Fixpoint{name: name, args: args, body: body} ->
         if args == [] do
-          "fix #{name}"
+          "(fix #{name} := #{to_string(body)})"
         else
           args_str = Enum.map_join(args, " ", &to_string/1)
           "(fix #{name} #{args_str})"
         end
+
+      %Ind{term: t} ->
+        "match #{to_string(t)} with ..."
 
       %Constr{index: i, inductive: d, args: args} ->
         name =
@@ -156,10 +156,6 @@ defmodule Christine.AST do
 
           "(#{name} #{args_str})"
         end
-
-      %Ind{inductive: d, motive: m, cases: cases, term: t} ->
-        cases_str = Enum.map_join(cases, ", ", &to_string/1)
-        "ind_#{d.name}(motive=#{to_string(m)}, cases=[#{cases_str}], term=#{to_string(t)})"
 
       %Let{decls: decls, body: body} ->
         decls_str =
@@ -256,4 +252,10 @@ defmodule Christine.AST do
   def nat(), do: %Var{name: "Nat"}
   def bool(), do: %Var{name: "Bool"}
   def unit(), do: %Var{name: "Unit"}
+
+  def names_match?(nil, _), do: false
+  def names_match?(_, nil), do: false
+  def names_match?(name1, name2) do
+    name1 == name2 or Elixir.String.ends_with?(name1, "." <> name2) or Elixir.String.ends_with?(name2, "." <> name1)
+  end
 end
