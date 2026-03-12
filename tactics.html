@@ -27,9 +27,10 @@
         <section>
             <h2>Abstract</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <b>Christine.Tactics</b> implements a minimal Coq-style tactical proof engine in Elixir (<code>lib/christine/tactics.ex</code>).
-                Every tactic is a pure function on the <code>ProofState</code> struct. It either returns <code>{:ok, new_state}</code> or <code>{:error, reason, state}</code>.
-                The engine builds the final CIC proof term via explicit reconstructor closures — no evars, no unification variables, no backtracking.
+                <b>Christine.Tactics</b> implements a minimal Coq-style tactical proof engine in Elixir.
+                Every tactic is a pure function on the proof state structure. It either returns
+                new state or error reason with state. The engine builds the final CIC proof term
+                via explicit reconstructor closures — no evars, no unification variables, no backtracking.
             </div>
         </section>
 
@@ -53,8 +54,9 @@ end</pre>
         <section>
             <h2>intro</h2>
             <div style="max-width:720px;margin:0 auto;">
-                <p><code>intro x</code> works only when the current goal normalizes to a <code>Pi</code> type <code>∀ x : A, B</code>. It adds the binding <code>x : A</code> to the context, replaces the goal with <code>B</code>, and updates the reconstructor to wrap the sub-proof in <code>Lam x A body</code>.</p>
-                <p>Error: <code>:not_a_pi</code> if the goal is not a dependent function type.</p>
+                <p>Tactic <b>intro x</b> works only when the current goal normalizes to a Pi type ∀ x : A, B.
+                   It adds the binding x : A to the context, replaces the goal with B, and updates the
+                   reconstructor to wrap the sub-proof in Lam x A body. Error: :not_a_pi if the goal is not a dependent function type.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
