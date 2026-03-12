@@ -214,7 +214,7 @@ Print flatten_aux_size.
 
 Lemma not_subterm_self_l : forall (x y : bin), ~ x = N x y.
 Proof.
-intros x y abs.
+intros x.
 induction x.
 intros y; discriminate.
 intros y abs.

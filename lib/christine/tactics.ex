@@ -27,7 +27,7 @@ defmodule Christine.Tactics do
   def apply_tactic(%ProofState{goals: [{ctx, current} | rest], env: env} = ps, tactic_str) do
     case parse_tactic_command(tactic_str) do
       {:intro, x} ->
-        IO.puts("DEBUG: intro #{x}. Current goal: #{AST.to_string(current)}")
+        # IO.puts("DEBUG: intro #{x}. Current goal: #{AST.to_string(current)}")
         case Typechecker.normalize(env, current) do
           %AST.Pi{name: _y, domain: a, codomain: b} ->
             new_ctx = [{x, a} | ctx]
@@ -43,7 +43,7 @@ defmodule Christine.Tactics do
         end
 
       {:intros, names} ->
-        IO.puts("DEBUG: intros #{inspect(names)}. Current goal: #{AST.to_string(current)}")
+        # IO.puts("DEBUG: intros #{inspect(names)}. Current goal: #{AST.to_string(current)}")
         # Handle intros without names by taking names from Pi
         case do_intros(ps, names) do
           {:ok, new_ps} -> {:ok, new_ps}
@@ -183,6 +183,7 @@ defmodule Christine.Tactics do
                     # These will be the new hypotheses in the context
                     binders = extract_constructor_binders(env, cty, ind.name, motive)
                     renamed_binders = rename_binders(binders, c_user_names)
+                    # IO.inspect(renamed_binders, label: "INDUCTION ADDING BINDERS")
                     new_ctx = renamed_binders ++ ctx
                     {new_ctx, current}
                   end)
@@ -365,11 +366,11 @@ defmodule Christine.Tactics do
         case parse_and_eval(expr_str, %{env | ctx: ctx}) do
           {:ok, witness} ->
             norm_current = Typechecker.normalize(env, current)
-            IO.inspect(norm_current, label: "NORMALIZED GOAL FOR EXISTS")
+            # IO.inspect(norm_current, label: "NORMALIZED GOAL FOR EXISTS")
             
             case norm_current do
               %AST.App{func: %AST.App{func: %AST.Var{name: ex_name}, arg: a_type}, arg: p_lambda}
-              when ex_name in ["ex", "Exists"] ->
+              when ex_name in ["ex", "Exists", "Coq.ex", "Coq.Exists"] ->
                 new_goal = %AST.App{func: p_lambda, arg: witness}
                 old_rec = ps.reconstructor
                 new_rec = fn [proof_of_p | remainder] ->
@@ -388,7 +389,8 @@ defmodule Christine.Tactics do
                 {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
 
               _ ->
-                IO.puts("DEBUG: not_an_existential. Goal normalized to: #{inspect(norm_current, limit: 5)}")
+                # IO.puts("DEBUG: not_an_existential. Goal normalized to: #{inspect(norm_current, limit: 5)}")
+                # IO.inspect(norm_current, label: "RAW NORMALIZED GOAL FOR EXISTS", structs: false)
                 {:error, :not_an_existential, ps}
             end
 
@@ -573,7 +575,7 @@ defmodule Christine.Tactics do
         []
 
       other ->
-        [%{coeff: 1, vars: %{AST.to_string(other) => 1}}]
+        [%{coeff: 1, vars: %{other => 1}}]
     end
   end
 
@@ -612,37 +614,11 @@ defmodule Christine.Tactics do
       |> Enum.reject(&(&1 == ""))
 
     Enum.reduce_while(tactic_list, ps, fn tactic_str, acc ->
-      # Handle Coq semicolon: tac1 ; tac2
-      case String.split(tactic_str, ~r/;\s*/, trim: true) do
-        [tac] ->
-          case apply_tactic(acc, tac) do
-            {:ok, nps} -> {:cont, nps}
-            {:error, reason, _ps} -> {:halt, {:error, reason, acc, tac}}
-            {:error, reason} -> {:halt, {:error, reason, acc, tac}}
-          end
-
-        [first_tac | rest_tacs] ->
-          case apply_tactic(acc, first_tac) do
-            {:ok, nps} ->
-              res =
-                Enum.reduce_while(rest_tacs, {:ok, nps}, fn next_tac, {:ok, inner_ps} ->
-                  case apply_to_all_goals(inner_ps, next_tac) do
-                    {:ok, final_ps} -> {:cont, {:ok, final_ps}}
-                    {:error, reason, _} -> {:halt, {:error, reason, inner_ps, next_tac}}
-                  end
-                end)
-
-              case res do
-                {:ok, final} -> {:cont, final}
-                {:error, reason, last_ps, failed_tac} -> {:halt, {:error, reason, last_ps, failed_tac}}
-              end
-
-            {:error, reason, _ps} ->
-              {:halt, {:error, reason, acc, first_tac}}
-
-            {:error, reason} ->
-              {:halt, {:error, reason, acc, first_tac}}
-          end
+      case process_semicolons(acc, tactic_str) do
+        {:ok, nps} -> {:cont, nps}
+        {:error, reason} -> {:halt, {:error, reason, acc, tactic_str}}
+        {:error, reason, _ps} -> {:halt, {:error, reason, acc, tactic_str}}
+        {:error, reason, _ps, failed_tac} -> {:halt, {:error, reason, acc, failed_tac}}
       end
     end)
     |> case do
@@ -661,6 +637,44 @@ defmodule Christine.Tactics do
           end
 
           {:error, {:unsolved_goals, ps.goals}}
+        end
+    end
+  end
+
+  defp process_semicolons(ps, tactic_str) do
+    case String.split(tactic_str, ~r/;\s*/, trim: true) do
+      [tac] ->
+        apply_tactic(ps, tac)
+
+      [first | rest] ->
+        case apply_tactic(ps, first) do
+          {:ok, %{goals: new_goals} = nps} ->
+            # Identify which goals were actually added by 'first'
+            # (Subgoals are always at the head of ps.goals)
+            n_new = length(new_goals) - length(ps.goals) + 1
+            {subgoals, others} = Enum.split(new_goals, n_new)
+            
+            # Apply rest of tactics to each subgoal produced by first
+            # We must be careful to combine them correctly
+            results = Enum.map(subgoals, fn g ->
+              temp_ps = %{nps | goals: [g]}
+              Enum.reduce_while(rest, {:ok, temp_ps}, fn tac, {:ok, curr_ps} ->
+                case apply_to_all_goals(curr_ps, tac) do
+                  {:ok, next_ps} -> {:cont, {:ok, next_ps}}
+                  err -> {:halt, err}
+                end
+              end)
+            end)
+
+            if Enum.all?(results, fn {:ok, _} -> true; _ -> false end) do
+              all_subgoals = Enum.flat_map(results, fn {:ok, r} -> r.goals end)
+              {:ok, %{nps | goals: all_subgoals ++ others}}
+            else
+              error = Enum.find(results, fn {:ok, _} -> false; _ -> true end)
+              error
+            end
+
+          err -> err
         end
     end
   end
@@ -796,6 +810,8 @@ defmodule Christine.Tactics do
     end
   end
 
+  defp do_intros(ps, names \\ [])
+  
   defp do_intros(ps, []) do
     case ps.goals do
       [{ctx, current} | _] ->
@@ -818,7 +834,12 @@ defmodule Christine.Tactics do
 
   defp do_intros(ps, [name | rest]) do
     case apply_tactic(ps, "intro #{name}") do
-      {:ok, nps} -> do_intros(nps, rest)
+      {:ok, nps} -> 
+        if rest == [] do
+          {:ok, nps} # STOP HERE if we consumed all requested names
+        else
+          do_intros(nps, rest)
+        end
       err -> err
     end
   end

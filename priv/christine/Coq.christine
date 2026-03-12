@@ -11,6 +11,9 @@ Inductive nat : Set :=
 | Zero : nat
 | Succ : nat -> nat.
 
+Definition O := Zero.
+Definition S := Succ.
+
 Inductive unit : Set :=
 | tt : unit.
 
@@ -44,7 +47,8 @@ Inductive ex (A : Type) (P : A -> Prop) : Prop :=
 
 Definition Exists := ex.
 
-Inductive Empty_set : Set :=.
+Inductive False : Prop :=.
+Inductive True : Prop := I : True.
 
 Definition not (A : Prop) := A -> False.
 
