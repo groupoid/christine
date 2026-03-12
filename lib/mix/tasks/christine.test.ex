@@ -2,10 +2,17 @@ defmodule Mix.Tasks.Christine.Test do
   use Mix.Task
 
   @shortdoc "Run Christine tests"
-  def run(_) do
+  def run(args) do
     IO.puts("Running Christine tests...")
 
-    test_files = Path.wildcard("test/christine/**/*.christine")
+    test_files =
+      if args != [] do
+        Enum.flat_map(args, fn arg ->
+          if File.dir?(arg), do: Path.wildcard("#{arg}/**/*.christine"), else: [arg]
+        end)
+      else
+        Path.wildcard("test/christine/**/*.christine")
+      end
 
     results =
       Enum.map(test_files, fn file ->

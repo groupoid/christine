@@ -1,0 +1,16 @@
+Module LiteralTest.
+
+import Coq.
+
+Check 3.
+Check (3 + 4).
+Check (1 :: 2 :: nil Nat).
+
+Definition l1 := 1 :: 2 :: nil Nat.
+Eval compute in l1.
+Eval compute in 1 + 2.
+
+Lemma test_plus : 1 + 2 = 3.
+Proof.
+reflexivity.
+Qed.

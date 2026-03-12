@@ -1,0 +1,26 @@
+Module Math.Tutorial.
+
+Lemma distrand : A −> B /\ C −> (A −> B) /\ (A −> C).
+tauto.
+Qed.
+
+Section Declaration.
+
+Variable n : nat.
+
+Hypothesis Pos n : ( gt n 0 ).
+
+Check gt.
+
+Section club .
+Variables Scottish RedSocks WearKilt Married GoOutSunday : Prop.
+Hypothesis rul e1 : ˜Scottish −> RedSocks.
+Hypothesis rul e2 : WearKilt \/ ˜RedSocks.
+Hypothesis rul e3 : Married −> ˜GoOutSunday.
+Hypothesis rul e4 : GoOutSunday <−> Scottish .
+Hypothesis rul e5 : WearKilt −> Scottish /\ Married.
+Hypothesis rul e6 : Scottish −> WearKilt.
+Lemma NoMember : False.
+tauto.
+Qed.
+

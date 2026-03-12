@@ -1,0 +1,216 @@
+Module Math.Bertot.
+
+(* Yves Bertot Reality Check *)
+
+Check True.
+Check False.
+Check 3.
+Check (3+4).
+Check (3=5).
+Check (3,4).
+Check ((3 = 5)/\True).
+Check nat -> Prop.
+Check (3 <= 6).
+Check (fun x : nat => x = 3).
+Check (forall x:nat, x < 3 \/ (exists y : nat, x = y + 3)).
+Check (let f := fun x => (x * 3,x) in f 3).
+
+Eval compute in let f := fun x => (x * 3, x) in f 3.
+
+Definition example1 := fun x : nat => x*x+2*x+1.
+
+Definition example2 (x : nat) := x*x+2*x+1.
+
+Require Import Bool.
+
+Eval compute in if true then 3 else 5.
+
+Search bool.
+
+Definition head_evb l := match l with
+| nil => false
+| a::tl => evenb a
+end.
+
+Fixpoint sum_list l := match l with
+| nil => 0
+| n::tl => n + sum_list tl
+end.
+
+Fixpoint insert n l := match l with
+| nil => n::nil
+| a::tl => if leb n a then n::l else a::insert n tl
+end.
+
+Fixpoint sort l := match l with
+| nil => nil
+| a::tl => insert a (sort tl)
+end.
+
+Eval compute in sort (1::4::3::22::5::16::7::nil).
+
+Lemma example2 : forall a b:Prop, a /\ b -> b /\ a.
+Proof.
+intros a b H.
+split.
+destruct H as [H1 H2].
+exact H2.
+intuition.
+Qed.
+
+Lemma example3 : forall A B, A \/ B -> B \/ A.
+Proof.
+intros A B H.
+destruct H as [H1 | H1].
+right; assumption.
+left; assumption.
+Qed.
+
+Lemma example4 : 3 <= 5.
+Proof.
+apply le_S.
+apply le_S.
+apply le_n.
+Qed.
+
+Lemma example5 : forall x y, x <= 10 -> 10 <= y -> x <= y.
+Proof.
+intros x y x10 y10.
+apply le_trans with (m := 10).
+exact x10.
+exact y10.
+Qed.
+
+Lemma example6 : forall x y, (x + y) * (x + y) = x*x + 2*x*y + y*y.
+Proof.
+intros x y.
+rewrite mult_plus_distr_l.
+rewrite mult_plus_distr_r.
+rewrite plus_assoc.
+rewrite <- plus_assoc with (n := x * x).
+rewrite mult_comm with (n:= y) (m:=x).
+rewrite mult_1_l.
+rewrite mult_succ_l.
+rewrite mult_assoc.
+reflexivity.
+Qed.
+
+Require Import Omega.
+
+Lemma omega_example : forall f x y, 0 < x -> 0 < f x -> 3 * f x <= 2 * y -> f x <= y.
+Proof.
+intros; omega.
+Qed.
+
+Lemma sum_n_p : forall n, 2 * sum_n n + n = n * n.
+Proof.
+  induction n.
+  reflexivity.
+  assert (SnSn : S n * S n = n * n + 2 * n + 1).
+  ring.
+  rewrite SnSn.
+  rewrite <- IHn.
+  simpl.
+  ring.
+Qed.
+
+Lemma evenb_p : forall n, evenb n = true -> exists x, n = 2 * x.
+Proof.
+  assert (Main: forall n, (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
+  {
+    induction n.
+    split.
+    intros H; exists 0; ring.
+    intros H; discriminate H.
+    split.
+    intros H.
+    destruct IHn as [_ IHn’].
+    exact IHn’.
+    intros H.
+    destruct IHn as [IHn’ _].
+    assert (H’ : exists x, n = 2 * x).
+    apply IHn’; exact H.
+    destruct H’ as [x q].
+    exists (x + 1).
+    rewrite q; ring.
+  }
+  intros n ev.
+  destruct (Main n) as [H _].
+  apply H; exact ev.
+Qed.
+
+Fixpoint count n l := match l with
+| nil => 0
+| a::tl => let r := count n tl in
+if beq_nat n a then 1+r else r
+end.
+
+Lemma insert_incr : forall n l, count n (insert n l) = 1 + count n l.
+Proof.
+intros n l; induction l.
+simpl.
+rewrite <- beq_nat_refl.
+reflexivity.
+simpl.
+case (leb n a).
+simpl.
+rewrite <- beq_nat_refl.
+reflexivity.
+simpl.
+case (beq_nat n a).
+rewrite IHl; reflexivity.
+rewrite IHl; reflexivity.
+Qed.
+
+Lemma example7_size : forall t, example7 t = false -> size t = 3.
+Proof.
+intros t; destruct t.
+simpl.
+intros H; discriminate H.
+destruct t1; destruct t2.
+simpl.
+intros H; discriminate H.
+simpl.
+intros H; discriminate H.
+simpl.
+intros H; discriminate H.
+Qed.
+
+Fixpoint flatten_aux (t1 t2:bin) : bin := match t1 with
+| L => N L t2
+| N t’1 t’2 => flatten_aux t’1 (flatten_aux t’2 t2)
+end.
+
+Fixpoint flatten (t:bin) : bin := match t with
+| L => L
+| N t1 t2 => flatten_aux t1 (flatten t2)
+end.
+
+Fixpoint size (t:bin) : nat := match t with
+| L => 1
+| N t1 t2 => 1 + size t1 + size t2
+end.
+
+Lemma flatten_aux_size : forall t1 t2, size (flatten_aux t1 t2) = size t1 + size t2 + 1.
+Proof.
+induction t1.
+intros t2; simpl; ring.
+intros t2; simpl.
+rewrite IHt1_1.
+rewrite IHt1_2.
+ring.
+Qed.
+
+Lemma not_subterm_self_l : forall x y, ~ x = N x y.
+Proof.
+intros x y abs.
+induction x.
+intros y; discriminate.
+intros y abs.
+inversion abs.
+intros h2 h1.
+assert (IHx1’ : x1 <> N x1 x2).
+apply IHx1.
+exact h1.
+Qed.
+

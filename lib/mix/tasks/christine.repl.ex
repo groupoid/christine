@@ -90,13 +90,11 @@ defmodule Mix.Tasks.Christine.Repl do
   defp start_proof(input, env) do
     with {:ok, tokens} <- Lexer.lex(input),
          resolved <- Layout.resolve(tokens),
-         {:ok, %AST.DeclValue{name: name, binders: _params, type: target_syn}, _} <-
-           Parser.parse_declaration(resolved) do
-      # In unified parser, theorems might result in a Pi directly or have params.
-      # parse_declaration forTheorem name : type. returns DeclValue with type=type.
+         {:ok, decls, _} <- Parser.parse_declaration(resolved),
+         # parse_declaration may return a list of decls since parse_def_theorem change
+         [%AST.DeclValue{name: name, type: target_syn} | _] <- List.wrap(decls) do
 
       IO.puts("Proof started for #{name}")
-      # Desugar target type
       desugared_target = Desugar.desugar_expression(target_syn, env)
       {:ok, Christine.Tactics.start_proof(desugared_target, env)}
     else
@@ -136,61 +134,15 @@ defmodule Mix.Tasks.Christine.Repl do
   end
 
   defp load_module(mod_name, env) do
-    path1 = "priv/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
-    path2 = "test/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
-    path = if File.exists?(path1), do: path1, else: path2
-
-    if File.exists?(path) do
-      source = File.read!(path)
-
-      with {:ok, tokens} <- Lexer.lex(source),
-           resolved <- Layout.resolve(tokens),
-           {:ok, %AST.Module{} = mod, _} <- Parser.parse(resolved) do
-        {new_defs, new_types} =
-          Enum.reduce(mod.declarations, {env.defs, env.env}, fn
-            %AST.DeclValue{} = v, {d_acc, t_acc} ->
-              current_env = %{env | defs: d_acc, env: t_acc}
-              desugared_v = Desugar.desugar_decl(v, current_env)
-              {Map.put(d_acc, desugared_v.name, desugared_v.expr), t_acc}
-
-            %AST.DeclData{} = data, {d_acc, t_acc} ->
-              current_env = %{env | defs: d_acc, env: t_acc}
-              desugared_ind = Desugar.desugar_decl(data, current_env)
-              new_t_acc = Map.put(t_acc, desugared_ind.name, desugared_ind)
-              new_d_acc = add_constructors(desugared_ind, d_acc)
-              {new_d_acc, new_t_acc}
-
-            _, acc ->
-              acc
-          end)
-
-        {:ok, %{env | defs: new_defs, env: new_types}}
-      else
-        err -> {:error, err}
-      end
-    else
-      {:error, :module_not_found}
+    # Delegate to the Compiler's module loader which properly populates
+    # both ctx (types) and defs (expressions) including for constructors.
+    case Christine.Compiler.load_module_to_env(mod_name, env, []) do
+      {:ok, new_env} -> {:ok, new_env}
+      {:error, :module_not_found} -> {:error, :module_not_found}
+      {:error, reason} -> {:error, reason}
     end
   end
 
-  defp add_constructors(ind, defs) do
-    Enum.reduce(ind.constrs, defs, fn {idx, name, ty}, acc ->
-      term = make_constr_term(idx, ind, ty, [])
-      Map.put(acc, name, term)
-    end)
-  end
-
-  def make_constr_term(idx, ind, ty, vars) do
-    case ty do
-      %AST.Pi{name: x, domain: a, codomain: b} ->
-        name = if x == "_", do: "a#{length(vars)}", else: x
-        %AST.Lam{name: name, domain: a, body: make_constr_term(idx, ind, b, [name | vars])}
-
-      _ ->
-        args = Enum.reverse(vars) |> Enum.map(fn n -> %AST.Var{name: n} end)
-        %AST.Constr{index: idx, inductive: ind, args: args}
-    end
-  end
 
   defp eval(input, env) do
     input = String.trim(input)

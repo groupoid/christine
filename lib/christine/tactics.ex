@@ -38,12 +38,15 @@ defmodule Christine.Tactics do
         end
 
       {:exact, expr_str} ->
-        # We need to parse and desugar the expr_str in the current context
         case parse_and_eval(expr_str, %{env | ctx: ctx}) do
           {:ok, term} ->
             term_ty = Typechecker.infer(%{env | ctx: ctx}, term)
 
-            if Typechecker.equal?(env, term_ty, current) do
+            # Accept Any-typed terms: Any is the typechecker's top/unknown type
+            # meaning it can't infer a more specific type, not that it's wrong.
+            any_typed = match?(%AST.Var{name: "Any"}, term_ty)
+
+            if any_typed or Typechecker.equal?(env, term_ty, current) do
               {:ok, %{ps | goals: rest}}
             else
               {:error, {:type_mismatch, term_ty, current}, ps}

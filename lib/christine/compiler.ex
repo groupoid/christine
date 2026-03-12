@@ -87,6 +87,47 @@ defmodule Christine.Compiler do
         acc = %{acc | defs: add_constructors(ind, acc.defs)}
         %{acc | ctx: add_constructors_to_ctx(ind, acc.ctx)}
 
+      {:module_start, _name}, acc ->
+        acc
+
+      {:section_start, _name}, acc ->
+        acc
+
+      {:command, :check_kw, expr}, acc ->
+        ty =
+          try do
+            Christine.Typechecker.infer(acc, expr)
+          rescue
+            e -> {:error, {:typechecker_crash, Exception.message(e)}}
+          end
+        IO.puts("Check: #{AST.to_string(expr)} : #{AST.to_string(ty)}")
+        acc
+
+      {:command, :eval_kw, expr}, acc ->
+        res =
+          try do
+            Christine.Typechecker.normalize(acc, expr)
+          rescue
+            e -> {:error, {:eval_crash, Exception.message(e)}}
+          end
+        IO.puts("Eval: #{AST.to_string(expr)} = #{AST.to_string(res)}")
+        acc
+
+      {:command, :search_kw, %AST.Var{name: name}}, acc ->
+        IO.puts("Search results for #{name}:")
+
+        for {n, ty} <- acc.ctx, String.contains?(n, name) do
+          ty_str =
+            try do
+              AST.to_string(ty)
+            rescue
+              _ -> "<complex type>"
+            end
+          IO.puts("  #{n} : #{ty_str}")
+        end
+
+        acc
+
       _, acc ->
         acc
     end)
@@ -110,9 +151,19 @@ defmodule Christine.Compiler do
   end
 
   def resolve_imports(%AST.Module{name: mod_name, declarations: decls}, env, opts) do
-    # Implicitly import Prelude if it exists and we are not in Prelude
+    # Implicitly import Prelude if it exists and we are not in Prelude or Coq
     env =
-      if mod_name != "Prelude" do
+      if mod_name not in ["Prelude", "Coq"] do
+        case load_module_to_env("Coq", env, opts) do
+          {:ok, new_env} -> new_env
+          _ -> env
+        end
+      else
+        env
+      end
+
+    env =
+      if mod_name not in ["Prelude", "Coq"] do
         case load_module_to_env("Prelude", env, opts) do
           {:ok, new_env} -> new_env
           _ -> env

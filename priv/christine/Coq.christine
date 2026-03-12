@@ -1,0 +1,119 @@
+(* Coq 6.3 Base Library for Christine *)
+(* This uses Coq 6.3 notation where possible for maximum compatibility. *)
+
+Module Coq.
+
+Inductive bool : Set :=
+| false : bool
+| true : bool.
+
+Inductive nat : Set :=
+| Zero : nat
+| Succ : nat -> nat.
+
+Inductive unit : Set :=
+| tt : unit.
+
+Inductive list (A : Set) : Set :=
+| nil : list A
+| cons : A -> list A -> list A.
+
+Inductive prod (A : Set) (B : Set) : Set :=
+| pair : A -> B -> prod A B.
+
+Inductive sum (A : Set) (B : Set) : Set :=
+| inl : A -> sum A B
+| inr : B -> sum A B.
+
+Inductive and (A : Prop) (B : Prop) : Prop :=
+| conj : A -> B -> and A B.
+
+Inductive or (A : Prop) (B : Prop) : Prop :=
+| or_introl : A -> or A B
+| or_intror : B -> or A B.
+
+Inductive eq (A : Set) (x : A) : A -> Prop :=
+| eq_refl : eq A x x.
+
+Inductive le : nat -> nat -> Prop :=
+| le_n : forall n, le n n
+| le_S : forall n m, le n m -> le n (Succ m).
+
+Inductive Empty_set : Set :=.
+
+Definition not (A : Prop) := A -> False.
+
+Fixpoint plus (n : nat) (m : nat) : nat :=
+  match n with
+  | Zero => m
+  | Succ k => Succ (plus k m)
+  end.
+
+Fixpoint mult (n : nat) (m : nat) : nat :=
+  match n with
+  | Zero => Zero
+  | Succ k => plus m (mult k m)
+  end.
+
+Fixpoint minus (n : nat) (m : nat) : nat :=
+  match n with
+  | Zero => Zero
+  | Succ k => match m with
+    | Zero => Succ k
+    | Succ j => minus k j
+    end
+  end.
+
+Fixpoint leb (n : nat) (m : nat) : bool :=
+  match n with
+  | Zero => true
+  | Succ k => match m with
+    | Zero => false
+    | Succ j => leb k j
+    end
+  end.
+
+Fixpoint ltb (n : nat) (m : nat) : bool := leb (Succ n) m.
+
+Fixpoint eqb (n : nat) (m : nat) : bool :=
+  match n with
+  | Zero => match m with
+    | Zero => true
+    | Succ _ => false
+    end
+  | Succ k => match m with
+    | Zero => false
+    | Succ j => eqb k j
+    end
+  end.
+
+Definition beq_nat (n : nat) (m : nat) : bool := eqb n m.
+
+Fixpoint evenb (n : nat) : bool :=
+  match n with
+  | Zero => true
+  | Succ Zero => false
+  | Succ (Succ k) => evenb k
+  end.
+
+Definition andb (a : bool) (b : bool) : bool :=
+  match a with
+  | true => b
+  | false => false
+  end.
+
+Definition orb (a : bool) (b : bool) : bool :=
+  match a with
+  | true => true
+  | false => b
+  end.
+
+Definition negb (b : bool) : bool :=
+  match b with
+  | true => false
+  | false => true
+  end.
+
+Definition lt (n : nat) (m : nat) : Prop := le (Succ n) m.
+Definition ge (n : nat) (m : nat) : Prop := le m n.
+Definition gt (n : nat) (m : nat) : Prop := lt m n.

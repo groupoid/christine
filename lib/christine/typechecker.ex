@@ -49,18 +49,18 @@ defmodule Christine.Typechecker do
           ty
 
         nil ->
-          case Map.get(e.defs, name) do
-            term when not is_nil(term) ->
-              infer(e, term)
+          # If name has a definition, return Any rather than re-inferring the body.
+          # Re-inferring would cause infinite recursion for recursive functions.
+          if Map.has_key?(e.defs, name) do
+            %AST.Var{name: "Any"}
+          else
+            case Map.get(e.env, name) do
+              %AST.Inductive{} = ind ->
+                infer(e, ind)
 
-            nil ->
-              case Map.get(e.env, name) do
-                %AST.Inductive{} = ind ->
-                  infer(e, ind)
-
-                _ ->
-                  {:error, {:unbound_variable, name}}
-              end
+              _ ->
+                {:error, {:unbound_variable, name}}
+            end
           end
       end
     end
@@ -112,6 +112,12 @@ defmodule Christine.Typechecker do
 
       %AST.Var{name: "Any"} ->
         %AST.Var{name: "Any"}
+
+      %AST.Universe{} ->
+        # Type-level application: applying a type constructor (like `eq`, `le`, `and`)
+        # to arguments. The result is a type at Prop level (U0 or U-1).
+        # This supports Coq-style explicit: `eq nat 3 5`, `le m n`, `and P Q`.
+        %AST.Universe{level: 0}
 
       other ->
         {:error, {:application_requires_pi, other}}
@@ -198,7 +204,8 @@ defmodule Christine.Typechecker do
     end
   end
 
-  def reduce(e, t, fuel \\ 50_000)
+  @spec reduce(any(), any(), any()) :: any()
+  def reduce(e, t, fuel \\ 500_000)
 
   def reduce(_e, t, 0) do
     raise "Out of fuel reducing: #{inspect(t, limit: 20)}"

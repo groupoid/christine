@@ -32,6 +32,13 @@ defmodule Christine.Desugar do
 
   def desugar_decl(decl, env \\ %Christine.Typechecker.Env{})
 
+  def desugar_decl({:command, k, expr}, env) do
+    {:command, k, desugar_expression(expr, env)}
+  end
+
+  def desugar_decl({:module_start, name}, _env), do: {:module_start, name}
+  def desugar_decl({:section_start, name}, _env), do: {:section_start, name}
+
   def desugar_decl(
         %AST.DeclValue{
           name: name,
@@ -106,12 +113,12 @@ defmodule Christine.Desugar do
         # In CIC, it's usually (params) -> (cparams) -> (res_type)
         inner_ty =
           Enum.reduce(Enum.reverse(cparams), res_type, fn {_pname, pty}, acc ->
-            %AST.Pi{name: "_", domain: pty, codomain: acc}
+            %AST.Pi{name: "_", domain: desugar_expression(pty, env), codomain: acc}
           end)
 
         full_ty =
           Enum.reduce(Enum.reverse(params), inner_ty, fn {pname, pty}, acc ->
-            %AST.Pi{name: pname, domain: pty, codomain: acc}
+            %AST.Pi{name: pname, domain: desugar_expression(pty, env), codomain: acc}
           end)
 
         {idx, cname, full_ty}
@@ -143,7 +150,8 @@ defmodule Christine.Desugar do
             case first_pat do
               %AST.BinderConstructor{name: cname} ->
                 Enum.find_value(Map.values(env.env), fn ind ->
-                  if Enum.any?(ind.constrs, fn {_, name, _} -> name == cname end), do: ind
+                  if Enum.any?(ind.constrs, fn {_, name, _} -> name == cname or (cname == "::" and name == "cons") end),
+                    do: ind
                 end)
 
               _ ->
@@ -168,6 +176,12 @@ defmodule Christine.Desugar do
               Enum.find(branches, fn {pat, _} ->
                 case pat do
                   %AST.BinderConstructor{name: ^cname} -> true
+                  # Alias :: to cons for list patterns
+                  %AST.BinderConstructor{name: "::"} when cname == "cons" -> true
+                  # Alias Nil to nil (Prelude uses Nil, Coq uses nil)
+                  %AST.BinderConstructor{name: "Nil"} when cname == "nil" -> true
+                  %AST.BinderConstructor{name: "nil"} when cname == "Nil" -> true
+                  %AST.BinderConstructor{name: "Cons"} when cname == "cons" -> true
                   _ -> false
                 end
               end)
@@ -180,7 +194,6 @@ defmodule Christine.Desugar do
                     Enum.reduce(Enum.reverse(args), desugar_expression(body, env, func_name), fn
                       {k, _}, acc ->
                         ih_name = "ih_#{k}"
-                        # Recursive call replacement
                         acc_with_ih = replace_recursion(acc, func_name, k, ih_name)
 
                         %AST.Lam{
@@ -195,7 +208,21 @@ defmodule Christine.Desugar do
 
                       %AST.Var{name: k}, acc ->
                         ih_name = "ih_#{k}"
-                        # Recursive call replacement
+                        acc_with_ih = replace_recursion(acc, func_name, k, ih_name)
+
+                        %AST.Lam{
+                          name: k,
+                          domain: %AST.Var{name: "Any"},
+                          body: %AST.Lam{
+                            name: ih_name,
+                            domain: %AST.Var{name: "Any"},
+                            body: acc_with_ih
+                          }
+                        }
+
+                      # BinderConstructor as arg (e.g. `tl` in `a::tl` pattern)
+                      %AST.BinderConstructor{name: k}, acc ->
+                        ih_name = "ih_#{k}"
                         acc_with_ih = replace_recursion(acc, func_name, k, ih_name)
 
                         %AST.Lam{
@@ -225,6 +252,58 @@ defmodule Christine.Desugar do
           cases: cases,
           term: desugared_target
         }
+
+      %AST.Number{value: n} ->
+        nat_to_succ(n)
+
+      %AST.App{func: %AST.App{func: %AST.Var{name: op}, arg: l}, arg: r}
+      when op in ["::", "+", "-", "*", "/", "<=", "<", ">=", ">", "=", "/\\", "\\/", "<->", ":"] ->
+        mapped_name =
+          case op do
+            "::" -> "cons"
+            "+" -> "plus"
+            "-" -> "minus"
+            "*" -> "mult"
+            "/" -> "div"
+            "<=" -> "le"
+            "<" -> "lt"
+            ">=" -> "ge"
+            ">" -> "gt"
+            "=" -> "eq"
+            "/\\" -> "and"
+            "\\/" -> "or"
+            "<->" -> "iff"
+            _ -> op
+          end
+
+        # For polymorphic propositions, insert implicit type arg `Any`
+        mapped_expr =
+          case op do
+            "::" ->
+              # cons _ left right
+              %AST.App{
+                func: %AST.App{
+                  func: %AST.App{func: %AST.Var{name: "cons"}, arg: %AST.Var{name: "Any"}},
+                  arg: desugar_expression(l, env, func_name)
+                },
+                arg: desugar_expression(r, env, func_name)
+              }
+
+            _ ->
+              # Standard binary function application
+              %AST.App{
+                func: %AST.App{
+                  func: %AST.Var{name: mapped_name},
+                  arg: desugar_expression(l, env, func_name)
+                },
+                arg: desugar_expression(r, env, func_name)
+              }
+          end
+
+        mapped_expr
+
+      %AST.Pi{name: "_", domain: d, codomain: c} ->
+        %AST.Pi{name: "_", domain: desugar_expression(d, env, func_name), codomain: desugar_expression(c, env, func_name)}
 
       %AST.App{func: f, arg: arg} ->
         %AST.App{
@@ -322,6 +401,9 @@ defmodule Christine.Desugar do
   defp build_app(f, [arg | rest]) do
     build_app(%AST.App{func: f, arg: arg}, rest)
   end
+
+  defp nat_to_succ(0), do: %AST.Var{name: "Zero"}
+  defp nat_to_succ(n), do: %AST.App{func: %AST.Var{name: "Succ"}, arg: nat_to_succ(n - 1)}
 
   defp find_recursion_arg(args, k) do
     Enum.with_index(args)

@@ -153,10 +153,53 @@ defmodule Christine.AST do
         "let #{decls_str} in #{to_string(body)}"
 
       %Number{value: v} ->
-        inspect(v)
+        "#{v}"
 
       %String{value: s} ->
         inspect(s)
+
+      %Lambda{binders: binders, body: body} ->
+        params_str =
+          Enum.map_join(binders, " ", fn
+            {n, %Var{name: "Any"}} -> n
+            {n, ty} -> "(#{n} : #{to_string(ty)})"
+            %Var{name: n} -> n
+          end)
+        "\\#{params_str} -> #{to_string(body)}"
+
+      %Case{expr: e, branches: branches} ->
+        branches_str =
+          Enum.map_join(branches, " | ", fn {pat, body} ->
+            "#{to_string(pat)} => #{to_string(body)}"
+          end)
+        "match #{to_string(e)} with #{branches_str}"
+
+      %BinderConstructor{name: name, args: []} ->
+        name
+
+      %BinderConstructor{name: name, args: args} ->
+        args_str = Enum.map_join(args, " ", fn
+          {n, _} -> n
+          %Var{name: n} -> n
+          x -> to_string(x)
+        end)
+        "#{name} #{args_str}"
+
+      # Error tuples — render cleanly instead of raw Elixir inspect
+      {:error, {:unbound_variable, name}} ->
+        "error(unbound: #{name})"
+
+      {:error, {:application_requires_pi, inner}} ->
+        "error(not_a_function: #{to_string(inner)})"
+
+      {:error, {reason, _}} ->
+        "error(#{reason})"
+
+      {:error, reason} ->
+        "error(#{inspect(reason)})"
+
+      {:ok, val} ->
+        to_string(val)
 
       _ ->
         inspect(term)
