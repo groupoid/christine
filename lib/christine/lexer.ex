@@ -115,6 +115,7 @@ defmodule Christine.Lexer do
         "Require" -> {:require, line, col}
         "Import" -> {:import_kw, line, col}
         "Check" -> {:check_kw, line, col}
+        "Print" -> {:print_kw, line, col}
         "Eval" -> {:eval_kw, line, col}
         "Search" -> {:search_kw, line, col}
         "let" -> {:let, line, col}

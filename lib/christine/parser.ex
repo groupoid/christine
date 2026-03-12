@@ -267,7 +267,7 @@ defmodule Christine.Parser do
             {:error, :invalid_notation}
         end
 
-      [{k, _, _} | rest] when k in [:check_kw, :eval_kw, :search_kw] ->
+      [{k, _, _} | rest] when k in [:check_kw, :eval_kw, :search_kw, :print_kw] ->
         # Check expr. Eval compute in expr.
         rest =
           if k == :eval_kw do

@@ -128,6 +128,24 @@ defmodule Christine.Compiler do
 
         acc
 
+      {:command, :print_kw, %AST.Var{name: name}}, acc ->
+        ty = List.keyfind(acc.ctx, name, 0)
+        term = Map.get(acc.defs, name)
+
+        case {ty, term} do
+          {nil, nil} ->
+            IO.puts("#{name} : <unknown>")
+          {{_, ty_val}, nil} ->
+            IO.puts("#{name} : #{AST.to_string(ty_val)}")
+          {nil, t} ->
+            IO.puts("#{name} := #{AST.to_string(t)}")
+          {{_, ty_val}, t} ->
+            IO.puts("#{name} : #{AST.to_string(ty_val)}")
+            IO.puts("     := #{AST.to_string(t)}")
+        end
+
+        acc
+
       _, acc ->
         acc
     end)

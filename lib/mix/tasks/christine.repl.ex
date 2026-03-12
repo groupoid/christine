@@ -60,7 +60,7 @@ defmodule Mix.Tasks.Christine.Repl do
         input = String.trim(input)
 
         cond do
-          String.starts_with?(input, "Theorem") ->
+          String.starts_with?(input, ~w[Theorem Lemma Corollary]) |> Enum.any? ->
             case start_proof(input, env) do
               {:ok, ps} ->
                 loop(env, ps)
@@ -69,6 +69,26 @@ defmodule Mix.Tasks.Christine.Repl do
                 IO.puts("Error: #{inspect(err)}")
                 loop(env, nil)
             end
+
+          # Print name. — show stored term and type (Coq 6.3 style)
+          Regex.match?(~r/^Print\s+\S+\.?$/, input) ->
+            name = input |> String.replace_prefix("Print", "") |> String.trim() |> String.trim_trailing(".")
+            ty = List.keyfind(env.ctx, name, 0)
+            term = Map.get(env.defs, name)
+
+            case {ty, term} do
+              {nil, nil} ->
+                IO.puts("#{name} : <unknown>")
+              {{_, ty_val}, nil} ->
+                IO.puts("#{name} : #{AST.to_string(ty_val)}")
+              {nil, t} ->
+                IO.puts("#{name} := #{AST.to_string(t)}")
+              {{_, ty_val}, t} ->
+                IO.puts("#{name} : #{AST.to_string(ty_val)}")
+                IO.puts("     := #{AST.to_string(t)}")
+            end
+
+            loop(env, proof_state)
 
           proof_state != nil ->
             handle_tactic(input, env, proof_state)

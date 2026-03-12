@@ -201,6 +201,8 @@ rewrite IHt1_2.
 ring.
 Qed.
 
+Print flatten_aux_size.
+
 Lemma not_subterm_self_l : forall x y, ~ x = N x y.
 Proof.
 intros x y abs.
@@ -213,4 +215,6 @@ assert (IHx1’ : x1 <> N x1 x2).
 apply IHx1.
 exact h1.
 Qed.
+
+Print not_subterm_self_l.
 
