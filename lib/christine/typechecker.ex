@@ -255,8 +255,7 @@ defmodule Christine.Typechecker do
             if fix.name in ["plus", "beq_nat", "insert", "count"] do
                IO.puts("DEBUG REDUCE FIX BLOCKED: #{fix.name} with args #{Enum.map_join(all_args, " ", &AST.to_string/1)}")
             end
-            # Reconstruct as App nodes so matching works better
-            Enum.reduce(all_args, %{fix | args: []}, fn a, acc -> %AST.App{func: acc, arg: a} end)
+            %{fix | args: all_args}
         end
 
       %AST.Constr{index: i, inductive: d, args: args} ->

@@ -803,6 +803,16 @@ defmodule Christine.Tactics do
             else
               _ -> :error
             end
+          %AST.Fixpoint{args: args} = fx when args != [] ->
+             # Treat as App(Fixpoint(args[:-1]), args[-1])
+             f2 = %{fx | args: Enum.drop(args, -1)}
+             a2 = List.last(args)
+             with {:ok, b1} <- try_match(env, f2, f1, params, bindings),
+                  {:ok, b2} <- try_match(env, a2, a1, params, b1) do
+               {:ok, b2}
+             else
+               _ -> :error
+             end
           %AST.Number{value: v} ->
             unfolded = unfold_number(env, v)
             try_match(env, unfolded, pattern, params, bindings)
