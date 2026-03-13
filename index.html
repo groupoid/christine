@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christine Language</title>
-    <link rel="stylesheet" href="index.css?v=5">
+    <link rel="stylesheet" href="index.css?v=6">
 </head>
 <body>
     <nav class="sticky">
@@ -84,12 +84,12 @@ Definition cong (A: Type) (B: Type) (f: forall (x: A), B)
 
             <div style="max-width:720px;margin:0 auto;">
 The type checker operates over a term syntax comprising:
-1) `Universe i`: Type universes with level `i ∈ ℕ`.
-2) `Pi (x, A, B)`: Dependent function, where `A : Universe i` and `B : Universe j` under `x : A`;
-   `Lam (x, A, t)`: Lambda abstraction with totality enforced; `App (f, a)`: Function application.
-3) `Sigma (x, A, B)`: Dependent pair types; `Pair (a, b)`, `Fst p`, `Snd p`: construction and projections.
-4) `Id (A, a, b)`: Identity type, with `Refl` a and `J` eliminator.
-5) `Inductive d`: Inductive types with intros `Constr` and eliminator `Ind`.
+1) <b class=box>Universe i</b>: Type universes with level i ∈ ℕ.
+2) <b class=box>Pi x A B</b>: Dependent function, where A : Universe i and B : Universe j under x : A;
+   <b class=box>Lam x A t</b>: Lambda abstraction with totality enforced; <b class=box>App f a</b>: Function application.
+3) <b class=box>Sigma x A B</b>: Dependent pair types; <b class=box>Pair a b</b>, <b class=box>Fst p</b>, <b class=box>Snd p</b>: construction and projections.
+4) <b class=box>Id A a b</b>: Identity type, with <b class=box>Refl a</b> and <b class=box>J A a b C d p</b> eliminator.
+5) <b class=box>Inductive n p l c</b>: Inductive types with intros <b class=box>Constr i n p l c t</b> and eliminator <b class=box>Ind n p l c a d x</b>.
             </div>
 
         </section>
