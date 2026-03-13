@@ -19,9 +19,6 @@ The type checker operates over a term syntax comprising:
 * `Pi (x, A, B)`: Dependent function, where `A : Universe i` and `B : Universe j` under `x : A`.
   `Lam (x, A, t)`: Lambda abstraction with totality enforced.
   `App (f, a)`: Function application.
-* `Sigma (x, A, B)`: Dependent pair types.
-  `Pair (a, b)`, `Fst p`, `Snd p` construction and projections.
-* `Id (A, a, b)`: Identity type, with `Refl` a and `J` eliminator.
 * `Inductive d`: Inductive types with intros `Constr` and eliminator `Ind`.
 
 The typing judgment `Γ ⊢ t : T` is defined via `infer` and `check` functions,
@@ -33,9 +30,6 @@ with definitional equality `Γ ⊢ t = t'` implemented via `equal`.
 type term =
   | Var of name | Universe of level
   | Pi of name * term * term | Lam of name * term * term | App of term * term
-  | Sigma of name * term * term | Pair of term * term | Fst of term | Snd of term
-  | Id of term * term * term | Refl of term
-  | J of term * term * term * term * term * term  (* J A a b C d p *)
   | Inductive of inductive | Constr of int * inductive * term list
   | Elim of inductive * term * term list * term
 ```
