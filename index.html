@@ -89,7 +89,8 @@ The type checker operates over a term syntax comprising:
    <b class=box>Lam x A t</b>: Lambda abstraction with totality enforced; <b class=box>App f a</b>: Function application.
 3) <b class=box>Sigma x A B</b>: Dependent pair types; <b class=box>Pair a b</b>, <b class=box>Fst p</b>, <b class=box>Snd p</b>: construction and projections.
 4) <b class=box>Id A a b</b>: Identity type, with <b class=box>Refl a</b> and <b class=box>J A a b C d p</b> eliminator.
-5) <b class=box>Inductive n p l c</b>: Inductive types with intros <b class=box>Constr i n p l c t</b> and eliminator <b class=box>Ind n p l c a d x</b>.
+5) <b class=box>Inductive n p l c</b>: Inductive types with intros <b class=box>Constr i n p l c t</b> and
+   dependent general induction eliminator <b class=box>Ind n p l c a d x</b>.
             </div>
 
         </section>
