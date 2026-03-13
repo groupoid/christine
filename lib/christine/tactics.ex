@@ -656,9 +656,9 @@ defmodule Christine.Tactics do
              new_env = %{env | ctx: [{name, d} | env.ctx]}
              unwrap_eq_from_pi_raw(new_env, cod, [{name, d} | params])
            app ->
-             case unwrap_eq(app) do
+             case Typechecker.unwrap_eq(app) do
                {l, r} -> {:ok, l, r, Enum.reverse(params), env}
-               _ -> :error
+               _ -> {:error, :not_an_equation}
              end
         end
     end
@@ -1201,7 +1201,8 @@ defmodule Christine.Tactics do
   end
 
   defp get_inductive_head(env, ty) do
-    case Typechecker.normalize(env, ty) do
+    res = case Typechecker.normalize(env, ty) do
+      %AST.Inductive{} = ind -> ind
       %AST.Ind{inductive: ind} -> ind
       %AST.App{func: f} -> get_inductive_head(env, f)
       %AST.Var{name: name} -> 
@@ -1212,6 +1213,7 @@ defmodule Christine.Tactics do
         end
       _ -> nil
     end
+    res
   end
 
   defp solve_goal(ps, term) do
