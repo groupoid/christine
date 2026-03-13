@@ -116,11 +116,11 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
-    r1 = reduce(e, t1)
-    r2 = reduce(e, t2)
-    res = structural_equal?(e, r1, r2)
+    n1 = normalize(e, t1)
+    n2 = normalize(e, t2)
+    res = structural_equal?(e, n1, n2)
     if !res do
-       Christine.Debug.log("DEBUG EQUAL? FAIL:\n  l: #{AST.to_string(r1)} (inspect: #{inspect(r1)})\n  r: #{AST.to_string(r2)} (inspect: #{inspect(r2)})")
+       # Christine.Debug.log("DEBUG EQUAL? FAIL:\n  l: #{AST.to_string(n1)} (inspect: #{inspect(n1)})\n  r: #{AST.to_string(n2)} (inspect: #{inspect(n2)})")
     end
     res
   end
@@ -130,24 +130,51 @@ defmodule Christine.Typechecker do
   end
  
   def normalize(e, t) do
+    # Prevent infinite recursion by checking a deadline/depth if needed, 
+    # but here we rely on structural properties and the fixpoint body guard.
     deadline = e.deadline || System.monotonic_time(:millisecond) + 60_000
     e = %{e | deadline: deadline}
-    t_red = reduce(e, t)
-    do_normalize(e, t_red)
-  end
+    
+    red = reduce(e, t)
+    
+    case red do
+      %AST.App{func: f, arg: arg} -> 
+        n_f = normalize(e, f)
+        n_arg = normalize(e, arg)
+        # If normalizing func turned it into a Lambda, we might need more reduction
+        case n_f do
+          %AST.Lam{name: x, body: b} -> normalize(e, subst(x, n_arg, b))
+          _ -> %AST.App{func: n_f, arg: n_arg}
+        end
 
-  defp do_normalize(e, t) do
-    case t do
-      %AST.App{func: f, arg: arg} -> %AST.App{func: do_normalize(e, f), arg: do_normalize(e, arg)}
-      %AST.Lam{name: x, domain: a, body: b} -> %AST.Lam{name: x, domain: do_normalize(e, a), body: do_normalize(e, b)}
-      %AST.Pi{name: x, domain: a, codomain: b} -> %AST.Pi{name: x, domain: do_normalize(e, a), codomain: do_normalize(e, b)}
+      %AST.Lam{name: x, domain: a, body: b} -> 
+        %AST.Lam{name: x, domain: normalize(e, a), body: normalize(e, b)}
+
+      %AST.Pi{name: x, domain: a, codomain: b} ->
+        %AST.Pi{name: x, domain: normalize(e, a), codomain: normalize(e, b)}
+
       %AST.Ind{inductive: d, motive: p, cases: cases, term: t_val} ->
-        %AST.Ind{inductive: d, motive: do_normalize(e, p), cases: Enum.map(cases, &do_normalize(e, &1)), term: do_normalize(e, t_val)}
+        %AST.Ind{inductive: d, 
+                 motive: normalize(e, p), 
+                 cases: Enum.map(cases, &normalize(e, &1)), 
+                 term: normalize(e, t_val)}
+
       %AST.Fixpoint{name: n, domain: d, body: b, args: args} ->
-        %AST.Fixpoint{name: n, domain: do_normalize(e, d), body: do_normalize(e, b), args: Enum.map(args, &do_normalize(e, &1))}
-      %AST.Constr{index: i, inductive: d, args: args} ->
-        %AST.Constr{index: i, inductive: d, args: Enum.map(args, &do_normalize(e, &1))}
-      _ -> t
+        # IMPORTANT: Do NOT normalize the body 'b' to avoid infinite loops with circular subst
+        %AST.Fixpoint{name: n, 
+                      domain: normalize(e, d), 
+                      body: b, 
+                      args: Enum.map(args, &normalize(e, &1))}
+
+      %AST.Constr{index: i, inductive: ind, args: args} ->
+        %AST.Constr{index: i, inductive: ind, args: Enum.map(args, &normalize(e, &1))}
+
+      %AST.Let{decls: decls, body: b} ->
+        # Let should have been reduced away by 'reduce', but just in case
+        new_defs = Enum.reduce(decls, e.defs, fn {n, expr}, acc -> Map.put(acc, n, expr) end)
+        normalize(%{e | defs: new_defs}, b)
+
+      _ -> red
     end
   end
 
@@ -212,7 +239,7 @@ defmodule Christine.Typechecker do
     
     n_params = length(params)
     n_args = length(args)
-    # Christine.Debug.log("DEBUG TRY_UNFOLD #{fix.name}: params=#{n_params} args=#{n_args}")
+    Christine.Debug.log("DEBUG TRY_UNFOLD #{fix.name}: params=#{n_params} args=#{n_args}")
 
     if n_args >= n_params and n_params > 0 do
       subst_map = Enum.zip(params, Enum.take(args, n_params))
