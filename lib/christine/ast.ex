@@ -253,9 +253,9 @@ defmodule Christine.AST do
   def bool(), do: %Var{name: "Bool"}
   def unit(), do: %Var{name: "Unit"}
 
-  defp names_match?(nil, _), do: false
-  defp names_match?(_, nil), do: false
-  defp names_match?(name1, name2) do
+  def names_match?(nil, _), do: false
+  def names_match?(_, nil), do: false
+  def names_match?(name1, name2) do
     n1 = Elixir.String.downcase(name1)
     n2 = Elixir.String.downcase(name2)
     n1 == n2 or Elixir.String.ends_with?(n1, "." <> n2) or Elixir.String.ends_with?(n2, "." <> n1)
