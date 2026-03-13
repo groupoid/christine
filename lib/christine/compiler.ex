@@ -267,12 +267,14 @@ defmodule Christine.Compiler do
   defp add_constructors(ind, defs) do
     Enum.reduce(ind.constrs, defs, fn {idx, name, ty}, acc ->
       term = make_constr_term(idx, ind, ty, [])
-      Map.put(acc, name, term)
+      acc
+      |> Map.put(ind.name <> "." <> name, term)
+      |> Map.put(name, term)
     end)
   end
 
   defp add_constructors_to_ctx(ind, ctx) do
-    Enum.reduce(ind.constrs, ctx, fn {_, name, ty}, acc -> [{name, ty} | acc] end)
+    Enum.reduce(ind.constrs, ctx, fn {_, name, ty}, acc -> [{ind.name <> "." <> name, ty}, {name, ty} | acc] end)
   end
 
   defp make_constr_term(idx, ind, ty, vars) do

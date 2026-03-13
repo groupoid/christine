@@ -282,6 +282,13 @@ defmodule Christine.Typechecker do
   end
   defp do_reduce(e, %AST.Ind{inductive: ind_def, cases: cases, term: term} = ind, fuel) do
     target = reduce(e, term, fuel - 1)
+    
+    # Handle numbers by unfolding them to constructors for matching
+    target = case target do
+      %AST.Number{value: v} -> reduce(e, Christine.Typechecker.unfold_number(e, v), fuel - 1)
+      _ -> target
+    end
+
     case target do
       %AST.Constr{index: j, args: args} ->
         # Look up inductive if constrs are missing (shallow definition)

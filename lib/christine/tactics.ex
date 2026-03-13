@@ -200,7 +200,9 @@ defmodule Christine.Tactics do
           app when is_map(app) ->
             case extract_ind_name(app) do
               {:ok, ind_name} ->
-                case Map.get(env.env, ind_name) do
+                # Search for inductive definition with namespacing fallback
+                ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+                case ind do
                   %AST.Inductive{constrs: [{_idx, cname, _cty}]} ->
                     apply_tactic(ps, {:apply, cname})
                   _ ->
@@ -338,27 +340,37 @@ defmodule Christine.Tactics do
 
 
       {:rewrite, arg} ->
-        {h_name, dir} = case arg do
-          {n, d} -> {n, d}
-          n -> {n, :forward}
+        {h_name, dir, with_args} = case arg do
+          {{n, d}, wa} -> {n, d, wa}
+          {n, d} -> {n, d, []}
+          n -> {n, :forward, []}
         end
         case find_variable(ps, h_name) do
           {:ok, _term, h_ty} ->
             case unwrap_eq_from_pi_raw(env, h_ty) do
               {:ok, l_raw, r_raw, pi_args, _new_env} ->
                 {l, r} = if dir == :backward, do: {r_raw, l_raw}, else: {l_raw, r_raw}
-                # Christine.Debug.log("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
-                # Christine.Debug.log("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
-                # Christine.Debug.log("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
-                 new_goal = replace_expression(current, l, r, env, pi_args)
-                 if Typechecker.equal?(env, current, new_goal) do
-                    Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.\nGoal AST: #{inspect(current)}\nPattern AST: #{inspect(l)}")
+                
+                # Handle with_args for rewrite
+                evaled_with = for {k, v_str} <- with_args do
+                  case parse_and_eval(v_str, %{env | ctx: ctx}) do
+                    {:ok, v} -> {k, v}
+                    _ -> nil
+                  end
+                end |> Enum.reject(&is_nil/1)
+                
+                # Substitute with_args into pattern and replace
+                l_bound = Enum.reduce(evaled_with, l, fn {k, v}, acc -> Christine.Typechecker.subst(k, v, acc) end)
+                r_bound = Enum.reduce(evaled_with, r, fn {k, v}, acc -> Christine.Typechecker.subst(k, v, acc) end)
+                
+                new_goal = replace_expression(current, l_bound, r_bound, env, pi_args)
+                if Typechecker.equal?(env, current, new_goal) do
+                    # Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.")
                     {:error, :nothing_to_rewrite, ps}
-                 else
+                else
                    old_rec = ps.reconstructor
                    new_rec = fn [p | remainder] ->
-                     # Note: proof term for rewrite is still forward-only for now in this prototype
-                     old_rec.([%AST.App{func: %AST.App{func: %AST.Var{name: "rewrite_#{h_name}"}, arg: l}, arg: p} | remainder])
+                     old_rec.([%AST.App{func: %AST.App{func: %AST.Var{name: "rewrite_#{h_name}"}, arg: l_bound}, arg: p} | remainder])
                    end
                    {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
                 end
@@ -406,14 +418,17 @@ defmodule Christine.Tactics do
             {:error, :not_an_equation, ps}
         end
 
-      {:inversion, h_name} ->
+       {:inversion, h_name} ->
         case find_variable(ps, h_name) do
           {:ok, _term, h_ty} ->
+            # Christine.Debug.log("DEBUG INVERSION: H=#{h_name}, ty=#{AST.to_string(h_ty)}")
             case unwrap_eq_from_pi_raw(env, h_ty) do
               {:ok, l, r, _, _} ->
                 if impossible_eq?(env, l, r) do
+                  # Christine.Debug.log("DEBUG INVERSION: Impossible equation found! Solving goal.")
                   solve_goal(ps, %AST.Var{name: "inversion_refl"})
                 else
+                  # Christine.Debug.log("DEBUG INVERSION: Not impossible. Falling back to destruct.")
                   apply_tactic(ps, {:destruct, h_name})
                 end
               _ ->
@@ -539,10 +554,21 @@ defmodule Christine.Tactics do
 
       String.starts_with?(str, "rewrite ") ->
         body = String.slice(str, 8..-1//1) |> String.trim() |> String.trim_trailing(".")
-        if String.starts_with?(body, "<-") do
-          {:rewrite, {String.slice(body, 2..-1//1) |> String.trim(), :backward}}
-        else
-          {:rewrite, {body, :forward}}
+        dir = if String.starts_with?(body, "<-"), do: :backward, else: :forward
+        body = if dir == :backward, do: String.slice(body, 2..-1//1) |> String.trim(), else: body
+        
+        case Regex.run(~r/^(.*?)\s+with\s+\((.*?)\)$/, body) do
+          [_, name, args_str] ->
+             args = String.split(args_str, ~r/,\s*/)
+             |> Enum.map(fn s ->
+                case String.split(s, ~r/\s*:=\s*/) do
+                  [k, v] -> {String.trim(k), String.trim(v)}
+                  _ -> nil
+                end
+             end) |> Enum.reject(&is_nil/1)
+             {:rewrite, { {String.trim(name), dir}, args}}
+          _ ->
+             {:rewrite, {body, dir}}
         end
 
       str =~ ~r/^\s*discriminate\b/ ->
@@ -694,20 +720,31 @@ defmodule Christine.Tactics do
   defp replace_expression(target, old, new, env, params) do
     # Normalize the pattern as well, because the target might be normalized/unfolded
     old_norm = if is_map(old), do: Typechecker.normalize(env, old), else: old
-    res = try_match(env, target, old_norm, params)
-    if Enum.member?(params, "n") and target == Typechecker.normalize(env, target) do
-       if res == :error do
-         # IO.puts("REPLACE EXPR FAILED MATCH:\nTarget:\n#{inspect(target, limit: 100)}\nPattern:\n#{inspect(old, limit: 100)}")
-       else
-         Christine.Debug.log("DEBUG REPLACE EXPR SUCCEEDED MATCH on target!!")
-       end
+
+    # If pattern is a Var NOT in params, we ONLY want to match it if target is an identical Var (or equal?)
+    # But we MUST recurse into substructures if it doesn't match exactly.
+    # To avoid "Succ n" matching "n" (because equal?(Succ n, n) is false but try_match might be loose),
+    # we force recursion for Apps if top-level match is just a Var.
+    
+    match_result = case old_norm do
+      %AST.Var{name: vn} ->
+         if Enum.member?(params, vn) do
+            try_match(env, target, old_norm, params)
+         else
+            case target do
+              %AST.Var{name: vn2} -> if AST.names_match?(vn, vn2), do: {:ok, %{}}, else: :error
+              _ -> :error
+            end
+         end
+      _ -> try_match(env, target, old_norm, params)
     end
-    case res do
+
+    case match_result do
       {:ok, bindings} ->
         res = Enum.reduce(bindings, new, fn {name, val}, acc ->
           Christine.Typechecker.subst(name, val, acc)
         end)
-        Christine.Debug.log("DEBUG REPLACE EXPR SUCCEEDED MATCH: target=#{AST.to_string(target)} result=#{AST.to_string(res)}")
+        # Christine.Debug.log("DEBUG REPLACE EXPR SUCCEEDED MATCH: target=#{AST.to_string(target)} result=#{AST.to_string(res)}")
         res
       :error ->
         case target do
@@ -1311,14 +1348,32 @@ defmodule Christine.Tactics do
     nr = Typechecker.normalize(env, r)
     vl = unwrap_constr(nl)
     vr = unwrap_constr(nr)
+    # Christine.Debug.log("DEBUG IMPOSSIBLE_EQ: L=#{AST.to_string(l)} -> #{inspect(vl)}, R=#{AST.to_string(r)} -> #{inspect(vr)}")
     case {vl, vr} do
-      {{i1, name1}, {i2, name2}} when name1 == name2 and i1 != i2 -> true
+      {{i1, name1}, {i2, name2}} when i1 != i2 -> 
+        if AST.names_match?(name1, name2), do: true, else: false
       _ -> false
     end
   end
 
   defp unwrap_constr(%AST.Constr{index: i, inductive: %{name: name}}), do: {i, name}
   defp unwrap_constr(%AST.App{func: f}), do: unwrap_constr(f)
+  defp unwrap_constr(%AST.Var{name: n}) do
+     # Handle potential constructor name
+     if n in ["Zero", "O", "true", "false", "S", "Succ"] do
+        case n do
+          "Zero" -> {1, "nat"}
+          "O" -> {1, "nat"}
+          "Succ" -> {2, "nat"}
+          "S" -> {2, "nat"}
+          "false" -> {1, "bool"}
+          "true" -> {2, "bool"}
+          _ -> nil
+        end
+     else
+        nil
+     end
+  end
   defp unwrap_constr(_), do: nil
 
   defp apply_all_intros(ps) do
