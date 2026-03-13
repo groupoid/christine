@@ -41,7 +41,7 @@ defmodule Christine.Typechecker do
           case find_def(e, name) do
             %AST.Fixpoint{domain: ty} when ty != nil -> ty
             _ ->
-              case Map.get(e.global_ctx, name) do
+              case find_global_ty(e, name) do
                 nil ->
                    case Map.get(e.env, name) do
                      %AST.Inductive{} = ind -> infer(e, ind)
@@ -284,9 +284,11 @@ defmodule Christine.Typechecker do
     target = reduce(e, term, fuel - 1)
     case target do
       %AST.Constr{index: j, args: args} ->
-        case Enum.find(ind_def.constrs, fn {idx, _, _} -> idx == j end) do
+        # Look up inductive if constrs are missing (shallow definition)
+        ind_full = if is_nil(ind_def.constrs) or ind_def.constrs == [], do: Map.get(e.env, ind_def.name) || ind_def, else: ind_def
+        case Enum.find(ind_full.constrs || [], fn {idx, _, _} -> idx == j end) do
           {^j, _cname, c_sig} ->
-            res = apply_args(e, Enum.at(cases, j - 1), args, c_sig, ind)
+            res = apply_args(e, Enum.at(cases, j - 1), args, c_sig, %{ind | inductive: ind_full})
             reduce(e, res, fuel - 1)
           _ -> ind
         end
@@ -369,11 +371,18 @@ defmodule Christine.Typechecker do
             %AST.Number{} -> 
               {:ok, unfolded}
             _ -> 
-              Christine.Debug.log("DEBUG UNFOLD BLOCKED (Ind term): #{fix.name} term=#{AST.to_string(red_t)}")
+              # Christine.Debug.log("DEBUG UNFOLD BLOCKED (Ind term): #{fix.name} term=#{AST.to_string(red_t)}")
               :blocked
           end
+        %AST.App{func: f_inner} ->
+          # Potential match on another fixpoint or app
+          red_f = reduce(e, f_inner, fuel - 1)
+          case red_f do
+            %AST.Constr{} -> {:ok, unfolded}
+            _ -> :blocked
+          end
         _ -> 
-           {:ok, unfolded}
+           :blocked
       end
     else
       :blocked
@@ -510,6 +519,19 @@ defmodule Christine.Typechecker do
      end
   end
   defp find_fixpoint(_, _), do: nil
+
+  defp find_global_ty(e, name) do
+    case Map.get(e.global_ctx, name) do
+      nil ->
+        case Map.get(e.name_to_mod, name) do
+          nil -> nil
+          mod ->
+             prefix = if mod == "local", do: "", else: mod <> "."
+             Map.get(e.global_ctx, prefix <> name)
+        end
+      ty -> ty
+    end
+  end
 
   def try_unfold_fixpoint_force_n(_e, %AST.Fixpoint{name: s_name, body: body} = fix, args, _n) do
     {actual_body, params} = collect_lams(subst(s_name, %{fix | args: []}, body))
