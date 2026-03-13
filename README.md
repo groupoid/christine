@@ -5,7 +5,7 @@ Christine: Calculus of Inductive Constructions
 
 ## Abstract
 
-**Christine** is MLTT/CIC tactical theorem prover implemented in OCaml, constitutes a minimal core for a dependently-typed lambda calculus,
+**Christine** is CoC+CIC tactical theorem prover implemented in OCaml, constitutes a minimal core for a dependently-typed lambda calculus,
 constrained to exclude pattern matching, let-bindings, implicit arguments, modules, namespaces, and function extensionality.
 It encompasses universes, dependent products `Pi`, dependent pairs `Sigma`, identity types `Id`, and `Inductive` types with strict positivity enforcement.
 Its mathematical properties, focusing on correctness, soundness, totality, canonicity, decidability and related
