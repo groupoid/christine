@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christine Tactics</title>
+    <title>Christine Automation</title>
     <link rel="stylesheet" href="index.css?v=5">
 </head>
 <body>
@@ -12,14 +12,14 @@
             <a href="https://groupoid.space" class="logo"><img width="50" style="padding-top:-30px;margin-bottom:-15px;" src="https://avatars.githubusercontent.com/u/17128096?s=200&v=4"></a>
             <ul class="nav-links">
                 <li><a href="index.html">Language</a></li>
-                <li><a href="tactics.html" class="active">Tactics</a></li>
+                <li><a href="tactics.html" class="active">Automation</a></li>
             </ul>
         </div>
     </nav>
 
     <header>
         <div class="hero-content">
-            <h1>Tactics</h1>
+            <h1>Automation</h1>
         </div>
     </header>
 
@@ -35,7 +35,7 @@
         </section>
 
         <section>
-            <h2>Proof State</h2>
+            <h2>State</h2>
             <div style="max-width:720px;margin:0 auto;">
                 <pre class="code-snippet">defmodule Christine.Tactics.ProofState do
   defstruct [
@@ -51,8 +51,28 @@ end</pre>
             </div>
         </section>
 
+
         <section>
-            <h2>intro</h2>
+            <h2>Sub-goals</h2>
+            <div style="max-width:720px;margin:0 auto;">
+                <p>Use bullets (<b>-</b>, <b>+</b>, <b>*</b>) to organize sub-goals within recursive proofs or case analysis. In the current Christine prototype, these are purely decorative but encouraged for parity with standard Coq proof scripts.</p>
+                <pre class="code-snippet">Theorem beq_nat_refl : ∀ n : nat, beq_nat n n = true.
+Proof.
+  induction n.
+  - reflexivity.
+  - simpl. rewrite IHn. reflexivity.
+Qed.</pre>
+            </div>
+        </section>
+
+
+
+        <section>
+            <h2>Tactics</h2>
+        </section>
+
+        <section>
+            <h3>intro</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>intro x</b> works only when the current goal normalizes to a Pi type ∀ x : A, B.
                    It adds the binding x : A to the context, replaces the goal with B, and updates the
@@ -66,7 +86,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>intros</h2>
+            <h3>intros</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>intros x y z</b> repeats <b>intro</b> for each name.
                 It chains the reconstructor updates so the final term has nested Lam binders.</p>
@@ -81,7 +101,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>exact</h2>
+            <h3>exact</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>exact t</b> parses the expression t in the current context, infers its type,
                    and checks that it equals the goal (or is Any). If successful, it closes the goal and
@@ -95,7 +115,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>simpl</h2>
+            <h3>simpl</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>simpl</b> replaces the current goal with its βι-normal form using Typechecker.normalize.
                 It does not change the proof term — only the goal presentation.</p>
@@ -109,7 +129,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>reflexivity</h2>
+            <h3>reflexivity</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>reflexivity</b> normalizes the goal. If it is an equality a = a,
                 it closes the goal with Refl and updates the reconstructor accordingly.
@@ -123,7 +143,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>ring</h2>
+            <h3>ring</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>ring</b> normalizes the goal to an equality, converts both sides
                 to polynomials via to_poly and poly_normalize,
@@ -137,7 +157,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>apply</h2>
+            <h3>apply</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>apply H</b> or <b>apply H with x:=t</b> looks up hypothesis H,
                    matches its type against the goal using match_goal, generates
@@ -152,7 +172,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>split</h2>
+            <h3>split</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>split</b> works when the current goal normalizes to an inductive type with exactly one constructor (e.g. conjunction A ∧ B with constructor conj). It applies that constructor, generating subgoals for each of its arguments and updating the reconstructor with the appropriate constructor application.</p>
                 <pre class="code-snippet">Theorem and_intro : ∀ A B : Prop, A → B → A ∧ B.
@@ -166,7 +186,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>left / right</h2>
+            <h3>left / right</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>left</b> (resp. <b>right</b>) works when the goal normalizes to a disjunction A ∨ B. It replaces the goal with the left (resp. right) disjunct and updates the reconstructor with or_introl (resp. or_intror).</p>
                 <pre class="code-snippet">Theorem left_example : ∀ A B : Prop, A → A ∨ B.
@@ -179,7 +199,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>exists</h2>
+            <h3>exists</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>exists t</b> works when the current goal normalizes to an existential ∃ x : A, P x (or ex). It provides witness t, replaces the goal with P t, and updates the reconstructor to build the ex_intro constructor.</p>
                 <pre class="code-snippet">Theorem exists_plus : ∃ n : Nat, plus n O = n.
@@ -191,7 +211,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>assumption</h2>
+            <h3>assumption</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>assumption</b> scans the current context for a hypothesis whose type exactly matches the goal (after normalization) and closes the goal with that hypothesis variable if found.</p>
                 <pre class="code-snippet">Theorem assumption_example : ∀ A : Prop, A → A.
@@ -203,7 +223,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>assert</h2>
+            <h3>assert</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>assert (H : T)</b> (or assert H : T) creates a new subgoal to prove T, then adds H : T to the context of the original goal (implemented via a let-binding in the proof term).</p>
                 <pre class="code-snippet">Theorem assert_example : ∀ n : Nat, n = n.
@@ -217,7 +237,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>rewrite</h2>
+            <h3>rewrite</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>rewrite H</b> or <b>rewrite &lt;- H</b> (where H has type l = r) matches l (or r if backward) in the goal and replaces it with r (or l), keeping the original goal type unchanged otherwise. The reconstructor wraps the sub-proof with a rewrite placeholder.</p>
                 <pre class="code-snippet">Theorem rewrite_demo : ∀ n : Nat, plus (plus O n) O = n.
@@ -229,8 +249,9 @@ Qed.</pre>
             </div>
         </section>
 
+
         <section>
-            <h2>induction / destruct</h2>
+            <h3>induction / destruct</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>induction x</b> (or <b>induction x as [c1_names | …]</b>) performs case analysis + induction on inductive variable x, generating one subgoal per constructor with induction hypotheses (IH) for recursive arguments. <b>destruct x</b> does the same but without generating IHs. The reconstructor builds a full Ind (match) node.</p>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
@@ -244,7 +265,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>discriminate</h2>
+            <h3>discriminate</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>discriminate H</b> (or without argument on an equality goal) solves the goal with a contradiction
                 term when H (or the goal) equates terms built from different constructors of the same inductive type.</p>
@@ -257,7 +278,7 @@ Qed.</pre>
         </section>
 
         <section>
-            <h2>intuition</h2>
+            <h3>intuition</h3>
             <div style="max-width:720px;margin:0 auto;">
                 <p>Tactic <b>intuition</b> attempts to solve the current goal using basic logical tautologies and rules (in this prototype it closes the goal with an intuition_placeholder term).</p>
                 <pre class="code-snippet">Theorem intuition_example : ∀ P : Prop, P ∨ ¬P.

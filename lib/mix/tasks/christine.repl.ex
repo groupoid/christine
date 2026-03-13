@@ -95,13 +95,11 @@ defmodule Mix.Tasks.Christine.Repl do
           true ->
             try do
               case eval(input, env) do
-                {:ok, result} ->
-                  str = try do
-                    AST.to_string(result)
-                  rescue
-                    _ -> inspect(result, limit: 10, pretty: false)
-                  end
-                  IO.puts("Result: #{str}")
+                {:ok, result, type} ->
+                  type_str = try do AST.to_string(type) rescue _ -> inspect(type, limit: 10) end
+                  eval_str = try do AST.to_string(result) rescue _ -> inspect(result, limit: 10) end
+                  IO.puts("TYPE: #{type_str}")
+                  IO.puts("EVAL: #{eval_str}")
 
                 {:error, {:eval_crash, msg}} ->
                   IO.puts("Error: #{msg}")
@@ -195,7 +193,9 @@ defmodule Mix.Tasks.Christine.Repl do
              resolved <- Layout.resolve(tokens),
              {:ok, expr, _} <- Parser.parse_expression(resolved) do
           desugared = Desugar.desugar_expression(expr, env)
-          {:ok, Typechecker.normalize(env, desugared)}
+          type = Typechecker.infer(env, desugared)
+          result = Typechecker.normalize(env, desugared)
+          {:ok, result, type}
         else
           err -> {:error, err}
         end

@@ -338,40 +338,13 @@ defmodule Christine.Tactics do
 
 
       {:rewrite, arg} ->
-        {h_name, dir, with_args_str} = case arg do
-          {n, d, w} -> {n, d, w}
-          {n, d} -> {n, d, nil}
-          n -> {n, :forward, nil}
+        {h_name, dir} = case arg do
+          {n, d} -> {n, d}
+          n -> {n, :forward}
         end
-        h_name = String.trim(h_name) |> String.trim_trailing(".")
         case find_variable(ps, h_name) do
           {:ok, _term, h_ty} ->
-            # If we have 'with' args, we need to substitute them first
-            h_ty_final = if with_args_str do
-               # Extract bindings from "m := m, n := ... "
-               with_bindings = String.split(with_args_str, ~r/,\s*/)
-               |> Enum.map(fn s ->
-                 case String.split(s, ~r/[:=]+/, parts: 2) do
-                   [n, v] -> {String.trim(n), String.trim(v)}
-                   _ -> {nil, String.trim(s)}
-                 end
-               end)
-               
-               Enum.reduce(with_bindings, h_ty, fn {k, v_str}, acc_ty ->
-                 if k do
-                    case parse_and_eval(v_str, %{env | ctx: ctx}) do
-                       {:ok, v_val} -> subst_in_pi(k, v_val, acc_ty)
-                       _ -> acc_ty
-                    end
-                 else
-                    acc_ty
-                 end
-               end)
-            else
-               h_ty
-            end
-
-            case unwrap_eq_from_pi_raw(env, h_ty_final) do
+            case unwrap_eq_from_pi_raw(env, h_ty) do
               {:ok, l_raw, r_raw, pi_args, _new_env} ->
                 {l, r} = if dir == :backward, do: {r_raw, l_raw}, else: {l_raw, r_raw}
                 # Christine.Debug.log("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
@@ -379,7 +352,7 @@ defmodule Christine.Tactics do
                 # Christine.Debug.log("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
                  new_goal = replace_expression(current, l, r, env, pi_args)
                  if Typechecker.equal?(env, current, new_goal) do
-                    # Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.")
+                    Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.\nGoal AST: #{inspect(current)}\nPattern AST: #{inspect(l)}")
                     {:error, :nothing_to_rewrite, ps}
                  else
                    old_rec = ps.reconstructor
@@ -566,20 +539,10 @@ defmodule Christine.Tactics do
 
       String.starts_with?(str, "rewrite ") ->
         body = String.slice(str, 8..-1//1) |> String.trim() |> String.trim_trailing(".")
-        {actual_body, dir} = if String.starts_with?(body, "<-") do
-          {String.slice(body, 2..-1//1) |> String.trim(), :backward}
+        if String.starts_with?(body, "<-") do
+          {:rewrite, {String.slice(body, 2..-1//1) |> String.trim(), :backward}}
         else
-          {body, :forward}
-        end
-        # Handle "lemma with (x := val)"
-        case Regex.run(~r/^(.*?)\s+with\s+\((.*?)\)$/, actual_body) do
-           [_, name, args_str] ->
-              {:rewrite, {String.trim(name), dir, args_str}}
-           _ ->
-              # Just a name or name with positional arguments?
-              # Coq rewrite doesn't usually take positional args like apply, but some dialects do.
-              # For now, let's just keep it as a string and handle extraction in apply_tactic.
-              {:rewrite, {actual_body, dir}}
+          {:rewrite, {body, :forward}}
         end
 
       str =~ ~r/^\s*discriminate\b/ ->
@@ -1267,18 +1230,6 @@ defmodule Christine.Tactics do
         end
       [] ->
         {:error, :no_goals_to_solve, ps}
-    end
-  end
-
-  defp subst_in_pi(name, val, ty) do
-    case ty do
-      %AST.Pi{name: n, domain: d, codomain: cod} ->
-        if n == name do
-           Christine.Typechecker.subst(name, val, cod)
-        else
-           %AST.Pi{name: n, domain: d, codomain: subst_in_pi(name, val, cod)}
-        end
-      _ -> ty
     end
   end
 

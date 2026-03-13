@@ -1,0 +1,104 @@
+(* Theorems from Coq Prelude *)
+
+Module CoqTheorems.
+
+Import Coq.
+
+Theorem beq_nat_refl : forall (n : nat), eq bool (beq_nat n n) true.
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn.
+ reflexivity.
+Qed.
+
+Theorem beq_nat_true : forall (n m : nat), eq bool (beq_nat n m) true -> eq nat n m.
+Proof.
+  induction n.
+  destruct m.
+  reflexivity.
+  simpl. intros H. discriminate H.
+  intros m. destruct m.
+  simpl. intros H. discriminate H.
+  simpl. intros H. rewrite IHn with (m := m). reflexivity. exact H.
+Qed.
+
+Theorem plus_0_r : forall (n : nat), eq nat (plus n Zero) n.
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. reflexivity.
+Qed.
+
+Theorem plus_S_r : forall (n m : nat), eq nat (plus n (Succ m)) (Succ (plus n m)).
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. reflexivity.
+Qed.
+
+Theorem plus_assoc : forall (n m p : nat), eq nat (plus n (plus m p)) (plus (plus n m) p).
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. reflexivity.
+Qed.
+
+Theorem plus_comm : forall (n m : nat), eq nat (plus n m) (plus m n).
+Proof.
+induction n.
+ simpl. rewrite plus_0_r. reflexivity.
+ simpl. rewrite IHn. rewrite plus_S_r. reflexivity.
+Qed.
+
+Theorem mult_0_r : forall (n : nat), eq nat (mult n Zero) Zero.
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. reflexivity.
+Qed.
+
+Theorem mult_S_r : forall (n m : nat), eq nat (mult n (Succ m)) (plus n (mult n m)).
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. rewrite plus_assoc. rewrite plus_assoc.
+ assert (H: eq nat (plus m n) (plus n m)).
+  rewrite plus_comm. reflexivity.
+ rewrite H. reflexivity.
+Qed.
+
+Theorem mult_plus_distr_l : forall (n m p : nat), eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)).
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. rewrite plus_assoc. reflexivity.
+Qed.
+
+Theorem mult_plus_distr_r : forall (n m p : nat), eq nat (mult (plus n m) p) (plus (mult n p) (mult m p)).
+Proof.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. reflexivity.
+Qed.
+
+Theorem mult_assoc : forall (n : nat) (m p : nat), eq nat (mult n (mult m p)) (mult (mult n m) p).
+Proof.
+intros n m p.
+induction n.
+ reflexivity.
+ simpl. rewrite IHn. rewrite mult_plus_distr_r. reflexivity.
+Qed.
+
+Theorem mult_comm : forall (n m : nat), eq nat (mult n m) (mult m n).
+Proof.
+induction n.
+ simpl. rewrite mult_0_r. reflexivity.
+ simpl. rewrite IHn. rewrite mult_S_r. reflexivity.
+Qed.
+
+Theorem le_trans : forall n m p, le n m -> le m p -> le n p.
+Proof.
+Qed.
+
+End CoqTheorems.

@@ -120,13 +120,9 @@ defmodule Christine.AST do
         a_str = if complex?(a), do: "(#{to_string(a)})", else: to_string(a)
         "#{f_str} #{a_str}"
 
-      %Inductive{name: name, params: params} ->
-        if params == [] do
-          name
-        else
-          params_str = Enum.map_join(params, " ", fn {n, _} -> n end)
-          "(#{name} #{params_str})"
-        end
+      %Inductive{name: n, params: p} ->
+        params_str = Enum.map_join(p, " ", fn {name, type} -> "(#{name} : #{to_string(type)})" end)
+        "(inductive #{n} #{params_str})"
 
       %Fixpoint{name: name, args: args, body: body} ->
         if args == [] do
@@ -136,8 +132,12 @@ defmodule Christine.AST do
           "(fix #{name} #{args_str})"
         end
 
-      %Ind{term: t} ->
-        "match #{to_string(t)} with ..."
+      %Ind{term: t, cases: c} ->
+        cases_sample = Enum.map_join(Enum.take(c, 2), " | ", fn case_term -> 
+          str = __MODULE__.to_string(case_term)
+          if Elixir.String.length(str) > 20, do: Elixir.String.slice(str, 0, 20) <> "...", else: str
+        end)
+        "match #{__MODULE__.to_string(t)} with #{cases_sample} ..."
 
       %Constr{index: i, inductive: d, args: args} ->
         name =

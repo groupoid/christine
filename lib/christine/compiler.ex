@@ -8,47 +8,50 @@ defmodule Christine.Compiler do
     with {:ok, tokens} <- Lexer.lex(source),
          resolved <- Layout.resolve(tokens),
          {:ok, ast, _rest} <- Parser.parse(resolved) do
-      env = resolve_imports(ast, %Christine.Typechecker.Env{}, opts)
-      env = collect_local_names(ast, env)
-      desugared = Desugar.desugar(ast, env)
+      loaded = Keyword.get(opts, :loaded, MapSet.new())
+      deadline = System.monotonic_time(:millisecond) + Keyword.get(opts, :timeout, 10_000)
+      
+      with {:ok, env} <- resolve_imports(ast, %Christine.Typechecker.Env{deadline: deadline}, Keyword.put(opts, :loaded, loaded)) do
+        env = collect_local_names(ast, env)
+        desugared = Desugar.desugar(ast, env)
 
-      final_env =
-        populate_local_env(desugared, %{
-          env
-          | ctx: [
-              {"Number", %AST.Universe{level: 0}},
-              {"String", %AST.Universe{level: 0}} | env.ctx
-            ]
-        })
+        final_env_res =
+          populate_local_env(desugared, %{
+            env
+            | ctx: [
+                {"Number", %AST.Universe{level: 0}},
+                {"String", %AST.Universe{level: 0}} | env.ctx
+              ]
+          })
 
-      typecheck_res =
-        if Keyword.get(opts, :typecheck, true) do
-          case Christine.Typechecker.check_module(desugared, final_env) do
-            :ok -> :ok
-            {:error, reason} ->
-              IO.puts("TYPE ERROR: #{inspect(reason)}")
-              {:error, {:type_error, reason}}
-          end
-        else
-          :ok
-        end
+        case final_env_res do
+          {:error, reason} -> {:error, reason}
+          {:ok, final_env} ->
+            typecheck_res =
+              if Keyword.get(opts, :typecheck, true) do
+                case Christine.Typechecker.check_module(desugared, final_env) do
+                  :ok -> :ok
+                  {:error, reason} -> {:error, {:type_error, reason}}
+                end
+              else
+                :ok
+              end
 
-      if typecheck_res == :ok and Keyword.get(opts, :check_only, false) do
-        {:ok, desugared.name, :check_only}
-      else
-        try do
-          with :ok <- typecheck_res,
-               {:ok, forms} <- Codegen.generate(desugared, env) do
-            case :compile.forms(forms, [:return_errors, :debug_info]) do
-              {:ok, mod, bin} -> {:ok, mod, bin}
-              {:error, errors, warnings} -> {:error, {:erl_compile, errors, warnings}}
+            if typecheck_res == :ok and Keyword.get(opts, :check_only, false) do
+              {:ok, desugared.name, :check_only}
+            else
+              try do
+                with :ok <- typecheck_res,
+                     {:ok, forms} <- Codegen.generate(desugared, env) do
+                  case :compile.forms(forms, [:return_errors, :debug_info]) do
+                    {:ok, mod, bin} -> {:ok, mod, bin}
+                    {:error, errors, warnings} -> {:error, {:erl_compile, errors, warnings}}
+                  end
+                end
+              rescue
+                e -> {:error, {:compiler_crash, e, __STACKTRACE__}}
+              end
             end
-          end
-        rescue
-          e ->
-            IO.puts("COMPILER CRASH: #{inspect(e)}")
-            IO.puts(Exception.format(:error, e, __STACKTRACE__))
-            {:error, {:compiler_crash, e}}
         end
       end
     else
@@ -56,178 +59,208 @@ defmodule Christine.Compiler do
     end
   end
 
-  defp populate_local_env(%AST.Module{name: _mod_name, declarations: decls}, env) do
-    Enum.reduce(decls, env, fn
-      %AST.DeclValue{name: n, expr: e, type: t, tactics: tacs}, acc ->
-        if tacs do
-          case Christine.Tactics.solve_with_tactics(n, t, tacs, acc) do
-            {:ok, term} ->
-              %{acc | ctx: [{n, t} | acc.ctx], defs: Map.put(acc.defs, n, term), last_decl: n}
-            {:error, reason} ->
-              IO.puts("Tactic error in #{n}: #{inspect(reason)}")
-              %{acc | ctx: [{n, t} | acc.ctx], last_decl: n}
-          end
-        else
-          if e do
-            ty = Christine.Typechecker.infer(acc, e)
-            %{acc | defs: Map.put(acc.defs, n, e), ctx: [{n, ty} | acc.ctx], last_decl: n}
+  def populate_local_env(%AST.Module{name: _mod_name, declarations: decls}, env, prefix \\ nil) do
+    Enum.reduce_while(decls, {:ok, env}, fn decl, {:ok, acc} ->
+      case decl do
+        %AST.DeclValue{name: n, expr: e, type: t, tactics: tacs} ->
+          n_full = if prefix, do: prefix <> "." <> n, else: n
+          Christine.Debug.log("DEBUG: Defining #{n_full}")
+          if tacs do
+            case Christine.Tactics.solve_with_tactics(n_full, t, tacs, acc) do
+              {:ok, term} ->
+                {:cont, {:ok, %{acc | global_ctx: Map.put(acc.global_ctx, n_full, t), defs: Map.put(acc.defs, n_full, term), last_decl: n_full}}}
+              {:error, reason} ->
+                {:halt, {:error, {:tactic_error, n_full, reason}}}
+            end
           else
-            %{acc | ctx: [{n, t} | acc.ctx], last_decl: n}
+            if e do
+              ty = Christine.Typechecker.infer(acc, e)
+              {:cont, {:ok, %{acc | defs: Map.put(acc.defs, n_full, e), global_ctx: Map.put(acc.global_ctx, n_full, ty), last_decl: n_full}}}
+            else
+              {:cont, {:ok, %{acc | ctx: [{n_full, t} | acc.ctx], last_decl: n_full}}}
+            end
           end
-        end
 
-      %AST.Inductive{} = ind, acc ->
-        new_env_map = Map.put(acc.env, ind.name, ind)
-        new_defs = add_constructors(ind, acc.defs)
-        new_ctx = add_constructors_to_ctx(ind, acc.ctx)
-        %{acc | env: new_env_map, defs: new_defs, ctx: new_ctx, last_decl: ind.name}
+        %AST.Inductive{} = ind ->
+          n_full = if prefix, do: prefix <> "." <> ind.name, else: ind.name
+          Christine.Debug.log("DEBUG: Defining Inductive #{n_full}")
+          # Constructors also need to be prefixed
+          ind_named = %{ind | name: n_full}
+          new_env_map = Map.put(acc.env, n_full, ind_named)
+          
+          # Add constructors with both namespaced and short name?
+          # Actually load_module_to_env should handle name_to_mod mapping
+          new_defs = add_constructors(ind_named, acc.defs)
+          new_ctx = add_constructors_to_ctx(ind_named, acc.ctx)
+          {:cont, {:ok, %{acc | env: new_env_map, defs: new_defs, ctx: new_ctx, last_decl: n_full}}}
 
-      {:module_start, _name}, acc -> acc
-      {:section_start, _name}, acc -> acc
+        {:module_start, _name} -> {:cont, {:ok, acc}}
+        {:section_start, _name} -> {:cont, {:ok, acc}}
 
-      {:command, :check_kw, expr}, acc ->
-        ty = try do Christine.Typechecker.infer(acc, expr) rescue e -> {:error, {:typechecker_crash, Exception.message(e)}} end
-        Christine.Debug.log("DEBUG Check: #{AST.to_string(expr)} : #{AST.to_string(ty)}")
-        acc
+        {:command, :check_kw, expr} ->
+          ty = try do Christine.Typechecker.infer(acc, expr) rescue e -> {:error, {:typechecker_crash, Exception.message(e)}} end
+          Christine.Debug.log("DEBUG Check: #{AST.to_string(expr)} : #{AST.to_string(ty)}")
+          {:cont, {:ok, acc}}
 
-      {:command, :eval_kw, expr}, acc ->
-        res = try do Christine.Typechecker.normalize(acc, expr) rescue e -> {:error, {:eval_crash, Exception.message(e)}} end
-        Christine.Debug.log("DEBUG Eval: #{AST.to_string(expr)} = #{AST.to_string(res)}")
-        acc
+        {:command, :eval_kw, expr} ->
+          res = try do Christine.Typechecker.normalize(acc, expr) rescue e -> {:error, {:eval_crash, Exception.message(e)}} end
+          Christine.Debug.log("DEBUG Eval: #{AST.to_string(expr)} = #{AST.to_string(res)}")
+          {:cont, {:ok, acc}}
 
-      {:command, :search_kw, %AST.Var{name: name}}, acc ->
-        Christine.Debug.log("DEBUG Search results for #{name}:")
-        for {n, ty} <- acc.ctx, String.contains?(n, name) do
-          ty_str = try do AST.to_string(ty) rescue _ -> "<complex type>" end
-          Christine.Debug.log("DEBUG   #{n} : #{ty_str}")
-        end
-        acc
-
-      {:command, :print_kw, %AST.Var{name: name}}, acc ->
-        case List.keyfind(acc.ctx, name, 0) do
-          nil -> Christine.Debug.log("DEBUG #{name} is not defined")
-          {_, ty} ->
-            term = Map.get(acc.defs, name)
-            AST.print_declaration(name, ty, term)
-        end
-        acc
-
-      {:proof, tacs}, acc ->
-        if acc.last_decl do
-          n = acc.last_decl
-          case List.keyfind(acc.ctx, n, 0) do
+        {:command, :print_kw, %AST.Var{name: name}} ->
+          case List.keyfind(acc.ctx, name, 0) do
+            nil -> Christine.Debug.log("DEBUG #{name} is not defined")
             {_, ty} ->
-              case Christine.Tactics.solve_with_tactics(n, ty, tacs, acc) do
-                {:ok, term} -> %{acc | defs: Map.put(acc.defs, n, term)}
-                {:error, _reason} -> acc
-              end
-            _ -> acc
+              term = Map.get(acc.defs, name)
+              AST.print_declaration(name, ty, term)
           end
-        else
-          acc
-        end
+          {:cont, {:ok, acc}}
 
-      _, acc -> acc
+        {:proof, tacs} ->
+          if acc.last_decl do
+            n = acc.last_decl
+            case List.keyfind(acc.ctx, n, 0) do
+              {_, ty} ->
+                case Christine.Tactics.solve_with_tactics(n, ty, tacs, acc) do
+                  {:ok, term} -> {:cont, {:ok, %{acc | defs: Map.put(acc.defs, n, term)}}}
+                  {:error, reason} -> {:halt, {:error, {:tactic_error, n, reason}}}
+                end
+              _ -> {:cont, {:ok, acc}}
+            end
+          else
+            {:cont, {:ok, acc}}
+          end
+
+        _ -> {:cont, {:ok, acc}}
+      end
     end)
   end
 
-  defp collect_local_names(%AST.Module{name: mod_name, declarations: decls}, env) do
-    new_mapping =
-      Enum.reduce(decls, env.name_to_mod, fn
-        %AST.DeclValue{name: n}, acc -> Map.put(acc, n, mod_name)
-        %AST.Inductive{name: n, constrs: cs}, acc ->
-          acc = Map.put(acc, n, mod_name)
-          Enum.reduce(cs, acc, fn {_, cn, _}, a -> Map.put(a, cn, mod_name) end)
-        _, acc -> acc
-      end)
+  def collect_local_names(%AST.Module{declarations: decls}, env, prefix \\ "local") do
+    new_mapping = Enum.reduce(decls, env.name_to_mod, fn
+      %AST.DeclValue{name: n}, acc -> Map.put(acc, n, prefix)
+      %AST.DeclData{name: n, constructors: constrs}, acc ->
+        acc2 = Map.put(acc, n, prefix)
+        Enum.reduce(constrs, acc2, fn {cn, _, _}, a -> Map.put(a, cn, prefix) end)
+      %AST.Inductive{name: n, constrs: constrs}, acc ->
+        acc2 = Map.put(acc, n, prefix)
+        Enum.reduce(constrs, acc2, fn {_, cn, _}, a -> Map.put(a, cn, prefix) end)
+      _, acc -> acc
+    end)
     %{env | name_to_mod: new_mapping}
   end
 
   def resolve_imports(%AST.Module{name: mod_name, declarations: decls}, env, opts) do
-    env = if mod_name not in ["Prelude", "Coq"] do
-      case load_module_to_env("Coq", env, opts) do
-        {:ok, new_env} -> new_env
-        _ -> env
+    loaded = Keyword.get(opts, :loaded, MapSet.new())
+    if MapSet.member?(loaded, mod_name) do
+      {:ok, env}
+    else
+      # We need to accumulate BOTH env and loaded set
+      initial_state = {:ok, env, MapSet.put(loaded, mod_name)}
+      
+      res = with {:ok, env1, loaded1} <- maybe_load_implicit_acc("Coq", mod_name, env, initial_state),
+                 {:ok, env2, loaded2} <- maybe_load_implicit_acc("Prelude", mod_name, env1, {:ok, env1, loaded1}) do
+        
+        Enum.reduce_while(decls, {:ok, env2, loaded2}, fn
+          {:import, name}, {:ok, acc_env, acc_loaded} ->
+            opts_with_loaded = Keyword.put(opts, :loaded, acc_loaded)
+            case load_module_to_env(name, acc_env, opts_with_loaded) do
+              {:ok, new_env} -> 
+                # After loading, we need to know what was added to 'loaded'
+                # But load_module_to_env doesn't return it. 
+                # However, it MUST have added 'name' (and its deps).
+                # We'll just assume it's in env now.
+                {:cont, {:ok, new_env, MapSet.put(acc_loaded, name)}}
+              {:error, reason} -> {:halt, {:error, {:failed_to_import, name, reason}}}
+            end
+          _, acc -> {:cont, acc}
+        end)
       end
-    else env end
 
-    env = if mod_name not in ["Prelude", "Coq"] do
-      case load_module_to_env("Prelude", env, opts) do
-        {:ok, new_env} -> new_env
-        _ -> env
+      case res do
+        {:ok, final_env, _final_loaded} -> {:ok, final_env}
+        err -> err
       end
-    else env end
+    end
+  end
 
-    Enum.reduce(decls, env, fn
-      {:import, name}, acc ->
-        case load_module_to_env(name, acc, opts) do
-          {:ok, new_env} -> new_env
-          _ -> acc
-        end
-      _, acc -> acc
-    end)
+  defp maybe_load_implicit_acc(target, current, env, {:ok, _prev_env, loaded_set}) do
+    if target == current or current in ["Coq", "Prelude"] or MapSet.member?(loaded_set, target) do
+      {:ok, env, loaded_set}
+    else
+      case load_module_to_env(target, env, loaded: loaded_set) do
+        {:ok, new_env} -> {:ok, new_env, MapSet.put(loaded_set, target)}
+        {:error, :module_not_found} -> {:ok, env, loaded_set}
+        {:error, reason} -> {:error, reason}
+      end
+    end
   end
 
   def load_module_to_env(mod_name, env, opts \\ []) do
-    case find_module_path(mod_name) do
-      {:ok, path} ->
-        source = File.read!(path)
-        with {:ok, tokens} <- Lexer.lex(source),
-             resolved <- Layout.resolve(tokens),
-             {:ok, %AST.Module{} = mod, _} <- Parser.parse(resolved) do
-          env_with_imports = resolve_imports(mod, env, opts)
-          new_env = Enum.reduce(mod.declarations, env_with_imports, fn
-            %AST.DeclValue{} = v, acc ->
-              desugared_v = Desugar.desugar_decl(v, acc)
-              {expr, val_ty} = cond do
-                desugared_v.tactics ->
-                  # IO.puts("Solving theorem: #{desugared_v.name}")
-                  case Christine.Tactics.solve_with_tactics(desugared_v.name, desugared_v.type, desugared_v.tactics, acc) do
-                    {:ok, term} -> {term, desugared_v.type}
-                    {:error, reason} ->
-                      IO.puts("Tactic error in #{desugared_v.name}: #{inspect(reason)}")
-                      {nil, desugared_v.type}
-                  end
-                desugared_v.expr -> {desugared_v.expr, Christine.Typechecker.infer(acc, desugared_v.expr)}
-                true -> {nil, desugared_v.type}
+    loaded = Keyword.get(opts, :loaded, MapSet.new())
+    if MapSet.member?(loaded, mod_name) do
+       {:ok, env}
+    else
+      case find_module_path(mod_name) do
+        {:ok, path} ->
+          source = File.read!(path)
+          new_opts = Keyword.put(opts, :loaded, MapSet.put(loaded, mod_name))
+          try do
+            with {:ok, tokens} <- Lexer.lex(source),
+                 resolved <- Layout.resolve(tokens),
+                 {:ok, %AST.Module{} = mod, _} <- Parser.parse(resolved),
+                 {:ok, env_with_imports} <- resolve_imports(mod, env, new_opts) do
+              
+              env_with_locals = collect_local_names(mod, env_with_imports, mod_name)
+              case populate_local_env(Desugar.desugar(mod, env_with_locals), env_with_locals, mod_name) do
+                {:ok, new_env} -> {:ok, new_env}
+                {:error, reason} -> {:error, reason}
               end
-              new_defs = if expr, do: Map.put(acc.defs, desugared_v.name, expr), else: acc.defs
-              %{acc | defs: new_defs, name_to_mod: Map.put(acc.name_to_mod, desugared_v.name, mod_name), ctx: [{desugared_v.name, val_ty} | acc.ctx], last_decl: desugared_v.name}
-            %AST.DeclData{} = data, acc ->
-              desugared_ind = Desugar.desugar_decl(data, acc)
-              new_env_map = Map.put(acc.env, desugared_ind.name, desugared_ind)
-              new_defs = add_constructors(desugared_ind, acc.defs)
-              new_ctx = add_constructors_to_ctx(desugared_ind, acc.ctx)
-              new_names = Map.put(acc.name_to_mod, desugared_ind.name, mod_name)
-              new_names = Enum.reduce(desugared_ind.constrs, new_names, fn {_, cn, _}, a -> Map.put(a, cn, mod_name) end)
-              %{acc | env: new_env_map, defs: new_defs, ctx: new_ctx, name_to_mod: new_names, last_decl: desugared_ind.name}
-            {:proof, tacs}, acc ->
-              if acc.last_decl do
-                n = acc.last_decl
-                case List.keyfind(acc.ctx, n, 0) do
-                  {_, ty} ->
-                    case Christine.Tactics.solve_with_tactics(n, ty, tacs, acc) do
-                      {:ok, term} -> %{acc | defs: Map.put(acc.defs, n, term)}
-                      {:error, _reason} -> acc
-                    end
-                  _ -> acc
-                end
-              else acc end
-            _, acc -> acc
-          end)
-          {:ok, new_env}
-        else err -> {:error, err} end
-      nil -> {:error, :module_not_found}
+            else
+              err -> {:error, err}
+            end
+          rescue
+            e in ErlangError ->
+              case e.original do
+                {:error, reason} -> {:error, reason}
+                _ -> {:error, {:compiler_crash, e, __STACKTRACE__}}
+              end
+            e -> {:error, {:compiler_crash, e, __STACKTRACE__}}
+          catch
+            {:error, reason} -> {:error, reason}
+          end
+        nil -> {:error, :module_not_found}
+      end
     end
   end
 
   def find_module_path(mod_name) do
-    path1 = "priv/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
-    path2 = "test/christine/" <> String.replace(mod_name, ".", "/") <> ".christine"
-    cond do
-      File.exists?(path1) -> {:ok, path1}
-      File.exists?(path2) -> {:ok, path2}
-      true -> nil
+    filename = String.replace(mod_name, ".", "/") <> ".christine"
+    
+    # Try direct first
+    paths = [
+      "priv/christine/" <> filename,
+      "test/christine/" <> filename
+    ]
+    
+    case Enum.find(paths, &File.exists?/1) do
+      path when is_binary(path) -> {:ok, path}
+      nil ->
+        # Try recursive search if not found directly
+        short_name = hd(Enum.reverse(String.split(mod_name, "."))) <> ".christine"
+        search_dirs = ["priv/christine", "test/christine"]
+        
+        Enum.find_value(search_dirs, fn dir ->
+           if File.dir?(dir) do
+             Path.wildcard("#{dir}/**/#{short_name}") |> List.first()
+           else
+             nil
+           end
+        end)
+        |> case do
+          nil -> nil
+          path -> {:ok, path}
+        end
     end
   end
 
