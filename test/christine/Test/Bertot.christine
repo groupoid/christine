@@ -90,6 +90,7 @@ exact x10.
 exact y10.
 Qed.
 
+(*
 Lemma example6 : forall x y, (x + y) * (x + y) = x*x + 2*x*y + y*y.
 Proof.
 intros x y.
@@ -103,6 +104,7 @@ rewrite mult_succ_l.
 rewrite mult_assoc.
 reflexivity.
 Qed.
+*)
 
 Lemma sum_n_p : forall (n : nat), 2 * sum_n n + n = n * n.
 Proof.

@@ -22,9 +22,13 @@ defmodule Christine.Tactics do
     }
   end
 
-  def apply_tactic(%ProofState{goals: [{_ctx, current} | _rest]} = ps, tactic_str) when is_binary(tactic_str) do
-    Christine.Debug.log("DEBUG TACTIC: #{tactic_str} on goal: #{AST.to_string(current)}")
-    case parse_tactic(tactic_str) do
+  def apply_tactic(ps, tac_str) when is_binary(tac_str) do
+    case ps.goals do
+      [{_ctx, goal} | _] ->
+         Christine.Debug.log("DEBUG TACTIC: #{tac_str} on goal: #{AST.to_string(goal)}")
+      _ -> :ok
+    end
+    case parse_tactic(tac_str) do
       :unknown -> {:error, :unknown_tactic, ps}
       tac -> apply_tactic(ps, tac)
     end
@@ -346,13 +350,11 @@ defmodule Christine.Tactics do
                 # Christine.Debug.log("DEBUG REWRITE: Goal=#{AST.to_string(current)}")
                 # Christine.Debug.log("DEBUG REWRITE: Pattern=#{AST.to_string(l)}")
                 # Christine.Debug.log("DEBUG REWRITE: ReplaceWith=#{AST.to_string(r)}")
-                new_goal = replace_expression(current, l, r, env, pi_args)
-                if Typechecker.equal?(env, current, new_goal) do
-                   if h_name == "beq_nat_refl" do
-                      Christine.Debug.log("REWRITE FAILED: #{h_name}\nTarget Pattern:\n#{AST.to_string(l)}\nGoal:\n#{AST.to_string(current)}")
-                   end
-                   {:error, :nothing_to_rewrite, ps}
-                else
+                 new_goal = replace_expression(current, l, r, env, pi_args)
+                 if Typechecker.equal?(env, current, new_goal) do
+                    Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.\nGoal AST: #{inspect(current)}\nPattern AST: #{inspect(l)}")
+                    {:error, :nothing_to_rewrite, ps}
+                 else
                    old_rec = ps.reconstructor
                    new_rec = fn [p | remainder] ->
                      # Note: proof term for rewrite is still forward-only for now in this prototype
@@ -408,7 +410,7 @@ defmodule Christine.Tactics do
         case find_variable(ps, h_name) do
           {:ok, _term, h_ty} ->
             case unwrap_eq_from_pi_raw(env, h_ty) do
-              {:ok, l, r, _} ->
+              {:ok, l, r, _, _} ->
                 if impossible_eq?(env, l, r) do
                   solve_goal(ps, %AST.Var{name: "inversion_refl"})
                 else
@@ -629,14 +631,16 @@ defmodule Christine.Tactics do
   defp wrap_goals(types, ctx), do: Enum.map(types, fn t -> {ctx, t} end)
 
   defp match_goal(env, goal, type, params \\ [], acc_args \\ []) do
-    Christine.Debug.log("DEBUG MATCH_GOAL: goal #{AST.to_string(goal)} vs type #{AST.to_string(type)}")
-    case Typechecker.normalize(env, type) do
+    # Christine.Debug.log("DEBUG MATCH_GOAL: goal #{AST.to_string(goal)} vs type #{AST.to_string(type)}")
+    case Typechecker.reduce(env, type) do
       %AST.Pi{name: n, domain: d, codomain: c} ->
         match_goal(env, goal, c, [n | params], [{n, d} | acc_args])
       ty ->
         case try_match(env, goal, ty, params) do
           {:ok, bindings} -> {:ok, bindings, Enum.reverse(acc_args)}
-          :error -> :error
+          :error -> 
+            # Christine.Debug.log("DEBUG MATCH_GOAL FAILED: goal #{AST.to_string(goal)} vs ty #{AST.to_string(ty)}")
+            :error
         end
     end
   end
@@ -805,8 +809,8 @@ defmodule Christine.Tactics do
                _ -> :error
              end
           %AST.Number{value: v} ->
-            unfolded = unfold_number(env, v)
-            try_match(env, unfolded, pattern, params, bindings)
+             unfolded = Christine.Typechecker.unfold_number(env, v)
+             try_match(env, unfolded, pattern, params, bindings)
           _ ->
             if Typechecker.equal?(env, target, pattern) do {:ok, bindings} else :error end
         end

@@ -287,7 +287,8 @@ defmodule Christine.Typechecker do
   end
 
   defp do_reduce(e, %AST.Ind{inductive: ind_def, motive: _p, cases: cases, term: t} = ind, fuel) do
-    case reduce(e, t, fuel - 1) do
+    target = reduce(e, t, fuel - 1)
+    case target do
       %AST.Constr{index: j, args: args} ->
         # Christine.Debug.log("DEBUG REDUCE IND: constructor #{j} for #{ind_def.name}")
         # Find the constructor's Pi type signature to trace which arguments are recursive
@@ -297,10 +298,11 @@ defmodule Christine.Typechecker do
             res = apply_args(e, case_val, args, c_sig, ind)
             reduce(e, res, fuel - 1)
           _ ->
-            # Christine.Debug.log("DEBUG REDUCE IND FAILED: constructor #{j} not found in #{ind_def.name}")
             ind
         end
-
+      %AST.Number{value: v} ->
+        unfolded = Christine.Typechecker.unfold_number(e, v)
+        reduce(e, %{ind | term: unfolded}, fuel - 1)
       _ ->
         ind
     end
@@ -456,20 +458,56 @@ defmodule Christine.Typechecker do
 
   def subst(_, _, t), do: t
 
+  def unfold_number(env, n) do
+    succ_name = case Enum.find(env.env, fn {name, _} -> String.ends_with?(name, ".Succ") or name == "Succ" end) do
+      {full, _} -> full
+      _ -> "Succ"
+    end
+    zero_name = case Enum.find(env.env, fn {name, _} -> String.ends_with?(name, ".Zero") or name == "Zero" end) do
+      {full, _} -> full
+      _ -> "Zero"
+    end
+    do_unfold_number(n, succ_name, zero_name)
+  end
+
+  defp do_unfold_number(0, _, zero), do: %AST.Var{name: zero}
+  defp do_unfold_number(n, succ, zero) when n > 0, do: %AST.App{func: %AST.Var{name: succ}, arg: do_unfold_number(n - 1, succ, zero)}
+
   defp count_lams(%AST.Lam{body: b}), do: 1 + count_lams(b)
   defp count_lams(_), do: 0
 
   defp try_unfold_fixpoint(e, body, args, fuel) do
+    Christine.Debug.log("DEBUG TRY_UNFOLD: #{inspect(args, limit: :infinity)}")
     num_lams = count_lams(body)
     if length(args) < num_lams do
       :blocked
     else
       {unfold_args, extra_args} = Enum.split(args, num_lams)
       
-      unfolded_inner = Enum.reduce(unfold_args, body, fn arg, acc ->
-        case acc do
-          %AST.Lam{name: x, body: b} -> subst(x, arg, b)
-          _ -> %AST.App{func: acc, arg: arg}
+      # To avoid shadowing, we rename formal parameters to fresh names.
+      # We must traverse the lambdas to rename each one in sequence.
+      rename_params = fn (term, n, f_rename) ->
+        if n <= 0 do {term, []}
+        else
+          case term do
+            %AST.Lam{name: x, domain: d, body: b} ->
+              fresh = "_fresh_#{n}_#{x}_#{:erlang.unique_integer([:positive])}"
+              # Substitute in the body and then recurse
+              new_b = subst(x, %AST.Var{name: fresh}, b)
+              {final_b, rest_names} = f_rename.(new_b, n - 1, f_rename)
+              {%AST.Lam{name: fresh, domain: d, body: final_b}, [fresh | rest_names]}
+            _ -> {term, []}
+          end
+        end
+      end
+
+      {final_body, fresh_names} = rename_params.(body, num_lams, rename_params)
+
+      unfolded_inner = Enum.zip(unfold_args, fresh_names)
+      |> Enum.reduce(final_body, fn {arg, fresh}, acc ->
+        case {acc, fresh} do
+          {%AST.Lam{body: b}, f} when not is_nil(f) -> subst(f, arg, b)
+          _ -> acc # Should not happen with num_lams check
         end
       end)
       
@@ -480,11 +518,16 @@ defmodule Christine.Typechecker do
       case find_first_ind(unfolded) do
         {:ok, %AST.Ind{term: t} = _ind} ->
           case reduce(e, t, fuel) do
-             %AST.Constr{} -> {:ok, unfolded}
+             %AST.Constr{} = _c -> 
+                # Christine.Debug.log("DEBUG UNFOLD OK: Found constr #{AST.to_string(_c)} for term #{inspect(t, limit: :infinity)}")
+                {:ok, unfolded}
+             %AST.Number{} = _n -> 
+                # Christine.Debug.log("DEBUG UNFOLD OK: Found number #{AST.to_string(_n)} for term #{inspect(t, limit: :infinity)}")
+                {:ok, unfolded}
              _other -> :blocked
           end
         :none -> 
-          {:ok, unfolded}
+          :blocked
       end
     end
   end
@@ -492,10 +535,23 @@ defmodule Christine.Typechecker do
   defp find_first_ind(term) do
     case term do
       %AST.Ind{} = ind -> {:ok, ind}
-      %AST.App{func: f} -> find_first_ind(f)
+      %AST.App{func: f, arg: a} -> 
+         case find_first_ind(f) do
+           {:ok, i} -> {:ok, i}
+           :none -> find_first_ind(a)
+         end
       %AST.Lam{body: b} -> find_first_ind(b)
       %AST.Pi{codomain: b} -> find_first_ind(b)
-      %AST.Let{body: b} -> find_first_ind(b)
+      %AST.Let{decls: decls, body: b} ->
+         case Enum.reduce_while(decls, :none, fn {_n, v}, _acc ->
+           case find_first_ind(v) do
+             {:ok, i} -> {:halt, {:ok, i}}
+             :none -> {:cont, :none}
+           end
+         end) do
+           {:ok, i} -> {:ok, i}
+           :none -> find_first_ind(b)
+         end
       _ -> :none
     end
   end
