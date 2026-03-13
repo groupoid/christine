@@ -83,13 +83,14 @@ Definition cong (A: Type) (B: Type) (f: forall (x: A), B)
             <h2>Intro</h2>
 
             <div style="max-width:720px;margin:0 auto;">
-The type checker operates over a term syntax comprising:
+The <b>Christine</b> operates over a term syntax comprising:
 1) <b class=box>Universe i</b>: Type universes with level i ∈ ℕ.
 2) <b class=box>Pi x A B</b>: Dependent function, where A : Universe i and B : Universe j under x : A;
    <b class=box>Lam x A t</b>: Lambda abstraction with totality enforced; <b class=box>App f a</b>: Function application.
 3) <b class=box>Inductive n p l c</b>: Inductive types with intros <b class=box>Constr i n p l c t</b> and
    dependent general induction eliminator <b class=box>Ind n p l c a d x</b>.
 4) <b class=box>Fixpoint n d b a</b>: Fixpoint with partially applied argements and body.
+Note that both <b>Christine</b> and <b>Coq</b> lack of Sigma and J eliminators built-in into core.
             </div>
 
         </section>
