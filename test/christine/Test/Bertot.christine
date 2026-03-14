@@ -1,5 +1,7 @@
 Module Math.Bertot.
 
+import Coq.
+
 (* Yves Bertot Reality Check *)
 
 Check True.

@@ -68,7 +68,13 @@ defmodule Mix.Tasks.Christine.Test do
     IO.puts("#{IO.ANSI.bright()}Test Summary:#{IO.ANSI.reset()}")
     IO.puts("  Total:     #{total}")
     IO.puts("  #{IO.ANSI.green()}Success:   #{successes}#{IO.ANSI.reset()}")
-    IO.puts("  #{IO.ANSI.red()}Failures:  #{failures}#{IO.ANSI.reset()}")
+
+    if failures == 0 do
+      IO.puts("  Failures:  #{failures}")
+    else
+      IO.puts("  #{IO.ANSI.red()}Failures:  #{failures}#{IO.ANSI.reset()}")
+    end
+
     IO.puts("  Duration:  #{Float.round(duration, 2)}s")
     IO.puts("#{String.duplicate("─", 40)}")
 

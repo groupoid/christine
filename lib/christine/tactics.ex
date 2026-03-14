@@ -1432,9 +1432,26 @@ defmodule Christine.Tactics do
                     {:ok, %AST.Var{name: full_name}, ty}
 
                   _ ->
-                    case Map.get(env.env, name) do
-                      ty when is_map(ty) -> {:ok, %AST.Var{name: name}, ty}
-                      _ -> :error
+                    # Search global_ctx for theorems and constructors (moved from ctx)
+                    found_global =
+                      case Map.get(env.global_ctx, name) do
+                        nil ->
+                          Enum.find(env.global_ctx, fn {n, _} -> String.ends_with?(n, "." <> name) end)
+
+                        ty ->
+                          {name, ty}
+                      end
+
+                    case found_global do
+                      {full_name, ty} ->
+                        val = Map.get(env.defs, full_name)
+                        {:ok, val || %AST.Var{name: full_name}, ty}
+
+                      _ ->
+                        case Map.get(env.env, name) do
+                          ty when is_map(ty) -> {:ok, %AST.Var{name: name}, ty}
+                          _ -> :error
+                        end
                     end
                 end
             end

@@ -150,9 +150,9 @@ defmodule Mix.Tasks.Christine.Repl do
 
       IO.puts("Proof started for #{name}")
       desugared_target = Desugar.desugar_expression(target_syn, env)
-      ps = Christine.Tactics.start_proof(name, desugared_target, env)
-      # Register the theorem in the context immediately so it is visible to Print.
-      new_env = %{env | ctx: [{name, desugared_target} | env.ctx]}
+      # Register the theorem in the global context immediately so it is visible to Tactics and Print.
+      new_env = %{env | global_ctx: Map.put(env.global_ctx, name, desugared_target)}
+      ps = Christine.Tactics.start_proof(name, desugared_target, new_env)
       {:ok, ps, new_env}
     else
       err -> {:error, err}
@@ -168,7 +168,10 @@ defmodule Mix.Tasks.Christine.Repl do
           IO.puts("Proof complete!")
           # Persist the proof term if we have one.
           new_env = if ps.proof_term do
-            %{env | defs: Map.put(env.defs, ps.name, ps.proof_term)}
+            %{env |
+              defs: Map.put(env.defs, ps.name, ps.proof_term),
+              global_ctx: Map.put(env.global_ctx, ps.name, ps.target)
+            }
           else
             env
           end

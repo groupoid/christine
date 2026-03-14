@@ -104,7 +104,14 @@ defmodule Christine.Compiler do
                     last_decl: n_full
                 }}}
             else
-              {:cont, {:ok, %{acc | ctx: [{n_full, t} | acc.ctx], last_decl: n_full}}}
+              {:cont,
+               {:ok,
+                %{
+                  acc
+                  | ctx: [{n_full, t} | acc.ctx],
+                    global_ctx: Map.put(acc.global_ctx, n_full, t),
+                    last_decl: n_full
+                }}}
             end
           end
 
@@ -118,10 +125,20 @@ defmodule Christine.Compiler do
           # Add constructors with both namespaced and short name?
           # Actually load_module_to_env should handle name_to_mod mapping
           new_defs = add_constructors(ind_named, acc.defs)
-          new_ctx = add_constructors_to_ctx(ind_named, acc.ctx)
+          new_global_ctx = add_constructors_to_global_ctx(ind_named, acc.global_ctx)
 
           {:cont,
-           {:ok, %{acc | env: new_env_map, defs: new_defs, ctx: new_ctx, last_decl: n_full}}}
+           {:ok,
+            %{
+              acc
+              | env: new_env_map,
+                defs: new_defs,
+                # Use current ctx without adding constructors
+                ctx: acc.ctx,
+                global_ctx:
+                  Map.put(new_global_ctx, n_full, Christine.Typechecker.infer(acc, ind_named)),
+                last_decl: n_full
+            }}}
 
         {:module_start, _name} ->
           {:cont, {:ok, acc}}
@@ -365,9 +382,11 @@ defmodule Christine.Compiler do
     end)
   end
 
-  defp add_constructors_to_ctx(ind, ctx) do
-    Enum.reduce(ind.constrs, ctx, fn {_, name, ty}, acc ->
-      [{ind.name <> "." <> name, ty}, {name, ty} | acc]
+  defp add_constructors_to_global_ctx(ind, global_ctx) do
+    Enum.reduce(ind.constrs, global_ctx, fn {_, name, ty}, acc ->
+      acc
+      |> Map.put(ind.name <> "." <> name, ty)
+      |> Map.put(name, ty)
     end)
   end
 
