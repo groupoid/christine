@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christine Automation</title>
+    <title>Christine Tactics</title>
     <link rel="stylesheet" href="index.css?v=5">
 </head>
 <body>
@@ -12,14 +12,14 @@
             <a href="https://groupoid.space" class="logo"><img width="50" style="padding-top:-30px;margin-bottom:-15px;" src="https://avatars.githubusercontent.com/u/17128096?s=200&v=4"></a>
             <ul class="nav-links">
                 <li><a href="index.html">Language</a></li>
-                <li><a href="tactics.html" class="active">Automation</a></li>
+                <li><a href="tactics.html" class="active">Tactics</a></li>
             </ul>
         </div>
     </nav>
 
     <header>
         <div class="hero-content">
-            <h1>Automation</h1>
+            <h1>Tactics</h1>
         </div>
     </header>
 
@@ -68,7 +68,7 @@ Qed.</pre>
 
 
         <section>
-            <h2>Tactics</h2>
+            <h2>Nomenclature</h2>
         </section>
 
         <section>
@@ -243,7 +243,7 @@ Qed.</pre>
                 <pre class="code-snippet">Theorem rewrite_demo : ∀ n : Nat, plus (plus O n) O = n.
 Proof.
   intro n.
-  rewrite plus_O_n.
+  rewrite plus_O_n.  -- assuming plus_O_n : ∀ n, plus O n = n is in scope
   reflexivity.
 Qed.</pre>
             </div>
