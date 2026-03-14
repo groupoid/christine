@@ -11,7 +11,7 @@ defmodule Christine.Compiler do
       loaded = Keyword.get(opts, :loaded, MapSet.new())
       deadline = System.monotonic_time(:millisecond) + Keyword.get(opts, :timeout, 10_000)
       
-      with {:ok, env} <- resolve_imports(ast, %Christine.Typechecker.Env{deadline: deadline}, Keyword.put(opts, :loaded, loaded)) do
+      with {:ok, env} <- resolve_imports(ast, %Christine.Typechecker.Env{deadline: deadline, verbose: Keyword.get(opts, :verbose, false)}, Keyword.put(opts, :loaded, loaded)) do
         env = collect_local_names(ast, env)
         desugared = Desugar.desugar(ast, env)
 

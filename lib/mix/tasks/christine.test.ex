@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Christine.Test do
         mod_name = Path.basename(file, ".christine")
 
         try do
-          case Christine.Compiler.compile_module(source, source_path: file) do
+          case Christine.Compiler.compile_module(source, source_path: file, verbose: !!opts[:verbose]) do
             {:ok, mod, _bin} ->
               IO.puts("OK (#{mod})")
               :ok

@@ -64,7 +64,7 @@ defmodule Christine.Typechecker do
     end
   end
   def infer(%Env{} = e, %AST.Ind{inductive: _d, motive: p, cases: _cases, term: t}) do
-    case infer(e, p) do
+    case reduce(e, infer(e, p)) do
       %AST.Pi{name: x, domain: _a, codomain: b} -> subst(x, t, b)
       other -> {:error, {:motive_not_pi, other}}
     end
@@ -82,7 +82,7 @@ defmodule Christine.Typechecker do
     ty
   end
   def infer(%Env{} = e, %AST.App{func: f, arg: arg}) do
-    case infer(e, f) do
+    case reduce(e, infer(e, f)) do
       %AST.Pi{name: x, domain: a, codomain: b} ->
         check(e, arg, a)
         subst(x, arg, b)
@@ -120,6 +120,9 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
+    if e.verbose do
+       # IO.puts("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
+    end
     deadline = e.deadline || System.monotonic_time(:millisecond) + 10_000
     e = %{e | deadline: deadline}
     n1 = normalize(e, t1)
@@ -128,6 +131,9 @@ defmodule Christine.Typechecker do
     if structural_equal?(e, n1, n2) do
       true
     else
+      if e.verbose do
+         # IO.puts("  DEBUG EQUAL? STRUCTURAL FAILED. n1_type=#{inspect(n1.__struct__)} n2_type=#{inspect(n2.__struct__)}")
+      end
       case {n1, n2} do
         {%AST.App{func: f1}, _} ->
           args = collect_app_args_list(n1)
@@ -198,7 +204,7 @@ defmodule Christine.Typechecker do
     end
   end
 
-  defp structural_equal?(e, t1, t2) do
+  def structural_equal?(e, t1, t2) do
     case {t1, t2} do
       {%AST.Var{name: n1}, %AST.Var{name: n2}} -> AST.names_match?(n1, n2)
       {%AST.Universe{level: l1}, %AST.Universe{level: l2}} -> l1 == l2
@@ -471,8 +477,11 @@ defmodule Christine.Typechecker do
   defp subst_many([{x, _} | rest], t), do: subst_many(rest, subst(x, %AST.Var{name: x}, t))
 
   defp infer_ctor(_e, ty, []), do: ty
-  defp infer_ctor(e, %AST.Pi{name: x, codomain: c}, [arg | rest]) do
-    infer_ctor(e, subst(x, arg, c), rest)
+  defp infer_ctor(e, ty, [arg | rest]) do
+    case reduce(e, ty) do
+      %AST.Pi{name: x, codomain: c} -> infer_ctor(e, subst(x, arg, c), rest)
+      other -> {:error, {:constructor_requires_pi, other}}
+    end
   end
 
   defp head_name(%AST.Var{name: n}), do: {:ok, n}

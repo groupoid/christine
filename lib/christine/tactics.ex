@@ -303,7 +303,7 @@ defmodule Christine.Tactics do
                     constr_args = Enum.map(Enum.take(renamed_binders, num_args), fn {bn, _} -> %AST.Var{name: bn} end)
                     constr_term = %AST.Constr{index: idx, inductive: ind, args: params ++ constr_args}
                     
-                    new_ctx = for {n, ty} <- (renamed_binders ++ ctx), do: {n, Christine.Typechecker.subst(x, constr_term, ty)}
+                    new_ctx = renamed_binders ++ (for {n, ty} <- ctx, do: {n, Christine.Typechecker.subst(x, constr_term, ty)})
                     new_goal = Christine.Typechecker.subst(x, constr_term, current)
 
                     {new_ctx, new_goal}
@@ -783,12 +783,13 @@ defmodule Christine.Tactics do
          if Enum.member?(params, vn) do
             try_match(env, target, old_norm, params)
          else
-            case target do
-              %AST.Var{name: vn2} -> if AST.names_match?(vn, vn2), do: {:ok, %{}}, else: :error
-              _ -> :error
-            end
+            if Typechecker.equal?(env, target, old_norm), do: {:ok, %{}}, else: :error
          end
-      _ -> try_match(env, target, old_norm, params)
+      _ -> 
+        case try_match(env, target, old_norm, params) do
+          {:ok, bindings} -> {:ok, bindings}
+          :error -> if Typechecker.equal?(env, target, old_norm), do: {:ok, %{}}, else: :error
+        end
     end
     
 
@@ -813,6 +814,43 @@ defmodule Christine.Tactics do
               codomain: replace_expression(c, old, new, env, params)
             }
           %AST.Lam{name: n, domain: d, body: b} ->
+            %AST.Lam{
+              name: n,
+              domain: replace_expression(d, old, new, env, params),
+              body: replace_expression(b, old, new, env, params)
+            }
+
+          %AST.Ind{inductive: d, motive: p, cases: cs, term: t} ->
+            %AST.Ind{
+              inductive: d,
+              motive: replace_expression(p, old, new, env, params),
+              cases: Enum.map(cs, &replace_expression(&1, old, new, env, params)),
+              term: replace_expression(t, old, new, env, params)
+            }
+
+          %AST.Constr{index: i, inductive: d, args: args} ->
+            %AST.Constr{
+              index: i,
+              inductive: d,
+              args: Enum.map(args, &replace_expression(&1, old, new, env, params))
+            }
+
+          %AST.Let{decls: ds, body: b} ->
+            %AST.Let{
+              decls: Enum.map(ds, fn {ln, lv} -> {ln, replace_expression(lv, old, new, env, params)} end),
+              body: replace_expression(b, old, new, env, params)
+            }
+
+          %AST.Fixpoint{name: n, domain: d, body: b, args: args} ->
+            %AST.Fixpoint{
+              name: n,
+              domain: replace_expression(d, old, new, env, params),
+              body: replace_expression(b, old, new, env, params),
+              args: Enum.map(args, &replace_expression(&1, old, new, env, params))
+            }
+
+          _ ->
+            target
             %AST.Lam{
               name: n,
               domain: replace_expression(d, old, new, env, params),
