@@ -140,6 +140,10 @@ Definition negb (b : bool) : bool :=
   | false => true
   end.
 
+Definition lt (n m : nat) : Prop := le (Succ n) m.
+Definition gt (n m : nat) : Prop := le (Succ m) n.
+Definition ge (n m : nat) : Prop := le m n.
+
 Axiom le_trans : forall (n m p : nat), le n m -> le m p -> le n p.
 
 End Coq.
