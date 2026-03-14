@@ -363,6 +363,7 @@ defmodule Christine.Tactics do
                       extract_constructor_binders(env, cty_subst, ind, motive, [], x, gen_ih?)
 
                     renamed_binders = rename_binders(binders, c_user_names)
+                    renamed_binders = fix_ih_binder_types(binders, renamed_binders)
 
                     num_ihs =
                       Enum.count(binders, fn {_, bty} ->
@@ -423,6 +424,7 @@ defmodule Christine.Tactics do
                         extract_constructor_binders(env, cty_subst, ind, motive, [], x, true)
 
                       renamed_binders = rename_binders(binders, c_user_names)
+                      renamed_binders = fix_ih_binder_types(binders, renamed_binders)
 
                       Enum.reduce(Enum.reverse(renamed_binders), proof, fn {name, ty}, acc ->
                         %AST.Lam{name: name, domain: ty, body: acc}
@@ -1874,6 +1876,32 @@ defmodule Christine.Tactics do
       %AST.Var{name: n} -> {:ok, n}
       %AST.Inductive{name: n} -> {:ok, n}
       _ -> :error
+    end
+  end
+
+  # After rename_binders renames recursive-arg binders (e.g., "n" -> "n0"),
+  # the IH types still reference Var("n"). This function substitutes old names
+  # with new names inside IH types so that the subsequent subst(x, constr_term)
+  # does not incorrectly rewrite the IH argument (e.g., turning motive(n0) into
+  # motive(Succ n0) when x="n" and constr_term=Succ(n0)).
+  defp fix_ih_binder_types(original_binders, renamed_binders) do
+    name_map =
+      Enum.zip(original_binders, renamed_binders)
+      |> Enum.reduce(%{}, fn {{orig_name, _}, {new_name, _}}, acc ->
+        if orig_name != new_name, do: Map.put(acc, orig_name, new_name), else: acc
+      end)
+
+    if map_size(name_map) == 0 do
+      renamed_binders
+    else
+      Enum.map(renamed_binders, fn {name, ty} ->
+        new_ty =
+          Enum.reduce(name_map, ty, fn {orig, new}, acc ->
+            Christine.Typechecker.subst(orig, %AST.Var{name: new}, acc)
+          end)
+
+        {name, new_ty}
+      end)
     end
   end
 end
