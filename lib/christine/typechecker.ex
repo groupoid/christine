@@ -47,8 +47,8 @@ defmodule Christine.Typechecker do
                      %AST.Inductive{} = ind -> infer(e, ind)
                      _ -> {:error, {:unbound_variable, name}}
                    end
-                ty -> ty
-              end
+                 ty -> ty
+               end
           end
       end
     end
@@ -292,7 +292,11 @@ defmodule Christine.Typechecker do
     case target do
       %AST.Constr{index: j, args: args} ->
         # Look up inductive if constrs are missing (shallow definition)
-        ind_full = if is_nil(ind_def.constrs) or ind_def.constrs == [], do: Map.get(e.env, ind_def.name) || ind_def, else: ind_def
+        ind_full = if is_nil(ind_def.constrs) or ind_def.constrs == [] do
+           Map.get(e.env, ind_def.name) || Enum.find_value(e.env, fn {n, ind} -> if AST.names_match?(n, ind_def.name), do: ind end) || ind_def
+        else
+           ind_def
+        end
         case Enum.find(ind_full.constrs || [], fn {idx, _, _} -> idx == j end) do
           {^j, _cname, c_sig} ->
             res = apply_args(e, Enum.at(cases, j - 1), args, c_sig, %{ind | inductive: ind_full})
@@ -375,10 +379,10 @@ defmodule Christine.Typechecker do
           case red_t do
             %AST.Constr{} -> 
               {:ok, unfolded}
-            %AST.Number{} -> 
+            %AST.Number{value: v} -> 
               {:ok, unfolded}
             _ -> 
-              # Christine.Debug.log("DEBUG UNFOLD BLOCKED (Ind term): #{fix.name} term=#{AST.to_string(red_t)}")
+              Christine.Debug.log("DEBUG UNFOLD BLOCKED (Ind term): #{fix.name} term=#{AST.to_string(t)} red=#{AST.to_string(red_t)} internals=#{inspect(red_t)}")
               :blocked
           end
         %AST.App{func: f_inner} ->

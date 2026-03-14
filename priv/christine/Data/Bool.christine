@@ -6,19 +6,19 @@ Inductive Bool :=
 | False
 | True.
 
-Definition not (b: Bool) : Bool :=
+Definition negb (b: Bool) : Bool :=
   match b with
   | True => False
   | False => True
   end.
 
-Definition and (a: Bool) (b: Bool) : Bool :=
+Definition andb (a: Bool) (b: Bool) : Bool :=
   match a with
   | True => b
   | False => False
   end.
 
-Definition or (a: Bool) (b: Bool) : Bool :=
+Definition orb (a: Bool) (b: Bool) : Bool :=
   match a with
   | True => True
   | False => b
@@ -26,19 +26,19 @@ Definition or (a: Bool) (b: Bool) : Bool :=
 
 Definition xor (a: Bool) (b: Bool) : Bool :=
   match a with
-  | True => not b
+  | True => negb b
   | False => b
   end.
 
 import Data.Eq.
 
-Definition not_not_id (b: Bool) : Eq Bool (not (not b)) b :=
+Definition not_not_id (b: Bool) : Eq Bool (negb (negb b)) b :=
   match b with
   | True => Refl Bool True True
   | False => Refl Bool False False
   end.
 
-Definition and_comm (a: Bool) (b: Bool) : Eq Bool (and a b) (and b a) :=
+Definition andb_comm (a: Bool) (b: Bool) : Eq Bool (andb a b) (andb b a) :=
   match a with
   | True =>
     match b with

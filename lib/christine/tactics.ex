@@ -196,23 +196,53 @@ defmodule Christine.Tactics do
         end
 
       {:split, _} ->
-        case Typechecker.normalize(env, current) do
-          app when is_map(app) ->
-            case extract_ind_name(app) do
-              {:ok, ind_name} ->
-                # Search for inductive definition with namespacing fallback
-                ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
-                case ind do
-                  %AST.Inductive{constrs: [{_idx, cname, _cty}]} ->
-                    apply_tactic(ps, {:apply, cname})
+        # Try raw goal first to avoid unfolding transparent definitions
+        case extract_ind_name(current) do
+          {:ok, ind_name} ->
+             ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+             case ind do
+               %AST.Inductive{constrs: [{_idx, cname, _cty}]} ->
+                 apply_tactic(ps, {:apply, cname})
+               %AST.Inductive{} ->
+                 {:error, :not_a_splitable_goal, ps}
+               _ ->
+                 # Fallback to normalize
+                 case Typechecker.normalize(env, current) do
+                   app when is_map(app) ->
+                     case extract_ind_name(app) do
+                       {:ok, ind_name} ->
+                         ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+                         case ind do
+                           %AST.Inductive{constrs: [{_idx, cname, _cty}]} ->
+                             apply_tactic(ps, {:apply, cname})
+                           _ ->
+                             {:error, :not_a_splitable_goal, ps}
+                         end
+                       _ ->
+                         {:error, :not_an_inductive_type, ps}
+                     end
+                   _ ->
+                     {:error, :not_an_inductive_type, ps}
+                 end
+             end
+          _ ->
+            case Typechecker.normalize(env, current) do
+              app when is_map(app) ->
+                case extract_ind_name(app) do
+                  {:ok, ind_name} ->
+                    ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+                    case ind do
+                      %AST.Inductive{constrs: [{_idx, cname, _cty}]} ->
+                        apply_tactic(ps, {:apply, cname})
+                      _ ->
+                        {:error, :not_a_splitable_goal, ps}
+                    end
                   _ ->
-                    {:error, :not_a_splitable_goal, ps}
+                    {:error, :not_an_inductive_type, ps}
                 end
               _ ->
                 {:error, :not_an_inductive_type, ps}
             end
-          _ ->
-            {:error, :not_an_inductive_type, ps}
         end
 
       {tag, target} when tag in [:induction, :destruct] ->
@@ -232,8 +262,8 @@ defmodule Christine.Tactics do
                   err -> err
                 end
               _ -> 
-                # Christine.Debug.log("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
-                {:error, {:variable_not_found, x}, ps}
+              Christine.Debug.log("DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}")
+              {:error, {:variable_not_found, x}, ps}
             end
 
           {_, ind_ty} ->
@@ -363,7 +393,8 @@ defmodule Christine.Tactics do
                 l_bound = Enum.reduce(evaled_with, l, fn {k, v}, acc -> Christine.Typechecker.subst(k, v, acc) end)
                 r_bound = Enum.reduce(evaled_with, r, fn {k, v}, acc -> Christine.Typechecker.subst(k, v, acc) end)
                 
-                new_goal = replace_expression(current, l_bound, r_bound, env, pi_args)
+                pi_names = Enum.map(pi_args, fn {n, _} -> n end)
+                new_goal = replace_expression(current, l_bound, r_bound, env, pi_names)
                 if Typechecker.equal?(env, current, new_goal) do
                     # Christine.Debug.log("REWRITE FAILED: #{h_name} resulted in same goal.")
                     {:error, :nothing_to_rewrite, ps}
@@ -463,31 +494,53 @@ defmodule Christine.Tactics do
         end
 
       {:left, _} ->
-        case Typechecker.normalize(env, current) do
-          %AST.App{func: %AST.App{func: %AST.Var{name: or_name}, arg: left}}
-          when or_name in ["or", "Or"] ->
-            old_rec = ps.reconstructor
-            new_rec = fn [p | remainder] ->
-              term = %AST.App{func: %AST.Var{name: "or_introl"}, arg: p}
-              old_rec.([term | remainder])
+        # Try raw first
+        case extract_ind_name(current) do
+          {:ok, ind_name} ->
+            ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+            case ind do
+              %AST.Inductive{constrs: [{_, cname, _} | _]} -> apply_tactic(ps, {:apply, cname})
+              _ -> {:error, :not_a_disjunction, ps}
             end
-            {:ok, %{ps | goals: [{ctx, left} | rest], reconstructor: new_rec}}
           _ ->
-            {:error, :not_a_disjunction, ps}
+            case Typechecker.normalize(env, current) do
+              app when is_map(app) ->
+                case extract_ind_name(app) do
+                  {:ok, ind_name} ->
+                    ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+                    case ind do
+                      %AST.Inductive{constrs: [{_, cname, _} | _]} -> apply_tactic(ps, {:apply, cname})
+                      _ -> {:error, :not_a_disjunction, ps}
+                    end
+                  _ -> {:error, :not_a_disjunction, ps}
+                end
+              _ -> {:error, :not_a_disjunction, ps}
+            end
         end
 
       {:right, _} ->
-        case Typechecker.normalize(env, current) do
-          %AST.App{func: %AST.App{func: %AST.Var{name: or_name}, arg: _left}, arg: right}
-          when or_name in ["or", "Or"] ->
-            old_rec = ps.reconstructor
-            new_rec = fn [p | remainder] ->
-              term = %AST.App{func: %AST.Var{name: "or_intror"}, arg: p}
-              old_rec.([term | remainder])
+        # Try raw first
+        case extract_ind_name(current) do
+          {:ok, ind_name} ->
+            ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+            case ind do
+              %AST.Inductive{constrs: [_, {_, cname, _} | _]} -> apply_tactic(ps, {:apply, cname})
+              _ -> {:error, :not_a_disjunction, ps}
             end
-            {:ok, %{ps | goals: [{ctx, right} | rest], reconstructor: new_rec}}
           _ ->
-            {:error, :not_a_disjunction, ps}
+            case Typechecker.normalize(env, current) do
+              app when is_map(app) ->
+                case extract_ind_name(app) do
+                  {:ok, ind_name} ->
+                    ind = Map.get(env.env, ind_name) || Enum.find_value(env.env, fn {n, ind} -> if AST.names_match?(n, ind_name), do: ind end)
+                    case ind do
+                      %AST.Inductive{constrs: [_, {_, cname, _} | _]} -> apply_tactic(ps, {:apply, cname})
+                      _ -> {:error, :not_a_disjunction, ps}
+                    end
+                  _ -> {:error, :not_a_disjunction, ps}
+                end
+              _ -> {:error, :not_a_disjunction, ps}
+            end
         end
 
       _ ->
@@ -683,7 +736,7 @@ defmodule Christine.Tactics do
              unwrap_eq_from_pi_raw(new_env, cod, [{name, d} | params])
            app ->
              case Typechecker.unwrap_eq(app) do
-               {l, r} -> {:ok, l, r, Enum.reverse(params), env}
+                {l, r} -> {:ok, l, r, Enum.reverse(params), env}
                _ -> {:error, :not_an_equation}
              end
         end
@@ -738,6 +791,8 @@ defmodule Christine.Tactics do
          end
       _ -> try_match(env, target, old_norm, params)
     end
+    
+    Christine.Debug.log("DEBUG REPLACE_EXPR: target=#{AST.to_string(target)} pattern=#{AST.to_string(old_norm)} params=#{inspect(params)} match=#{inspect(match_result)}")
 
     case match_result do
       {:ok, bindings} ->
@@ -1057,7 +1112,7 @@ defmodule Christine.Tactics do
              if is_succ?(f) do
                 [%{coeff: 1, vars: %{}}] ++ to_poly(env, b)
              else
-                to_poly_norm(env, expr)
+                [%{coeff: 1, vars: %{Typechecker.normalize(env, expr) => 1}}]
              end
         end
       _ ->
@@ -1388,11 +1443,12 @@ defmodule Christine.Tactics do
   end
   defp extract_app_args(_), do: []
 
-  defp extract_ind_name(app) do
-    case app do
+  defp extract_ind_name(t) do
+    Christine.Debug.log("DEBUG EXTRACT_IND_NAME: term=#{AST.to_string(t)} internals=#{inspect(t)}")
+    case t do
       %AST.App{func: f} -> extract_ind_name(f)
-      %AST.Inductive{name: name} -> {:ok, name}
-      %AST.Var{name: name} -> {:ok, name}
+      %AST.Var{name: n} -> {:ok, n}
+      %AST.Inductive{name: n} -> {:ok, n}
       _ -> :error
     end
   end
