@@ -25,7 +25,3 @@ Definition sym (A: Type) (x: A) (y: A) (p: Eq A x y) : Eq A y x :=
   | Refl => Refl A x x
   end.
 
-Definition trans (A: Type) (x: A) (y: A) (z: A) (p: Eq A x y) (q: Eq A y z) : Eq A x z :=
-  match p with
-  | Refl => q
-  end.

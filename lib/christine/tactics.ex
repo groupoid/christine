@@ -1286,17 +1286,20 @@ defmodule Christine.Tactics do
             end
         end
 
-      %AST.Fixpoint{name: n1} = pattern_fix ->
+      %AST.Fixpoint{name: n1, args: p_args} = pattern_fix ->
         case target do
-          %AST.Fixpoint{name: n2} ->
-            if AST.names_match?(n1, n2) do
-              {:ok, bindings}
+          %AST.Fixpoint{name: n2, args: t_args} ->
+            if AST.names_match?(n1, n2) and length(p_args) == length(t_args) do
+              # Recursively match args pairwise so params are bound from args
+              Enum.zip(t_args, p_args)
+              |> Enum.reduce_while({:ok, bindings}, fn {ta, pa}, {:ok, acc} ->
+                case try_match(env, ta, pa, params, acc) do
+                  {:ok, next} -> {:cont, {:ok, next}}
+                  _ -> {:halt, :error}
+                end
+              end)
             else
-              if Typechecker.equal?(env, target, pattern_fix) do
-                {:ok, bindings}
-              else
-                :error
-              end
+              if Typechecker.equal?(env, target, pattern_fix), do: {:ok, bindings}, else: :error
             end
 
           %AST.Var{name: n2} ->

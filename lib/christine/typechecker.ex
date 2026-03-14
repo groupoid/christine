@@ -392,6 +392,13 @@ defmodule Christine.Typechecker do
     do_reduce(e, t, fuel)
   end
 
+  defp do_reduce(e, %AST.App{func: %AST.Ind{} = ind_f, arg: _arg}, fuel) do
+    # App(Ind{...}, extra_arg): the extra arg is redundant because `replace_recursion`
+    # produced App(ih_k, m) for recursive calls like `plus k m`, and ih_k is Ind{term=k}
+    # with `m` already captured in the Ind's cases through fixpoint body substitution.
+    reduce(e, ind_f, fuel - 1)
+  end
+
   defp do_reduce(e, %AST.App{func: f, arg: arg}, fuel) do
     f_red = reduce(e, f, fuel - 1)
 
@@ -415,6 +422,13 @@ defmodule Christine.Typechecker do
 
       %AST.Constr{index: i, inductive: d, args: args} ->
         %AST.Constr{index: i, inductive: d, args: args ++ [reduce(e, arg, fuel - 1)]}
+
+      %AST.Ind{} = ind_f ->
+        # App(Ind{...}, extra_arg): the Ind was produced by `replace_recursion` building
+        # `App(ih_k, m)` for recursive calls like `plus k m` where ih_k = Ind{term=k}.
+        # The `m` is already captured inside the Ind's cases via fixpoint body substitution,
+        # so the extra arg is redundant. Just reduce the Ind directly.
+        reduce(e, ind_f, fuel - 1)
 
       _ ->
         %AST.App{func: f_red, arg: arg}
@@ -536,11 +550,22 @@ defmodule Christine.Typechecker do
   # Needed because name_to_mod maps "Succ" -> "Prelude" but the key in defs
   # may be "Prelude.nat.Succ" (including the inductive name), not "Prelude.Succ".
   defp find_ctor_def(e, name) do
-    suffix = "." <> name
-
-    Enum.find_value(e.defs, fn {k, v} ->
-      if k == name or String.ends_with?(k, suffix), do: v, else: nil
-    end)
+    # First try direct bare-name match (e.g. "Zero" -> Constr)
+    case Map.get(e.defs, name) do
+      nil ->
+        # Try module-qualified name via name_to_mod (e.g. "Coq" -> "Coq.Zero")
+        case Map.get(e.name_to_mod, name) do
+          nil -> nil
+          mod ->
+            prefix = if mod == "local", do: "", else: mod <> "."
+            # Try "Coq.IndName.CtorName" form: iterate inductive names
+            # The constructor is stored as "Coq.nat.Zero" in defs
+            Enum.find_value(e.defs, fn {k, v} ->
+              if String.starts_with?(k, prefix) and String.ends_with?(k, "." <> name), do: v, else: nil
+            end)
+        end
+      v -> v
+    end
   end
 
   # When a match (Ind) term reduces to App(Var(ctor), args...) instead of a
@@ -602,8 +627,9 @@ defmodule Christine.Typechecker do
     # Christine.Debug.log("DEBUG TRY_UNFOLD #{fix.name}: params=#{n_params} args=#{n_args}")
 
     if n_args >= n_params and n_params > 0 do
-      subst_map = Enum.zip(params, Enum.take(args, n_params))
-      unfolded_base = Enum.reduce(subst_map, actual_body, fn {p, a}, acc -> subst(p, a, acc) end)
+      subst_map = Enum.zip(params, Enum.take(args, n_params)) |> Map.new()
+      unfolded_base = subst_simultaneous(subst_map, actual_body)
+
       # Ensure args are wrapped if we have more than params
       unfolded =
         if n_args > n_params do

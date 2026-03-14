@@ -67,6 +67,8 @@ exact H2.
 intuition.
 Qed.
 
+Print example2.
+
 Lemma example3 : forall A B, A \/ B -> B \/ A.
 Proof.
 intros A B H.
@@ -75,12 +77,16 @@ right; assumption.
 left; assumption.
 Qed.
 
+Print example3.
+
 Lemma example4 : 3 <= 5.
 Proof.
 apply le_S.
 apply le_S.
 apply le_n.
 Qed.
+
+Print example4.
 
 Lemma example5 : forall x y, x <= 10 -> 10 <= y -> x <= y.
 Proof.
@@ -89,6 +95,8 @@ apply le_trans with (m := 10).
 exact x10.
 exact y10.
 Qed.
+
+Print example5.
 
 (*
 Lemma example6 : forall x y, (x + y) * (x + y) = x*x + 2*x*y + y*y.
@@ -118,6 +126,8 @@ Proof.
   ring.
 Qed.
 
+Print sum_n_p.
+
 Lemma evenb_p : forall (n : nat), evenb n = true -> exists x, n = 2 * x.
 Proof.
   assert (Main: forall (n : nat), (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
@@ -142,6 +152,8 @@ Proof.
   apply H; exact ev.
 Qed.
 
+Print evenb_p.
+
 Fixpoint count n l := match l with
 | nil => 0
 | a::tl => let r := count n tl in
@@ -164,7 +176,9 @@ rewrite IHl; reflexivity.
 rewrite IHl; reflexivity.
 Qed.
 
-Lemma example7_size : forall (t : bin), example7 t = false -> size t = 3.
+Print insert_incr.
+
+Lemma example7 : forall (t : bin), example7 t = false -> size t = 3.
 Proof.
 intros t; destruct t as [| t1 t2].
 simpl.
@@ -177,6 +191,8 @@ intros H; discriminate H.
 simpl.
 intros H; discriminate H.
 Qed.
+
+Print example7.
 
 Fixpoint flatten_aux (t1 t2:bin) : bin := match t1 with
 | L => N L t2
