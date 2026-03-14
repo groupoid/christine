@@ -6,3 +6,7 @@ import Coq.
 import Data.W.
 
 Definition test_W : W Bool B_nat := wplus wTwo wOne.
+
+Check test_W.
+Print test_W.
+Eval test_W.

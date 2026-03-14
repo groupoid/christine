@@ -161,13 +161,24 @@ defmodule Christine.Compiler do
           {:cont, {:ok, acc}}
 
         {:command, :print_kw, %AST.Var{name: name}} ->
-          case Enum.find(acc.ctx, fn {n, _} -> AST.names_match?(n, name) end) do
-            nil ->
-              IO.puts("#{name} is not defined")
+          # DeclValue definitions go into global_ctx; axioms/params go into ctx
+          {full_name, ty} =
+            case Enum.find(acc.global_ctx, fn {n, _} -> AST.names_match?(n, name) end) do
+              nil ->
+                case Enum.find(acc.ctx, fn {n, _} -> AST.names_match?(n, name) end) do
+                  nil -> {nil, nil}
+                  pair -> pair
+                end
 
-            {full_name, ty} ->
-              term = Map.get(acc.defs, full_name)
-              AST.print_declaration(full_name, ty, term)
+              pair ->
+                pair
+            end
+
+          if full_name do
+            term = Map.get(acc.defs, full_name)
+            AST.print_declaration(full_name, ty, term)
+          else
+            IO.puts("#{name} is not defined")
           end
 
           {:cont, {:ok, acc}}
