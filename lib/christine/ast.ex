@@ -111,8 +111,8 @@ defmodule Christine.AST do
         domain_str = if complex?(a), do: "(#{to_string(a)})", else: to_string(a)
         "(#{x} : #{domain_str}) -> #{to_string(b)}"
 
-      %Lam{name: x, body: b} ->
-        "\\#{x} -> #{to_string(b)}"
+      %Lam{name: x, domain: a, body: b} ->
+        "(λ #{x} : #{to_string(a)} -> #{to_string(b)})"
 
       %App{func: f, arg: a} ->
         # f a b ...
@@ -132,18 +132,17 @@ defmodule Christine.AST do
           "(fix #{name} #{args_str})"
         end
 
-      %Ind{term: t, cases: c} ->
-        cases_sample = Enum.map_join(Enum.take(c, 2), " | ", fn case_term -> 
-          str = __MODULE__.to_string(case_term)
-          if Elixir.String.length(str) > 20, do: Elixir.String.slice(str, 0, 20) <> "...", else: str
+      %Ind{term: t, motive: p, cases: c} ->
+        cases_str = Enum.map_join(c, " | ", fn case_term -> 
+          __MODULE__.to_string(case_term)
         end)
-        "match #{__MODULE__.to_string(t)} with #{cases_sample} ..."
+        "match #{__MODULE__.to_string(t)} in #{__MODULE__.to_string(p)} with #{cases_str}"
 
       %Constr{index: i, inductive: d, args: args} ->
         name =
-          case Enum.find(d.constrs, fn {idx, _, _} -> idx == i end) do
-            {_, n, _} -> n
-            _ -> "Constr#{i}"
+          case Enum.find(d.constrs || [], fn {idx, _, _} -> idx == i end) do
+            {_, n, _} -> "#{d.name}.#{n}"
+            _ -> "Constr#{i}(#{d.name})"
           end
 
         if args == [] do

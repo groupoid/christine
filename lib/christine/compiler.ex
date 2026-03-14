@@ -111,11 +111,11 @@ defmodule Christine.Compiler do
           {:cont, {:ok, acc}}
 
         {:command, :print_kw, %AST.Var{name: name}} ->
-          case List.keyfind(acc.ctx, name, 0) do
+          case Enum.find(acc.ctx, fn {n, _} -> AST.names_match?(n, name) end) do
             nil -> IO.puts("#{name} is not defined")
-            {_, ty} ->
-              term = Map.get(acc.defs, name)
-              AST.print_declaration(name, ty, term)
+            {full_name, ty} ->
+              term = Map.get(acc.defs, full_name)
+              AST.print_declaration(full_name, ty, term)
           end
           {:cont, {:ok, acc}}
 
