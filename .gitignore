@@ -1,0 +1,7 @@
+_build/*
+.DS_Store
+doc/*
+deps/*
+ebin/*
+mix.lock
+.elixir_ls/*

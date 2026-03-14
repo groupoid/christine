@@ -1,0 +1,16 @@
+
+Module Beq.
+
+Import Coq.
+
+Theorem beq_nat_refl : forall (n : nat), eq bool (beq_nat n n) true.
+Proof.
+  induction n.
+  reflexivity.
+  simpl. rewrite IHn.
+  reflexivity.
+Qed.
+
+Print beq_nat_refl.
+
+End Beq.
