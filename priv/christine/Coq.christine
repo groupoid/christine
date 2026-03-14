@@ -58,6 +58,24 @@ Fixpoint plus (n : nat) (m : nat) : nat :=
   | Succ k => Succ (plus k m)
   end.
 
+Definition id (A: Type) (x: A) : A := x.
+
+Definition depth (A: Type) (t: Tree A) : nat :=
+  match t with
+  | Leaf => Zero
+  | Node l v r => Succ (max (depth A l) (depth A r))
+  end.
+
+Definition max (m: nat) (n: nat) : nat :=
+  match m with
+  | Zero => n
+  | Succ k =>
+    match n with
+    | Zero => m
+    | Succ j => Succ (max k j)
+    end
+  end.
+
 Fixpoint mult (n : nat) (m : nat) : nat :=
   match n with
   | Zero => Zero
@@ -121,5 +139,7 @@ Definition negb (b : bool) : bool :=
   | true => false
   | false => true
   end.
+
+Axiom le_trans : forall (n m p : nat), le n m -> le m p -> le n p.
 
 End Coq.

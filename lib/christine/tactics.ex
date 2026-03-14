@@ -150,11 +150,9 @@ defmodule Christine.Tactics do
                   Enum.reduce(args_info, [], fn {aname, aty}, gs ->
                     case Map.get(final_bindings, aname) do
                       nil ->
-                        subst_aty =
-                          Enum.reduce(final_bindings, aty, fn {bk, bv}, acc ->
-                            Christine.Typechecker.subst(bk, bv, acc)
-                          end)
-
+                        # Use simultaneous substitution so that symmetric
+                        # bindings like {A -> B, B -> A} are applied correctly.
+                        subst_aty = Christine.Typechecker.subst_simultaneous(final_bindings, aty)
                         gs ++ [subst_aty]
 
                       _val ->
@@ -1393,7 +1391,6 @@ defmodule Christine.Tactics do
     do: %AST.App{func: %AST.Var{name: succ}, arg: do_unfold_number(n - 1, succ, zero)}
 
   defp find_variable(%ProofState{goals: [{ctx, _} | _], env: env}, name) do
-    # Christine.Debug.log("DEBUG FIND_VARIABLE: #{name}")
     case Enum.find(ctx, fn {n, _} -> n == name end) ||
            Enum.find(env.ctx, fn {n, _} -> n == name end) do
       {^name, ty} ->
@@ -1410,14 +1407,23 @@ defmodule Christine.Tactics do
             {:ok, val || %AST.Var{name: full_name}, t}
 
           _ ->
-            case Enum.find(env.env, fn {n, _} -> String.ends_with?(n, "." <> name) end) do
-              {full_name, ty} when is_map(ty) ->
-                {:ok, %AST.Var{name: full_name}, ty}
+            # Also search env.ctx by suffix (covers Axioms and global declarations
+            # registered as "Mod.name" in ctx rather than env.env).
+            case Enum.find(env.ctx, fn {n, _} -> String.ends_with?(n, "." <> name) end) do
+              {full_name, ty} ->
+                val = Map.get(env.defs, full_name)
+                {:ok, val || %AST.Var{name: full_name}, ty}
 
               _ ->
-                case Map.get(env.env, name) do
-                  ty when is_map(ty) -> {:ok, %AST.Var{name: name}, ty}
-                  _ -> :error
+                case Enum.find(env.env, fn {n, _} -> String.ends_with?(n, "." <> name) end) do
+                  {full_name, ty} when is_map(ty) ->
+                    {:ok, %AST.Var{name: full_name}, ty}
+
+                  _ ->
+                    case Map.get(env.env, name) do
+                      ty when is_map(ty) -> {:ok, %AST.Var{name: name}, ty}
+                      _ -> :error
+                    end
                 end
             end
         end
@@ -1685,13 +1691,25 @@ defmodule Christine.Tactics do
           get_inductive_head(env, f)
 
         %AST.Var{name: name} ->
-          # Search for namespaced match
-          case Map.get(env.env, name) ||
-                 Enum.find_value(env.env, fn {n, ind} ->
-                   if String.ends_with?(n, "." <> name), do: ind
-                 end) do
+          # Use name_to_mod to find the correct inductive, respecting explicit imports.
+          # This ensures "nat" resolves to Coq.nat when "Import Coq" is used, not Prelude.nat.
+          qualified =
+            case Map.get(env.name_to_mod, name) do
+              nil -> name
+              "local" -> name
+              mod -> mod <> "." <> name
+            end
+          case Map.get(env.env, qualified) do
             %AST.Inductive{} = ind -> ind
-            _ -> nil
+            _ ->
+              # Fallback: suffix search in env.env
+              case Map.get(env.env, name) do
+                %AST.Inductive{} = ind -> ind
+                _ ->
+                  Enum.find_value(env.env, fn {n, ind} ->
+                    if String.ends_with?(n, "." <> name), do: ind
+                  end)
+              end
           end
 
         _ ->

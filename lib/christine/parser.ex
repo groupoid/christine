@@ -183,6 +183,10 @@ defmodule Christine.Parser do
       when kw in [:definition, :theorem, :lemma, :fact, :remark, :fixpoint, :hypothesis, :variable] ->
         parse_def_theorem(rest, kw == :fixpoint)
 
+      [{:axiom, _, _} | rest] ->
+        # Axiom name : type. — parsed as a DeclValue with nil body (opaque declaration)
+        parse_def_theorem(rest, false)
+
       [{:ident, _, _, name} | rest] when name in ["Variables", "End"] ->
         # Skip until dot
         rest2 = Enum.drop_while(rest, fn t -> elem(t, 0) != :dot end)

@@ -37,12 +37,16 @@ induction n.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
+Print plus_0_r.
+
 Theorem plus_S_r : forall (n m : nat), eq nat (plus n (Succ m)) (Succ (plus n m)).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
+
+Print plus_S_r.
 
 Theorem plus_assoc : forall (n m p : nat), eq nat (plus n (plus m p)) (plus (plus n m) p).
 Proof.
@@ -51,6 +55,8 @@ induction n.
  simpl. rewrite IHn. reflexivity.
 Qed.
 
+Print plus_assoc.
+
 Theorem plus_comm : forall (n m : nat), eq nat (plus n m) (plus m n).
 Proof.
 induction n.
@@ -58,12 +64,16 @@ induction n.
  simpl. rewrite IHn. rewrite plus_S_r. reflexivity.
 Qed.
 
+Print plus_comm.
+
 Theorem mult_0_r : forall (n : nat), eq nat (mult n Zero) Zero.
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
+
+Print mult_0_r.
 
 Theorem mult_S_r : forall (n m : nat), eq nat (mult n (Succ m)) (plus n (mult n m)).
 Proof.
@@ -75,6 +85,8 @@ induction n.
  rewrite H. reflexivity.
 Qed.
 
+Print mult_S_r.
+
 Theorem mult_plus_distr_l : forall (n m p : nat), eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)).
 Proof.
 induction n.
@@ -82,12 +94,16 @@ induction n.
  simpl. rewrite IHn. rewrite plus_assoc. reflexivity.
 Qed.
 
+Print mult_plus_distr_l.
+
 Theorem mult_plus_distr_r : forall (n m p : nat), eq nat (mult (plus n m) p) (plus (mult n p) (mult m p)).
 Proof.
 induction n.
  reflexivity.
  simpl. rewrite IHn. reflexivity.
 Qed.
+
+Print mult_plus_distr_r.
 
 Theorem mult_assoc : forall (n : nat) (m p : nat), eq nat (mult n (mult m p)) (mult (mult n m) p).
 Proof.
@@ -97,6 +113,8 @@ induction n.
  simpl. rewrite IHn. rewrite mult_plus_distr_r. reflexivity.
 Qed.
 
+Print mult_assoc.
+
 Theorem mult_comm : forall (n m : nat), eq nat (mult n m) (mult m n).
 Proof.
 induction n.
@@ -104,8 +122,12 @@ induction n.
  simpl. rewrite IHn. rewrite mult_S_r. reflexivity.
 Qed.
 
+Print mult_comm.
+
 Theorem le_trans : forall n m p, le n m -> le m p -> le n p.
 Proof.
 Qed.
+
+Print le_trans.
 
 End Theorems.

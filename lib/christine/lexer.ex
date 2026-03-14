@@ -94,6 +94,10 @@ defmodule Christine.Lexer do
         "definition" -> {:definition, line, col}
         "Theorem" -> {:theorem, line, col}
         "theorem" -> {:theorem, line, col}
+        "Axiom" -> {:axiom, line, col}
+        "axiom" -> {:axiom, line, col}
+        "Parameter" -> {:axiom, line, col}
+        "Conjecture" -> {:axiom, line, col}
         "Lemma" -> {:lemma, line, col}
         "Remark" -> {:remark, line, col}
         "Fact" -> {:fact, line, col}
