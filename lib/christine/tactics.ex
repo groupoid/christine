@@ -25,7 +25,7 @@ defmodule Christine.Tactics do
   def apply_tactic(ps, tac_str) when is_binary(tac_str) do
     case ps.goals do
       [{_ctx, goal} | _] ->
-        Christine.Debug.log("DEBUG TACTIC: #{tac_str} on goal: #{AST.to_string(goal)}")
+        Christine.Debug.info("#{IO.ANSI.faint()}Δ TACTIC:#{IO.ANSI.reset()} #{tac_str} #{IO.ANSI.faint()}on goal:#{IO.ANSI.reset()} #{AST.to_string(goal)}", indent: 4)
 
       _ ->
         :ok
@@ -306,8 +306,8 @@ defmodule Christine.Tactics do
 
         case List.keyfind(ctx, x, 0) do
           nil ->
-            Christine.Debug.log(
-              "DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}"
+            Christine.Debug.info(
+              "#{IO.ANSI.faint()}Δ INDUCTION:#{IO.ANSI.reset()} variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
             )
 
             case Typechecker.reduce(env, current) do
@@ -318,8 +318,8 @@ defmodule Christine.Tactics do
                 end
 
               _ ->
-                Christine.Debug.log(
-                  "DEBUG INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}"
+                Christine.Debug.info(
+                  "#{IO.ANSI.faint()}Δ INDUCTION:#{IO.ANSI.reset()} variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
                 )
 
                 {:error, {:variable_not_found, x}, ps}
@@ -521,8 +521,8 @@ defmodule Christine.Tactics do
                 n_current = Typechecker.normalize(env, current)
 
                 if env.verbose and h_name in ["IHn", "plus_assoc"] do
-                  IO.puts("REWRITE_DBG #{h_name} goal: #{AST.to_string(n_current)}")
-                  IO.puts("REWRITE_DBG #{h_name} pattern: #{AST.to_string(l_bound)}")
+                  Christine.Debug.info("#{IO.ANSI.faint()}Δ REWRITE goal:#{IO.ANSI.reset()} #{AST.to_string(n_current)}", indent: 4)
+                  Christine.Debug.info("#{IO.ANSI.faint()}Δ REWRITE pattern:#{IO.ANSI.reset()} #{AST.to_string(l_bound)}", indent: 4)
                 end
 
                 new_goal = replace_expression(n_current, l_bound, r_bound, env, pi_names)
@@ -608,7 +608,7 @@ defmodule Christine.Tactics do
                   # Christine.Debug.log("DEBUG INVERSION: Impossible equation found! Solving goal.")
                   solve_goal(ps, %AST.Var{name: "inversion_refl"})
                 else
-                  # Christine.Debug.log("DEBUG INVERSION: Not impossible. Falling back to destruct.")
+                  # Christine.Debug.log("#{IO.ANSI.faint()}Δ INVERSION:#{IO.ANSI.reset()} Not impossible. Falling back to destruct.", indent: 0)
                   apply_tactic(ps, {:destruct, h_name})
                 end
 
@@ -1007,7 +1007,7 @@ defmodule Christine.Tactics do
     old_norm = if is_map(old), do: Typechecker.normalize(env, old), else: old
 
     if env.verbose and String.contains?(AST.to_string(old), "beq_nat") do
-      IO.puts("      DEBUG REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}")
+      IO.puts("DEBUG REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}")
     end
 
     # If pattern is a Var NOT in params, we ONLY want to match it if target is an identical Var (or equal?)
@@ -1114,9 +1114,7 @@ defmodule Christine.Tactics do
   def try_match(env, target, pattern, params, bindings \\ %{}) do
     if env.verbose and String.contains?(AST.to_string(pattern), "beq_nat") and
          String.contains?(AST.to_string(target), "match") do
-      IO.puts(
-        "      DEBUG TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}"
-      )
+      IO.puts("DEBUG TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}")
     end
 
     case pattern do
@@ -1582,7 +1580,7 @@ defmodule Christine.Tactics do
           IO.puts("Proof failed for #{name}. Remaining goals:")
 
           for {c, g} <- ps.goals do
-            IO.puts("  #{AST.to_string(g)} in context #{inspect(Enum.map(c, &elem(&1, 0)))}")
+            IO.puts("#{AST.to_string(g)} in context #{inspect(Enum.map(c, &elem(&1, 0)))}")
           end
 
           {:error, {:unsolved_goals, ps.goals}}

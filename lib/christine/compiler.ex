@@ -74,7 +74,7 @@ defmodule Christine.Compiler do
       case decl do
         %AST.DeclValue{name: n, expr: e, type: t, tactics: tacs} ->
           n_full = if prefix, do: prefix <> "." <> n, else: n
-          Christine.Debug.log("DEBUG: Defining #{n_full}")
+          Christine.Debug.info("⚙ Defining #{n_full}", indent: 0)
 
           if tacs do
             case Christine.Tactics.solve_with_tactics(n_full, t, tacs, acc) do
@@ -110,7 +110,7 @@ defmodule Christine.Compiler do
 
         %AST.Inductive{} = ind ->
           n_full = if prefix, do: prefix <> "." <> ind.name, else: ind.name
-          Christine.Debug.log("DEBUG: Defining Inductive #{n_full}")
+          Christine.Debug.info("⚙ Defining Inductive #{n_full}", indent: 0)
           # Constructors also need to be prefixed
           ind_named = %{ind | name: n_full}
           new_env_map = Map.put(acc.env, n_full, ind_named)
@@ -137,7 +137,7 @@ defmodule Christine.Compiler do
               e -> {:error, {:typechecker_crash, Exception.message(e)}}
             end
 
-          IO.puts("Check: #{AST.to_string(expr)}")
+          Christine.Debug.print("#{IO.ANSI.bright()}⊢ Check:#{IO.ANSI.reset()} #{AST.to_string(expr)}", indent: 0)
           AST.print_result(ty, nil)
           {:cont, {:ok, acc}}
 
@@ -156,7 +156,7 @@ defmodule Christine.Compiler do
               e -> {:error, {:eval_crash, Exception.message(e)}}
             end
 
-          IO.puts("Eval: #{AST.to_string(expr)}")
+          Christine.Debug.print("#{IO.ANSI.bright()}⊢ Eval:#{IO.ANSI.reset()} #{AST.to_string(expr)}", indent: 0)
           AST.print_result(ty, res)
           {:cont, {:ok, acc}}
 
@@ -178,7 +178,7 @@ defmodule Christine.Compiler do
             term = Map.get(acc.defs, full_name)
             AST.print_declaration(full_name, ty, term)
           else
-            IO.puts("#{name} is not defined")
+            Christine.Debug.print("Error: #{name} is not defined", indent: 4)
           end
 
           {:cont, {:ok, acc}}

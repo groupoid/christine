@@ -29,7 +29,7 @@ defmodule Christine.Typechecker do
       %AST.DeclValue{name: name, expr: expr}, _acc ->
         case infer(env, expr) do
           {:error, reason} = err ->
-            IO.puts("Type error in #{name}: #{inspect(reason)}")
+            Christine.Debug.error("Type error in #{name}: #{inspect(reason)}")
             {:halt, err}
 
           _ty ->
@@ -160,12 +160,10 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
-    if e.verbose do
-      IO.puts("      DEBUG EQUAL?: L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}")
-    end
+    Christine.Debug.info("#{IO.ANSI.faint()}Δ EQUAL? L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}", indent: 4)
 
     if e.verbose do
-      # IO.puts("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
+      # Christine.Debug.log("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
     end
 
     deadline = e.deadline || System.monotonic_time(:millisecond) + 10_000

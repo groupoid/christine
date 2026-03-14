@@ -124,7 +124,9 @@ defmodule Christine.AST do
         "#{f_str} #{a_str}"
 
       %Inductive{name: n, params: p} ->
-        params_str = Enum.map_join(p, " ", fn {name, type} -> "(#{name} : #{to_string(type)})" end)
+        params_str =
+          Enum.map_join(p, " ", fn {name, type} -> "(#{name} : #{to_string(type)})" end)
+
         "(inductive #{n} #{params_str})"
 
       %Fixpoint{name: name, args: args, body: body} ->
@@ -136,9 +138,11 @@ defmodule Christine.AST do
         end
 
       %Ind{term: t, motive: p, cases: c} ->
-        cases_str = Enum.map_join(c, " | ", fn case_term -> 
-          __MODULE__.to_string(case_term)
-        end)
+        cases_str =
+          Enum.map_join(c, " | ", fn case_term ->
+            __MODULE__.to_string(case_term)
+          end)
+
         "match #{__MODULE__.to_string(t)} in #{__MODULE__.to_string(p)} with #{cases_str}"
 
       %Constr{index: i, inductive: d, args: args} ->
@@ -180,6 +184,7 @@ defmodule Christine.AST do
             {n, ty} -> "(#{n} : #{to_string(ty)})"
             %Var{name: n} -> n
           end)
+
         "\\#{params_str} -> #{to_string(body)}"
 
       %Case{expr: e, branches: branches} ->
@@ -187,17 +192,20 @@ defmodule Christine.AST do
           Enum.map_join(branches, " | ", fn {pat, body} ->
             "#{to_string(pat)} => #{to_string(body)}"
           end)
+
         "match #{to_string(e)} with #{branches_str}"
 
       %BinderConstructor{name: name, args: []} ->
         name
 
       %BinderConstructor{name: name, args: args} ->
-        args_str = Enum.map_join(args, " ", fn
-          {n, _} -> n
-          %Var{name: n} -> n
-          x -> to_string(x)
-        end)
+        args_str =
+          Enum.map_join(args, " ", fn
+            {n, _} -> n
+            %Var{name: n} -> n
+            x -> to_string(x)
+          end)
+
         "#{name} #{args_str}"
 
       # Error tuples — render cleanly instead of raw Elixir inspect
@@ -223,18 +231,30 @@ defmodule Christine.AST do
 
   def print_result(type, result \\ nil) do
     if type do
-      type_str = try do to_string(type) rescue _ -> Kernel.inspect(type) end
-      IO.puts("TYPE: #{type_str}")
+      type_str =
+        try do
+          to_string(type)
+        rescue
+          _ -> Kernel.inspect(type)
+        end
+
+      Christine.Debug.print("#{IO.ANSI.cyan()}TYPE:#{IO.ANSI.reset()} #{type_str}", indent: 0)
     end
 
     if result do
-      result_str = try do to_string(result) rescue _ -> Kernel.inspect(result) end
-      IO.puts("EVAL: #{result_str}")
+      result_str =
+        try do
+          to_string(result)
+        rescue
+          _ -> Kernel.inspect(result)
+        end
+
+      Christine.Debug.print("#{IO.ANSI.cyan()}EVAL:#{IO.ANSI.reset()} #{result_str}", indent: 0)
     end
   end
 
   def print_declaration(name, type, term \\ nil) do
-    IO.puts(name)
+    Christine.Debug.print("#{IO.ANSI.bright()}⊢ Print:#{IO.ANSI.reset()} #{name}", indent: 0)
     print_result(type, term)
   end
 
@@ -264,6 +284,7 @@ defmodule Christine.AST do
 
   def names_match?(nil, _), do: false
   def names_match?(_, nil), do: false
+
   def names_match?(name1, name2) do
     n1 = Elixir.String.downcase(name1)
     n2 = Elixir.String.downcase(name2)
