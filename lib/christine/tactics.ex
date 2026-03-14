@@ -25,7 +25,7 @@ defmodule Christine.Tactics do
   def apply_tactic(ps, tac_str) when is_binary(tac_str) do
     case ps.goals do
       [{_ctx, goal} | _] ->
-        Christine.Debug.info("#{IO.ANSI.faint()}Δ TACTIC:#{IO.ANSI.reset()} #{tac_str} #{IO.ANSI.faint()}on goal:#{IO.ANSI.reset()} #{AST.to_string(goal)}", indent: 4)
+        Christine.Debug.delta("TACTIC: #{tac_str} on goal: #{AST.to_string(goal)}", indent: 4)
 
       _ ->
         :ok
@@ -306,8 +306,8 @@ defmodule Christine.Tactics do
 
         case List.keyfind(ctx, x, 0) do
           nil ->
-            Christine.Debug.info(
-              "#{IO.ANSI.faint()}Δ INDUCTION:#{IO.ANSI.reset()} variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
+            Christine.Debug.delta(
+              "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
             )
 
             case Typechecker.reduce(env, current) do
@@ -318,8 +318,8 @@ defmodule Christine.Tactics do
                 end
 
               _ ->
-                Christine.Debug.info(
-                  "#{IO.ANSI.faint()}Δ INDUCTION:#{IO.ANSI.reset()} variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
+                Christine.Debug.delta(
+                  "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
                 )
 
                 {:error, {:variable_not_found, x}, ps}
@@ -521,8 +521,8 @@ defmodule Christine.Tactics do
                 n_current = Typechecker.normalize(env, current)
 
                 if env.verbose and h_name in ["IHn", "plus_assoc"] do
-                  Christine.Debug.info("#{IO.ANSI.faint()}Δ REWRITE goal:#{IO.ANSI.reset()} #{AST.to_string(n_current)}", indent: 4)
-                  Christine.Debug.info("#{IO.ANSI.faint()}Δ REWRITE pattern:#{IO.ANSI.reset()} #{AST.to_string(l_bound)}", indent: 4)
+                  Christine.Debug.delta("REWRITE goal: #{AST.to_string(n_current)}", indent: 4)
+                  Christine.Debug.delta("REWRITE pattern: #{AST.to_string(l_bound)}", indent: 4)
                 end
 
                 new_goal = replace_expression(n_current, l_bound, r_bound, env, pi_names)
@@ -1007,7 +1007,7 @@ defmodule Christine.Tactics do
     old_norm = if is_map(old), do: Typechecker.normalize(env, old), else: old
 
     if env.verbose and String.contains?(AST.to_string(old), "beq_nat") do
-      IO.puts("DEBUG REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}")
+      Christine.Debug.delta("REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}", indent: 4)
     end
 
     # If pattern is a Var NOT in params, we ONLY want to match it if target is an identical Var (or equal?)
@@ -1114,7 +1114,7 @@ defmodule Christine.Tactics do
   def try_match(env, target, pattern, params, bindings \\ %{}) do
     if env.verbose and String.contains?(AST.to_string(pattern), "beq_nat") and
          String.contains?(AST.to_string(target), "match") do
-      IO.puts("DEBUG TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}")
+      Christine.Debug.delta("TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}", indent: 4)
     end
 
     case pattern do
@@ -1218,9 +1218,7 @@ defmodule Christine.Tactics do
 
                     :error ->
                       if Enum.member?(params, "n") do
-                        Christine.Debug.log(
-                          "DEBUG IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}"
-                        )
+                        Christine.Debug.delta("IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}", indent: 4)
                       end
 
                       {:halt, :error}
@@ -1604,8 +1602,8 @@ defmodule Christine.Tactics do
         apply_tactic(ps, tac)
 
       [first | rest] ->
-        Christine.Debug.log(
-          "DEBUG SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}"
+        Christine.Debug.delta(
+          "SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}", indent: 4
         )
 
         case apply_tactic(ps, first) do

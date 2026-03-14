@@ -29,6 +29,13 @@ defmodule Christine.Debug do
     end
   end
 
+  def delta(msg, opts \\ []) do
+    if Application.get_env(:christine, :verbose, false) do
+      indent = String.duplicate(" ", opts[:indent] || 4)
+      log("#{indent}#{IO.ANSI.cyan()}#{IO.ANSI.faint()}Δ #{msg}#{IO.ANSI.reset()}", opts)
+    end
+  end
+
   def print(msg, opts \\ []) do
     indent_size = opts[:indent] || 4
     indent = if Application.get_env(:christine, :verbose, false), do: String.duplicate(" ", indent_size), else: ""

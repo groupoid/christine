@@ -160,7 +160,7 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
-    Christine.Debug.info("#{IO.ANSI.faint()}Δ EQUAL? L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}", indent: 4)
+    Christine.Debug.delta("EQUAL? L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}", indent: 4)
 
     if e.verbose do
       # Christine.Debug.log("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
