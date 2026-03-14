@@ -114,6 +114,7 @@ reflexivity.
 Qed.
 *)
 
+(*
 Lemma sum_n_p : forall (n : nat), 2 * sum_n n + n = n * n.
 Proof.
   induction n.
@@ -127,7 +128,9 @@ Proof.
 Qed.
 
 Print sum_n_p.
+*)
 
+(*
 Lemma evenb_p : forall (n : nat), evenb n = true -> exists x, n = 2 * x.
 Proof.
   assert (Main: forall (n : nat), (evenb n = true -> exists x, n = 2 * x) /\ (evenb (S n) = true -> exists x, S n = 2 * x)).
@@ -154,12 +157,15 @@ Qed.
 
 Print evenb_p.
 
+*)
+
 Fixpoint count n l := match l with
 | nil => 0
 | a::tl => let r := count n tl in
 if beq_nat n a then 1+r else r
 end.
 
+(*
 Lemma insert_incr : forall (n : nat) (l : list nat), count n (insert n l) = 1 + count n l.
 Proof.
 intros n l; induction l as [| a l].
@@ -178,6 +184,7 @@ Qed.
 
 Print insert_incr.
 
+
 Lemma example7 : forall (t : bin), example7 t = false -> size t = 3.
 Proof.
 intros t; destruct t as [| t1 t2].
@@ -193,6 +200,7 @@ intros H; discriminate H.
 Qed.
 
 Print example7.
+*)
 
 Fixpoint flatten_aux (t1 t2:bin) : bin := match t1 with
 | L => N L t2
@@ -209,6 +217,7 @@ Fixpoint size (t:bin) : nat := match t with
 | N t1 t2 => 1 + size t1 + size t2
 end.
 
+(*)
 Lemma flatten_aux_size : forall (t1 t2:bin), size (flatten_aux t1 t2) = size t1 + size t2 + 1.
 Proof.
 induction t1 as [| t1_1 t1_2].
@@ -236,3 +245,4 @@ Qed.
 
 Print not_subterm_self_l.
 
+*)

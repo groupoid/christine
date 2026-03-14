@@ -59,7 +59,7 @@ defmodule Christine.Typechecker do
             _ ->
               case find_global_ty(e, name) do
                 nil ->
-                  case Map.get(e.env, name) do
+                  case find_inductive(e, name) do
                     %AST.Inductive{} = ind -> infer(e, ind)
                     _ -> {:error, {:unbound_variable, name}}
                   end
@@ -399,6 +399,11 @@ defmodule Christine.Typechecker do
     reduce(e, ind_f, fuel - 1)
   end
 
+  defp do_reduce(e, %AST.Let{decls: decls, body: body}, fuel) do
+    new_defs = Enum.reduce(decls, e.defs, fn {n, expr}, acc -> Map.put(acc, n, expr) end)
+    reduce(%{e | defs: new_defs}, body, fuel - 1)
+  end
+
   defp do_reduce(e, %AST.App{func: f, arg: arg}, fuel) do
     f_red = reduce(e, f, fuel - 1)
 
@@ -533,6 +538,9 @@ defmodule Christine.Typechecker do
     end
   end
 
+
+  defp do_reduce(_e, t, _fuel), do: t
+
   # Returns true if the def value is a bare constructor or a Lam that only
   # wraps a constructor (i.e., a constructor term from make_constr_term).
   # This lets Zero, Succ, true, false, nil, cons etc. reduce while keeping
@@ -541,12 +549,6 @@ defmodule Christine.Typechecker do
   defp constructor_def?(%AST.Lam{body: body}), do: constructor_def?(body)
   defp constructor_def?(_), do: false
 
-  defp do_reduce(e, %AST.Let{decls: decls, body: body}, fuel) do
-    new_defs = Enum.reduce(decls, e.defs, fn {n, expr}, acc -> Map.put(acc, n, expr) end)
-    reduce(%{e | defs: new_defs}, body, fuel - 1)
-  end
-
-  defp do_reduce(_e, t, _fuel), do: t
 
   defp find_def(e, name) do
     # Prefer name_to_mod resolution (explicitly imported namespaces) over bare key,
@@ -1013,6 +1015,19 @@ defmodule Christine.Typechecker do
       {:ok, unfolded_base}
     else
       :blocked
+    end
+  end
+
+  defp find_inductive(e, name) do
+    case Map.get(e.env, name) do
+      nil ->
+        case Map.get(e.name_to_mod, name) do
+          nil -> nil
+          mod ->
+            prefix = if mod == "local", do: "", else: mod <> "."
+            Map.get(e.env, prefix <> name)
+        end
+      ind -> ind
     end
   end
 end

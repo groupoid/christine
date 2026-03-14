@@ -520,7 +520,7 @@ defmodule Christine.Tactics do
                 pi_names = Enum.map(pi_args, fn {n, _} -> n end)
                 n_current = Typechecker.normalize(env, current)
 
-                if h_name in ["IHn", "plus_assoc"] do
+                if env.verbose and h_name in ["IHn", "plus_assoc"] do
                   IO.puts("REWRITE_DBG #{h_name} goal: #{AST.to_string(n_current)}")
                   IO.puts("REWRITE_DBG #{h_name} pattern: #{AST.to_string(l_bound)}")
                 end

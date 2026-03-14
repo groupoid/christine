@@ -79,13 +79,28 @@ defmodule Christine.Desugar do
 
       desugared_type = if type, do: desugar_expression(type, env), else: nil
 
-      final_body = if is_fixpoint do
-         %AST.Fixpoint{name: name, domain: desugared_type, body: body}
-      else
-         body
-      end
+      # Correctly build the full Pi type for the Fixpoint domain
+      full_type =
+        Enum.reduce(
+          Enum.reverse(binders),
+          desugared_type || %AST.Var{name: "Any"},
+          fn
+            {vn, vt}, acc ->
+              %AST.Pi{name: vn, domain: desugar_expression(vt, env), codomain: acc}
 
-      %AST.DeclValue{name: name, binders: [], expr: final_body, type: desugared_type}
+            %AST.Var{name: vn}, acc ->
+              %AST.Pi{name: vn, domain: %AST.Var{name: "Any"}, codomain: acc}
+          end
+        )
+
+      final_body =
+        if is_fixpoint do
+          %AST.Fixpoint{name: name, domain: full_type, body: body}
+        else
+          body
+        end
+
+      %AST.DeclValue{name: name, binders: [], expr: final_body, type: full_type}
     else
       # Axiom case: expr is nil. We should fold binders into the type (Pi types).
       final_type =
@@ -349,6 +364,9 @@ defmodule Christine.Desugar do
           decls: decls_desugared,
           body: desugar_expression(let_body, env, func_name)
         }
+
+      %AST.Var{} ->
+        expr
 
       _ ->
         expr

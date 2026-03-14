@@ -71,20 +71,48 @@ defmodule Mix.Tasks.Christine.Repl do
           Regex.match?(~r/^Print\s+\S+\.?$/, input) ->
             name = input |> String.replace_prefix("Print", "") |> String.trim() |> String.trim_trailing(".")
 
-            # Check active proof session first
-            if proof_state && proof_state.name == name do
-              ty_val = if proof_state.goals == [], do: proof_state.target, else: proof_state.target
-              Christine.AST.print_declaration(name, ty_val, proof_state.proof_term)
-            else
-              # Check env
-              case List.keyfind(env.ctx, name, 0) do
-                {_, ty} ->
-                  term = Map.get(env.defs, name)
-                  Christine.AST.print_declaration(name, ty, term)
+            # Find in proof state or environment
+            found =
+              cond do
+                proof_state && proof_state.name == name ->
+                  {:ok, name, proof_state.target, proof_state.proof_term}
 
-                _ ->
-                  IO.puts("#{name} is not defined")
+                true ->
+                  # Check local ctx first
+                  case List.keyfind(env.ctx, name, 0) do
+                    {_, ty} ->
+                      {:ok, name, ty, Map.get(env.defs, name)}
+
+                    _ ->
+                      # Use name_to_mod for global resolution
+                      mod = Map.get(env.name_to_mod, name)
+                      prefix = if mod == "local", do: "", else: mod <> "."
+                      # If it already contains a dot, don't re-prefix it unless it fails
+                      full_name = if String.contains?(name, "."), do: name, else: prefix <> name
+
+                      case Map.get(env.global_ctx, full_name) || Map.get(env.global_ctx, name) do
+                        nil ->
+                          # Try inductive
+                          case Map.get(env.env, full_name) || Map.get(env.env, name) do
+                            %AST.Inductive{} = ind -> {:ind, ind}
+                            _ -> :not_found
+                          end
+
+                        ty ->
+                          {:ok, full_name, ty, Map.get(env.defs, full_name) || Map.get(env.defs, name)}
+                      end
+                  end
               end
+
+            case found do
+              {:ok, n, t, v} ->
+                Christine.AST.print_declaration(n, t, v)
+
+              {:ind, ind} ->
+                IO.puts(AST.to_string(ind))
+
+              :not_found ->
+                IO.puts("#{name} is not defined")
             end
 
             loop(env, proof_state)

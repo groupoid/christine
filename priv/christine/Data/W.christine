@@ -20,7 +20,7 @@ Definition succ_w (n: W Bool B_nat) : W Bool B_nat :=
 Definition wTwo : W Bool B_nat := succ_w (succ_w zero_w).
 Definition wOne : W Bool B_nat := succ_w zero_w.
 
-Definition wplus (m: W Bool B_nat) (n: W Bool B_nat) : W Bool B_nat :=
+Fixpoint wplus (m: W Bool B_nat) (n: W Bool B_nat) : W Bool B_nat :=
   match m with
   | Sup b f =>
     match b with
