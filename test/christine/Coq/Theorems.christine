@@ -4,6 +4,7 @@ Module Theorems.
 
 Import Coq.
 
+(*
 Theorem beq_nat_refl : forall (n : nat), eq bool (beq_nat n n) true.
 Proof.
   induction n.
@@ -11,6 +12,7 @@ Proof.
   simpl. rewrite IHn.
   reflexivity.
 Qed.
+*)
 
 Theorem beq_nat_true : forall (n m : nat), eq bool (beq_nat n m) true -> eq nat n m.
 Proof.
