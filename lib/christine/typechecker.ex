@@ -160,7 +160,7 @@ defmodule Christine.Typechecker do
   end
 
   def equal?(e, t1, t2) do
-    Christine.Debug.delta("EQUAL? L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}", indent: 4)
+    Christine.Debug.delta("EQUAL? L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}")
 
     if e.verbose do
       # Christine.Debug.log("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
@@ -322,7 +322,9 @@ defmodule Christine.Typechecker do
         n_arg = normalize(e, arg)
 
         case n_f do
-          %AST.Lam{name: x, body: body} -> normalize(e, subst(x, n_arg, body))
+          %AST.Lam{name: x, body: body} ->
+            normalize(e, subst(x, n_arg, body))
+
           %AST.Var{name: vname} ->
             # If the var refers to a constructor Lam in defs (opaque in ctx shadows it),
             # apply it to get the canonical Constr form.
@@ -331,7 +333,9 @@ defmodule Christine.Typechecker do
               %AST.Constr{args: []} = c -> normalize(e, %AST.App{func: c, arg: n_arg})
               _ -> %AST.App{func: n_f, arg: n_arg}
             end
-          _ -> %AST.App{func: n_f, arg: n_arg}
+
+          _ ->
+            %AST.App{func: n_f, arg: n_arg}
         end
 
       %AST.Lam{name: x, domain: a, body: b} ->
@@ -373,7 +377,8 @@ defmodule Christine.Typechecker do
         # Bare Var("Zero") should become Constr(1, nat, []) for equality checks.
         case find_def(e, vname) do
           %AST.Constr{} = c -> c
-          %AST.Lam{} -> var  # constructor with args — stay as Var (will be applied)
+          # constructor with args — stay as Var (will be applied)
+          %AST.Lam{} -> var
           _ -> var
         end
 
@@ -478,7 +483,9 @@ defmodule Christine.Typechecker do
         # and the Var is opaque in ctx (e.g. "Zero", "Succ"), try to resolve it
         # to its Constr so the match can fire.
         case try_resolve_ctor_app(e, target) do
-          {:ok, constr} -> reduce(e, %{ind | term: constr}, fuel - 1)
+          {:ok, constr} ->
+            reduce(e, %{ind | term: constr}, fuel - 1)
+
           :error ->
             # If this Ind has a fixpoint origin tag, is blocked on an abstract var,
             # AND the first fix_arg (structural arg) is an abstract Var, reconstitute
@@ -493,7 +500,9 @@ defmodule Christine.Typechecker do
                   %AST.Fixpoint{} = fix_def -> %{fix_def | args: fargs}
                   _ -> %{ind | term: target}
                 end
-              _ -> %{ind | term: target}
+
+              _ ->
+                %{ind | term: target}
             end
         end
     end
@@ -536,7 +545,6 @@ defmodule Christine.Typechecker do
     end
   end
 
-
   defp do_reduce(_e, t, _fuel), do: t
 
   # Returns true if the def value is a bare constructor or a Lam that only
@@ -546,7 +554,6 @@ defmodule Christine.Typechecker do
   defp constructor_def?(%AST.Constr{}), do: true
   defp constructor_def?(%AST.Lam{body: body}), do: constructor_def?(body)
   defp constructor_def?(_), do: false
-
 
   defp find_def(e, name) do
     # Prefer name_to_mod resolution (explicitly imported namespaces) over bare key,
@@ -570,16 +577,22 @@ defmodule Christine.Typechecker do
       nil ->
         # Try module-qualified name via name_to_mod (e.g. "Coq" -> "Coq.Zero")
         case Map.get(e.name_to_mod, name) do
-          nil -> nil
+          nil ->
+            nil
+
           mod ->
             prefix = if mod == "local", do: "", else: mod <> "."
             # Try "Coq.IndName.CtorName" form: iterate inductive names
             # The constructor is stored as "Coq.nat.Zero" in defs
             Enum.find_value(e.defs, fn {k, v} ->
-              if String.starts_with?(k, prefix) and String.ends_with?(k, "." <> name), do: v, else: nil
+              if String.starts_with?(k, prefix) and String.ends_with?(k, "." <> name),
+                do: v,
+                else: nil
             end)
         end
-      v -> v
+
+      v ->
+        v
     end
   end
 
@@ -767,6 +780,7 @@ defmodule Christine.Typechecker do
                   [_ | rest] -> [arg | rest]
                   other -> other
                 end
+
               %AST.Ind{ind | term: arg, fix_args: updated_fix_args}
           end
 
@@ -1020,12 +1034,16 @@ defmodule Christine.Typechecker do
     case Map.get(e.env, name) do
       nil ->
         case Map.get(e.name_to_mod, name) do
-          nil -> nil
+          nil ->
+            nil
+
           mod ->
             prefix = if mod == "local", do: "", else: mod <> "."
             Map.get(e.env, prefix <> name)
         end
-      ind -> ind
+
+      ind ->
+        ind
     end
   end
 end

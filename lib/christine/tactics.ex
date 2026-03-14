@@ -25,7 +25,7 @@ defmodule Christine.Tactics do
   def apply_tactic(ps, tac_str) when is_binary(tac_str) do
     case ps.goals do
       [{_ctx, goal} | _] ->
-        Christine.Debug.delta("TACTIC: #{tac_str} on goal: #{AST.to_string(goal)}", indent: 4)
+        Christine.Debug.delta("TACTIC: #{tac_str} on goal: #{AST.to_string(goal)}")
 
       _ ->
         :ok
@@ -307,7 +307,7 @@ defmodule Christine.Tactics do
         case List.keyfind(ctx, x, 0) do
           nil ->
             Christine.Debug.delta(
-              "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
+              "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}"
             )
 
             case Typechecker.reduce(env, current) do
@@ -319,7 +319,7 @@ defmodule Christine.Tactics do
 
               _ ->
                 Christine.Debug.delta(
-                  "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}", indent: 4
+                  "INDUCTION: variable #{x} not in ctx, checking goal: #{AST.to_string(current)}"
                 )
 
                 {:error, {:variable_not_found, x}, ps}
@@ -521,8 +521,8 @@ defmodule Christine.Tactics do
                 n_current = Typechecker.normalize(env, current)
 
                 if env.verbose and h_name in ["IHn", "plus_assoc"] do
-                  Christine.Debug.delta("REWRITE goal: #{AST.to_string(n_current)}", indent: 4)
-                  Christine.Debug.delta("REWRITE pattern: #{AST.to_string(l_bound)}", indent: 4)
+                  Christine.Debug.delta("REWRITE goal: #{AST.to_string(n_current)}")
+                  Christine.Debug.delta("REWRITE pattern: #{AST.to_string(l_bound)}")
                 end
 
                 new_goal = replace_expression(n_current, l_bound, r_bound, env, pi_names)
@@ -1007,7 +1007,7 @@ defmodule Christine.Tactics do
     old_norm = if is_map(old), do: Typechecker.normalize(env, old), else: old
 
     if env.verbose and String.contains?(AST.to_string(old), "beq_nat") do
-      Christine.Debug.delta("REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}", indent: 4)
+      Christine.Debug.delta("REPLACE_EXPR OLD_NORM: #{AST.to_string(old_norm)}")
     end
 
     # If pattern is a Var NOT in params, we ONLY want to match it if target is an identical Var (or equal?)
@@ -1056,6 +1056,7 @@ defmodule Christine.Tactics do
             # Extend env with the Pi-bound variable so it's recognized as opaque
             # and won't be accidentally matched as a rewrite pattern parameter.
             inner_env = %{env | ctx: [{n, d} | env.ctx]}
+
             %AST.Pi{
               name: n,
               domain: replace_expression(d, old, new, env, params),
@@ -1064,6 +1065,7 @@ defmodule Christine.Tactics do
 
           %AST.Lam{name: n, domain: d, body: b} ->
             inner_env = %{env | ctx: [{n, d} | env.ctx]}
+
             %AST.Lam{
               name: n,
               domain: replace_expression(d, old, new, env, params),
@@ -1114,7 +1116,9 @@ defmodule Christine.Tactics do
   def try_match(env, target, pattern, params, bindings \\ %{}) do
     if env.verbose and String.contains?(AST.to_string(pattern), "beq_nat") and
          String.contains?(AST.to_string(target), "match") do
-      Christine.Debug.delta("TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}", indent: 4)
+      Christine.Debug.delta(
+        "TRY_MATCH:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(pattern)}"
+      )
     end
 
     case pattern do
@@ -1218,7 +1222,9 @@ defmodule Christine.Tactics do
 
                     :error ->
                       if Enum.member?(params, "n") do
-                        Christine.Debug.delta("IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}", indent: 4)
+                        Christine.Debug.delta(
+                          "IND CASE MISMATCH: Target:\n#{inspect(tc, limit: :infinity)}\nPattern:\n#{inspect(pc, limit: :infinity)}"
+                        )
                       end
 
                       {:halt, :error}
@@ -1436,7 +1442,9 @@ defmodule Christine.Tactics do
                     found_global =
                       case Map.get(env.global_ctx, name) do
                         nil ->
-                          Enum.find(env.global_ctx, fn {n, _} -> String.ends_with?(n, "." <> name) end)
+                          Enum.find(env.global_ctx, fn {n, _} ->
+                            String.ends_with?(n, "." <> name)
+                          end)
 
                         ty ->
                           {name, ty}
@@ -1620,7 +1628,7 @@ defmodule Christine.Tactics do
 
       [first | rest] ->
         Christine.Debug.delta(
-          "SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}", indent: 4
+          "SEQUENCE: first = #{first}, goals = #{inspect(Enum.map(ps.goals, fn {c, _} -> Enum.map(c, &elem(&1, 0)) end))}"
         )
 
         case apply_tactic(ps, first) do
@@ -1728,12 +1736,17 @@ defmodule Christine.Tactics do
               "local" -> name
               mod -> mod <> "." <> name
             end
+
           case Map.get(env.env, qualified) do
-            %AST.Inductive{} = ind -> ind
+            %AST.Inductive{} = ind ->
+              ind
+
             _ ->
               # Fallback: suffix search in env.env
               case Map.get(env.env, name) do
-                %AST.Inductive{} = ind -> ind
+                %AST.Inductive{} = ind ->
+                  ind
+
                 _ ->
                   Enum.find_value(env.env, fn {n, ind} ->
                     if String.ends_with?(n, "." <> name), do: ind

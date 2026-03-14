@@ -31,18 +31,25 @@ defmodule Christine.Debug do
 
   def delta(msg, opts \\ []) do
     if Application.get_env(:christine, :verbose, false) do
-      indent = String.duplicate(" ", opts[:indent] || 4)
+      indent = String.duplicate(" ", opts[:indent] || 2)
       log("#{indent}#{IO.ANSI.cyan()}#{IO.ANSI.faint()}Δ #{msg}#{IO.ANSI.reset()}", opts)
     end
   end
 
   def print(msg, opts \\ []) do
     indent_size = opts[:indent] || 4
-    indent = if Application.get_env(:christine, :verbose, false), do: String.duplicate(" ", indent_size), else: ""
+
+    indent =
+      if Application.get_env(:christine, :verbose, false),
+        do: String.duplicate(" ", indent_size),
+        else: ""
+
     log("#{indent}#{msg}", opts)
   end
 
   def print_term(label, term) do
-    print("#{IO.ANSI.bright()}#{label}:#{IO.ANSI.reset()}\n#{Christine.AST.to_string(term)}", indent: 0)
+    print("#{IO.ANSI.bright()}#{label}:#{IO.ANSI.reset()}\n#{Christine.AST.to_string(term)}",
+      indent: 0
+    )
   end
 end
