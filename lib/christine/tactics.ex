@@ -521,39 +521,23 @@ defmodule Christine.Tactics do
                 n_current = Typechecker.normalize(env, current)
                 new_goal = replace_expression(n_current, l_bound, r_bound, env, pi_names)
 
-                if env.verbose do
-                  IO.puts(
-                    "      DEBUG REWRITE: h=#{h_name} goal changed? #{inspect(not Typechecker.structural_equal?(env, n_current, new_goal))}"
-                  )
+                if Typechecker.structural_equal?(env, n_current, new_goal) do
+                  {:error, :nothing_to_rewrite, ps}
+                else
+                  old_rec = ps.reconstructor
 
-                  IO.puts(
-                    "      DEBUG REWRITE: Current (normalized): #{AST.to_string(n_current)}"
-                  )
+                  new_rec = fn [p | remainder] ->
+                    old_rec.([
+                      %AST.App{
+                        func: %AST.App{func: %AST.Var{name: "rewrite_#{h_name}"}, arg: l_bound},
+                        arg: p
+                      }
+                      | remainder
+                    ])
+                  end
 
-                  IO.puts("      DEBUG REWRITE: New Goal: #{AST.to_string(new_goal)}")
+                  {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
                 end
-
-                if env.verbose do
-                  IO.puts(
-                    "      DEBUG REWRITE: h=#{h_name} goal changed? #{inspect(not Typechecker.structural_equal?(env, n_current, new_goal))}"
-                  )
-
-                  IO.puts("      DEBUG REWRITE: New Goal: #{AST.to_string(new_goal)}")
-                end
-
-                old_rec = ps.reconstructor
-
-                new_rec = fn [p | remainder] ->
-                  old_rec.([
-                    %AST.App{
-                      func: %AST.App{func: %AST.Var{name: "rewrite_#{h_name}"}, arg: l_bound},
-                      arg: p
-                    }
-                    | remainder
-                  ])
-                end
-
-                {:ok, %{ps | goals: [{ctx, new_goal} | rest], reconstructor: new_rec}}
 
               _ ->
                 {:error, :not_an_equality, ps}
@@ -1040,16 +1024,7 @@ defmodule Christine.Tactics do
               {:ok, bindings}
 
             :error ->
-              res = Typechecker.equal?(env, target, old_norm)
-
-              if env.verbose and String.contains?(AST.to_string(old_norm), "beq_nat") and
-                   String.contains?(AST.to_string(target), "match") do
-                IO.puts(
-                  "      DEBUG REPLACE EQUAL FAIL:\n      Target: #{AST.to_string(target)}\n      Pattern: #{AST.to_string(old_norm)}\n      Result: #{inspect(res)}"
-                )
-              end
-
-              if res, do: {:ok, %{}}, else: :error
+              if Typechecker.equal?(env, target, old_norm), do: {:ok, %{}}, else: :error
           end
       end
 

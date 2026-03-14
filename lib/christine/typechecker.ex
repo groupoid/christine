@@ -121,7 +121,7 @@ defmodule Christine.Typechecker do
 
   def equal?(e, t1, t2) do
     if e.verbose do
-       IO.puts("      DEBUG EQUAL?:\n      L: #{inspect(t1, limit: :infinity)}\n      R: #{inspect(t2, limit: :infinity)}")
+       IO.puts("      DEBUG EQUAL?: L=#{AST.to_string(t1)} vs R=#{AST.to_string(t2)}")
     end
     if e.verbose do
        # IO.puts("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
