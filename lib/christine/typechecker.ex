@@ -319,7 +319,15 @@ defmodule Christine.Typechecker do
   defp do_reduce(e, %AST.Var{name: name} = t, fuel) do
     # Check ctx for local variables or axioms (opaque)
     case List.keyfind(e.ctx, name, 0) do
-      {^name, _} -> t
+      {^name, _} ->
+        # Even if in ctx (for type info), check defs for a transparent value.
+        # Constructors are added to both ctx and defs; Pi-introduced variables
+        # are only in ctx (no def entry) and remain opaque.
+        case find_def(e, name) do
+          %AST.Fixpoint{} -> t   # fixpoints in ctx stay opaque (need args)
+          nil -> t               # no def -> truly opaque variable
+          val -> reduce(e, val, fuel - 1)  # constructor/definition -> reduce
+        end
       nil ->
         # Check defs for transparent global definitions
         case find_def(e, name) do

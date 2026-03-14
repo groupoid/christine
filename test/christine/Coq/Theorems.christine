@@ -12,6 +12,8 @@ Proof.
   reflexivity.
 Qed.
 
+Print beq_nat_refl.
+
 Theorem beq_nat_true : forall (n m : nat), eq bool (beq_nat n m) true -> eq nat n m.
 Proof.
   induction n as [| n0 IHn0].
@@ -25,6 +27,8 @@ Proof.
   exact (IHn0 m H).
   rewrite E. reflexivity.
 Qed.
+
+Print beq_nat_true.
 
 Theorem plus_0_r : forall (n : nat), eq nat (plus n Zero) n.
 Proof.

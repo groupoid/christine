@@ -55,8 +55,35 @@ Definition cong (A: Type) (B: Type) (f: forall (x: A), B)
   (x: A) (y: A) (p: Eq A x y) : Eq B (f x) (f y) :=
   match p with
   | Refl => Refl B (f x) (f x)
-  end.
-        </div>
+  end.</div>
+
+            <div style="float:inline;align:center;margin-left:-23px;" class="code-snippet">Module Theorems.
+
+Theorem beq_nat_refl
+  : forall (n : nat), eq bool (beq_nat n n) true.
+Proof.
+  induction n.
+  reflexivity.
+  simpl. rewrite IHn.
+  reflexivity.
+Qed.
+
+Print beq_nat_refl.
+
+Theorem beq_nat_true
+  : forall (n m : nat), eq bool (beq_nat n m) true -> eq nat n m.
+Proof.
+  induction n as [| n0 IHn0].
+  destruct m.
+  reflexivity.
+  simpl. intros H. discriminate H.
+  intros m. destruct m.
+  simpl. intros H. discriminate H.
+  simpl. intros H.
+  assert (E: eq nat n0 m).
+  exact (IHn0 m H).
+  rewrite E. reflexivity.
+Qed.</div>
         </div>
         </section>
         <section>
