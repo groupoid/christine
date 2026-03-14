@@ -97,7 +97,7 @@ Qed.</pre>
                 <pre class="code-snippet">Theorem app_nil : ∀ A (l : List A), app l nil = l.
 Proof.
   intros A l.
-  induction l.   -- (once induction is added)
+  induction l.
   - simpl. reflexivity.
   - simpl. rewrite IHl_0. reflexivity.
 Qed.</pre>
@@ -126,7 +126,7 @@ Qed.</pre>
                 <pre class="code-snippet">Theorem plus_O_n : ∀ n : Nat, plus O n = n.
 Proof.
   intro n.
-  simpl.         -- reduces plus O n to n
+  simpl.
   reflexivity.
 Qed.</pre>
             </div>
@@ -170,7 +170,7 @@ Qed.</pre>
                 <pre class="code-snippet">Theorem plus_comm : ∀ n m : Nat, plus n m = plus m n.
 Proof.
   intros n m.
-  apply plus_comm_helper.   -- assuming helper is in context
+  apply plus_comm_helper.
 Qed.</pre>
             </div>
         </section>
