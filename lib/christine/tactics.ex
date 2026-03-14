@@ -519,6 +519,12 @@ defmodule Christine.Tactics do
 
                 pi_names = Enum.map(pi_args, fn {n, _} -> n end)
                 n_current = Typechecker.normalize(env, current)
+
+                if h_name in ["IHn", "plus_assoc"] do
+                  IO.puts("REWRITE_DBG #{h_name} goal: #{AST.to_string(n_current)}")
+                  IO.puts("REWRITE_DBG #{h_name} pattern: #{AST.to_string(l_bound)}")
+                end
+
                 new_goal = replace_expression(n_current, l_bound, r_bound, env, pi_names)
 
                 if Typechecker.structural_equal?(env, n_current, new_goal) do
@@ -1047,17 +1053,21 @@ defmodule Christine.Tactics do
             }
 
           %AST.Pi{name: n, domain: d, codomain: c} ->
+            # Extend env with the Pi-bound variable so it's recognized as opaque
+            # and won't be accidentally matched as a rewrite pattern parameter.
+            inner_env = %{env | ctx: [{n, d} | env.ctx]}
             %AST.Pi{
               name: n,
               domain: replace_expression(d, old, new, env, params),
-              codomain: replace_expression(c, old, new, env, params)
+              codomain: replace_expression(c, old, new, inner_env, params)
             }
 
           %AST.Lam{name: n, domain: d, body: b} ->
+            inner_env = %{env | ctx: [{n, d} | env.ctx]}
             %AST.Lam{
               name: n,
               domain: replace_expression(d, old, new, env, params),
-              body: replace_expression(b, old, new, env, params)
+              body: replace_expression(b, old, new, inner_env, params)
             }
 
           %AST.Ind{inductive: d, motive: p, cases: cs, term: t} ->
@@ -1085,10 +1095,13 @@ defmodule Christine.Tactics do
             }
 
           %AST.Fixpoint{name: n, domain: d, body: b, args: args} ->
+            # Only recurse into args (accumulated applied values), NOT into body/domain.
+            # The body is the raw fixpoint definition template containing self-references
+            # — recursing into it causes exponential/infinite search that never terminates.
             %AST.Fixpoint{
               name: n,
-              domain: replace_expression(d, old, new, env, params),
-              body: replace_expression(b, old, new, env, params),
+              domain: d,
+              body: b,
               args: Enum.map(args, &replace_expression(&1, old, new, env, params))
             }
 

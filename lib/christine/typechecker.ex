@@ -476,7 +476,22 @@ defmodule Christine.Typechecker do
         # to its Constr so the match can fire.
         case try_resolve_ctor_app(e, target) do
           {:ok, constr} -> reduce(e, %{ind | term: constr}, fuel - 1)
-          :error -> %{ind | term: target}
+          :error ->
+            # If this Ind has a fixpoint origin tag, is blocked on an abstract var,
+            # AND the first fix_arg (structural arg) is an abstract Var, reconstitute
+            # as Fixpoint so rewrite patterns can match against it.
+            # Key: if first fix_arg is Var (abstract), try_unfold will always block
+            # regardless of other args — so the reconstituted Fixpoint won't re-fire.
+            # If first fix_arg were Constr, try_unfold would fire again → new tagged Ind
+            # → blocked IH → reconstitute with same Constr → infinite loop.
+            case {ind.fix_name, ind.fix_args, target} do
+              {fname, [%AST.Var{} | _] = fargs, %AST.Var{}} when is_binary(fname) ->
+                case find_def(e, fname) do
+                  %AST.Fixpoint{} = fix_def -> %{fix_def | args: fargs}
+                  _ -> %{ind | term: target}
+                end
+              _ -> %{ind | term: target}
+            end
         end
     end
   end
@@ -647,10 +662,14 @@ defmodule Christine.Typechecker do
 
           case red_t do
             %AST.Constr{} ->
-              {:ok, unfolded}
+              # Tag the unfolded Ind with its fixpoint origin so normalize can
+              # reconstitute Fixpoint(s_name, all_args) when the result is blocked.
+              tagged = tag_ind_with_fix(unfolded, s_name, Enum.take(args, n_params))
+              {:ok, tagged}
 
             %AST.Number{value: _v} ->
-              {:ok, unfolded}
+              tagged = tag_ind_with_fix(unfolded, s_name, Enum.take(args, n_params))
+              {:ok, tagged}
 
             _ ->
               :blocked
@@ -677,6 +696,16 @@ defmodule Christine.Typechecker do
     do: (fn {bb, pp} -> {bb, [x | pp]} end).(collect_lams(b))
 
   defp collect_lams(t), do: {t, []}
+
+  # Tag the top-level Ind (or the base Ind in an App-wrapped form) produced by
+  # try_unfold_fixpoint so normalize can reconstitute Fixpoint form when blocked.
+  defp tag_ind_with_fix(%AST.Ind{} = ind, fix_name, fix_args),
+    do: %{ind | fix_name: fix_name, fix_args: fix_args}
+
+  defp tag_ind_with_fix(%AST.App{func: f, arg: a}, fix_name, fix_args),
+    do: %AST.App{func: tag_ind_with_fix(f, fix_name, fix_args), arg: a}
+
+  defp tag_ind_with_fix(other, _fix_name, _fix_args), do: other
 
   defp apply_args(e, f, args, c_sig, ind) do
     do_apply_args(e, f, args, c_sig, ind, length(ind.inductive.params))
@@ -730,7 +759,15 @@ defmodule Christine.Typechecker do
               }
 
             _ ->
-              %AST.Ind{ind | term: arg}
+              # IH represents the recursive call with predecessor `arg` as first structural arg.
+              # Update fix_args to use `arg` (the predecessor) instead of the Constr
+              # so do_reduce can reconstitute Fixpoint(fix_name,[arg|rest_fix_args]).
+              updated_fix_args =
+                case ind.fix_args do
+                  [_ | rest] -> [arg | rest]
+                  other -> other
+                end
+              %AST.Ind{ind | term: arg, fix_args: updated_fix_args}
           end
 
         # Check whether the case function accepts the ih argument (has a second Lam

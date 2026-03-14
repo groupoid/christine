@@ -70,9 +70,12 @@ defmodule Christine.AST do
     defstruct [:index, :inductive, :args]
   end
 
-  # Induction operator: inductive definition, motive (P), cases, and target term
+  # Induction operator: inductive definition, motive (P), cases, and target term.
+  # fix_name/fix_args: optional originating Fixpoint info — set when this Ind was produced
+  # by try_unfold_fixpoint. Allows normalize to reconstitute Fixpoint(fix_name, fix_args)
+  # when the Ind is blocked on an abstract term, so rewrite patterns match correctly.
   defmodule Ind do
-    defstruct [:inductive, :motive, :cases, :term]
+    defstruct [:inductive, :motive, :cases, :term, :fix_name, :fix_args]
   end
 
   # Fixpoint operator: name, domain, body, and partially applied args
