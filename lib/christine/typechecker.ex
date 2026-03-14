@@ -375,14 +375,12 @@ defmodule Christine.Typechecker do
         %AST.Ind{term: t} ->
           # If the term being matched on is not a constructor, unfold is blocked
           red_t = reduce(e, t, fuel - 1)
-          Christine.Debug.log("DEBUG TRY_UNFOLD #{fix.name} Ind term=#{AST.to_string(t)} red=#{AST.to_string(red_t)}")
           case red_t do
             %AST.Constr{} -> 
               {:ok, unfolded}
-            %AST.Number{value: v} -> 
+            %AST.Number{value: _v} -> 
               {:ok, unfolded}
             _ -> 
-              Christine.Debug.log("DEBUG UNFOLD BLOCKED (Ind term): #{fix.name} term=#{AST.to_string(t)} red=#{AST.to_string(red_t)} internals=#{inspect(red_t)}")
               :blocked
           end
         %AST.App{func: f_inner} ->

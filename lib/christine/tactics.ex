@@ -744,7 +744,6 @@ defmodule Christine.Tactics do
   end
 
   defp unwrap_eq(app) do
-    Christine.Debug.log("DEBUG UNWRAP_EQ: #{AST.to_string(app)}")
     case extract_app_args_full(app) do
       [f | args] ->
         if is_eq?(f) do
@@ -792,7 +791,6 @@ defmodule Christine.Tactics do
       _ -> try_match(env, target, old_norm, params)
     end
     
-    Christine.Debug.log("DEBUG REPLACE_EXPR: target=#{AST.to_string(target)} pattern=#{AST.to_string(old_norm)} params=#{inspect(params)} match=#{inspect(match_result)}")
 
     case match_result do
       {:ok, bindings} ->
@@ -1444,7 +1442,6 @@ defmodule Christine.Tactics do
   defp extract_app_args(_), do: []
 
   defp extract_ind_name(t) do
-    Christine.Debug.log("DEBUG EXTRACT_IND_NAME: term=#{AST.to_string(t)} internals=#{inspect(t)}")
     case t do
       %AST.App{func: f} -> extract_ind_name(f)
       %AST.Var{name: n} -> {:ok, n}
