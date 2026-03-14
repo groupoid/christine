@@ -96,10 +96,7 @@ defmodule Mix.Tasks.Christine.Repl do
             try do
               case eval(input, env) do
                 {:ok, result, type} ->
-                  type_str = try do AST.to_string(type) rescue _ -> inspect(type, limit: 10) end
-                  eval_str = try do AST.to_string(result) rescue _ -> inspect(result, limit: 10) end
-                  IO.puts("TYPE: #{type_str}")
-                  IO.puts("EVAL: #{eval_str}")
+                  AST.print_result(type, result)
 
                 {:error, {:eval_crash, msg}} ->
                   IO.puts("Error: #{msg}")

@@ -219,14 +219,21 @@ defmodule Christine.AST do
     end
   end
 
-  def print_declaration(name, type, term \\ nil) do
-    type_str = if type, do: to_string(type), else: "<unknown>"
-    IO.puts("#{name} : #{type_str}")
-
-    if term do
-      term_str = to_string(term)
-      IO.puts("     := #{term_str}")
+  def print_result(type, result \\ nil) do
+    if type do
+      type_str = try do to_string(type) rescue _ -> Kernel.inspect(type) end
+      IO.puts("TYPE: #{type_str}")
     end
+
+    if result do
+      result_str = try do to_string(result) rescue _ -> Kernel.inspect(result) end
+      IO.puts("EVAL: #{result_str}")
+    end
+  end
+
+  def print_declaration(name, type, term \\ nil) do
+    IO.puts(name)
+    print_result(type, term)
   end
 
   defp complex?(%App{}), do: true

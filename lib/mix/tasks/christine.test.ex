@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Christine.Test do
 
     results =
       Enum.map(test_files, fn file ->
-        IO.write("  Testing #{file}... ")
+        IO.puts("  Testing #{file}... ")
         source = File.read!(file)
         mod_name = Path.basename(file, ".christine")
 

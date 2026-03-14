@@ -99,17 +99,20 @@ defmodule Christine.Compiler do
 
         {:command, :check_kw, expr} ->
           ty = try do Christine.Typechecker.infer(acc, expr) rescue e -> {:error, {:typechecker_crash, Exception.message(e)}} end
-          Christine.Debug.log("DEBUG Check: #{AST.to_string(expr)} : #{AST.to_string(ty)}")
+          IO.puts("Check: #{AST.to_string(expr)}")
+          AST.print_result(ty, nil)
           {:cont, {:ok, acc}}
 
         {:command, :eval_kw, expr} ->
+          ty = try do Christine.Typechecker.infer(acc, expr) rescue _ -> nil end
           res = try do Christine.Typechecker.normalize(acc, expr) rescue e -> {:error, {:eval_crash, Exception.message(e)}} end
-          Christine.Debug.log("DEBUG Eval: #{AST.to_string(expr)} = #{AST.to_string(res)}")
+          IO.puts("Eval: #{AST.to_string(expr)}")
+          AST.print_result(ty, res)
           {:cont, {:ok, acc}}
 
         {:command, :print_kw, %AST.Var{name: name}} ->
           case List.keyfind(acc.ctx, name, 0) do
-            nil -> Christine.Debug.log("DEBUG #{name} is not defined")
+            nil -> IO.puts("#{name} is not defined")
             {_, ty} ->
               term = Map.get(acc.defs, name)
               AST.print_declaration(name, ty, term)
