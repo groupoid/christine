@@ -1,0 +1,1699 @@
+$ mix test && rlwrap mix christine.test --verbose | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g' > protocol.txt
+
+Running Christine tests...
+⚙ Testing test/christine/Coq/Beq.christine...
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining beq_nat_refl
+    Δ TACTIC: induction n on goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ TACTIC: intro n on goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ TACTIC: reflexivity on goal: eq bool (beq_nat Coq.nat.Zero Coq.nat.Zero) true
+    Δ EQUAL? L=beq_nat Coq.nat.Zero Coq.nat.Zero vs R=true
+    Δ TACTIC: simpl on goal: eq bool (beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))) true
+    Δ TACTIC: rewrite IHn on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true
+    Δ REWRITE goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true
+    Δ REWRITE pattern: beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) true Coq.bool.true
+    Δ EQUAL? L=true vs R=Coq.bool.true
+⊢ Print: beq_nat_refl
+TYPE: (n : nat) -> eq bool (beq_nat n n) true
+EVAL: (λ n : nat -> match n in (λ n : nat -> eq bool (beq_nat n n) true) with eq_refl Any (beq_nat Coq.nat.Zero Coq.nat.Zero) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> eq bool (beq_nat n n) true)) n -> rewrite_IHn (beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))) (eq_refl Any true))))
+✓ OK (Beq)
+⚙ Testing test/christine/Coq/Theorems.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining beq_nat_refl
+    Δ TACTIC: induction n on goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ TACTIC: intro n on goal: (n : nat) -> eq bool (beq_nat n n) true
+    Δ TACTIC: reflexivity on goal: eq bool (beq_nat Coq.nat.Zero Coq.nat.Zero) true
+    Δ EQUAL? L=beq_nat Coq.nat.Zero Coq.nat.Zero vs R=true
+    Δ TACTIC: simpl on goal: eq bool (beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))) true
+    Δ TACTIC: rewrite IHn on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true
+    Δ REWRITE goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true
+    Δ REWRITE pattern: beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=(inductive Coq.bool ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ REPLACE_EXPR OLD_NORM: match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ EQUAL? L=Coq.bool.true vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n))
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) true Coq.bool.true
+    Δ EQUAL? L=true vs R=Coq.bool.true
+⊢ Print: beq_nat_refl
+TYPE: (n : nat) -> eq bool (beq_nat n n) true
+EVAL: (λ n : nat -> match n in (λ n : nat -> eq bool (beq_nat n n) true) with eq_refl Any (beq_nat Coq.nat.Zero Coq.nat.Zero) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> eq bool (beq_nat n n) true)) n -> rewrite_IHn (beq_nat ((Coq.nat.Succ n)) ((Coq.nat.Succ n))) (eq_refl Any true))))
+⚙ Defining beq_nat_true
+    Δ TACTIC: induction n as  | n0 IHn0 on goal: (n : nat) -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m
+    Δ TACTIC: destruct m on goal: (m : nat) -> (_ : (eq bool (beq_nat Coq.nat.Zero m) true)) -> eq nat Coq.nat.Zero m
+    Δ INDUCTION: variable m not in ctx, checking goal: (m : nat) -> (_ : (eq bool (beq_nat Coq.nat.Zero m) true)) -> eq nat Coq.nat.Zero m
+    Δ TACTIC: intro m on goal: (m : nat) -> (_ : (eq bool (beq_nat Coq.nat.Zero m) true)) -> eq nat Coq.nat.Zero m
+    Δ TACTIC: reflexivity on goal: (_ : (eq bool (beq_nat Coq.nat.Zero Coq.nat.Zero) true)) -> eq nat Coq.nat.Zero Coq.nat.Zero
+    Δ EQUAL? L=Coq.nat.Zero vs R=Coq.nat.Zero
+    Δ TACTIC: simpl on goal: (_ : (eq bool (beq_nat Coq.nat.Zero ((Coq.nat.Succ m))) true)) -> eq nat Coq.nat.Zero ((Coq.nat.Succ m))
+    Δ TACTIC: intros H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero ((Coq.nat.Succ m))
+    Δ TACTIC: intro H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero ((Coq.nat.Succ m))
+    Δ TACTIC: intro on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero ((Coq.nat.Succ m))
+    Δ TACTIC: discriminate H on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero ((Coq.nat.Succ m))
+    Δ TACTIC: intros m on goal: (m : nat) -> (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m
+    Δ TACTIC: intro m on goal: (m : nat) -> (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m
+    Δ TACTIC: intro on goal: (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m
+    Δ TACTIC: destruct m on goal: (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m
+    Δ TACTIC: simpl on goal: (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) Coq.nat.Zero) true)) -> eq nat ((Coq.nat.Succ n0)) Coq.nat.Zero
+    Δ TACTIC: intros H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) Coq.nat.Zero
+    Δ TACTIC: intro H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) Coq.nat.Zero
+    Δ TACTIC: intro on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) Coq.nat.Zero
+    Δ TACTIC: discriminate H on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) Coq.nat.Zero
+    Δ TACTIC: simpl on goal: (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))) true)) -> eq nat ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ TACTIC: intros H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match m in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n0))) Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ TACTIC: intro H on goal: (_ : (((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match m in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n0))) Coq.bool.true)) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ TACTIC: intro on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ TACTIC: assert ( E : eq nat n0 m ) on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ TACTIC: exact ( IHn0 m H ) on goal: eq nat n0 m
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=nat
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match m in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n0))) Coq.bool.true vs R=eq bool (beq_nat n0 m) true
+    Δ EQUAL? L=eq nat n0 m vs R=eq nat n0 m
+    Δ TACTIC: rewrite E on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) ((Coq.nat.Succ m)) vs R=n0
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n0)) vs R=n0
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=n0
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=n0
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=n0
+    Δ EQUAL? L=(Coq.nat.Succ n0) vs R=n0
+    Δ EQUAL? L=n0 vs R=n0
+    Δ EQUAL? L=(Coq.nat.Succ m) vs R=n0
+    Δ EQUAL? L=m vs R=n0
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ m)) ((Coq.nat.Succ m))
+    Δ EQUAL? L=(Coq.nat.Succ m) vs R=(Coq.nat.Succ m)
+⊢ Print: beq_nat_true
+TYPE: (n : nat) -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m) with (λ m : nat -> match m in (λ m : nat -> (_ : (eq bool (beq_nat Coq.nat.Zero m) true)) -> eq nat Coq.nat.Zero m) with (λ _ : eq bool (beq_nat Coq.nat.Zero Coq.nat.Zero) true -> eq_refl Any Coq.nat.Zero) | (λ m : (inductive Coq.nat ) -> (λ IHm : ((λ m : nat -> (_ : (eq bool (beq_nat Coq.nat.Zero m) true)) -> eq nat Coq.nat.Zero m)) m -> (λ H : ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true -> inversion_refl)))) | (λ n0 : (inductive Coq.nat ) -> (λ IHn0 : ((λ n : nat -> (m : nat) -> (_ : (eq bool (beq_nat n m) true)) -> eq nat n m)) n0 -> (λ m : nat -> match m in (λ m : nat -> (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m) with (λ H : ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) Coq.bool.false Coq.bool.true -> inversion_refl) | (λ m : (inductive Coq.nat ) -> (λ IHm : ((λ m : nat -> (_ : (eq bool (beq_nat ((Coq.nat.Succ n0)) m) true)) -> eq nat ((Coq.nat.Succ n0)) m)) m -> (λ H : ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.bool ) (match m in (λ _ : (inductive nat ) -> Any) with Coq.bool.false | (λ j : Any -> (λ ih_j : Any -> ih_j n0))) Coq.bool.true -> ((λ E : eq nat n0 m -> rewrite_E n0 (eq_refl Any ((Coq.nat.Succ m))))) (IHn0 m H))))))))
+⚙ Defining plus_0_r
+    Δ TACTIC: induction n on goal: (n : nat) -> eq nat (plus n Zero) n
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> eq nat (plus n Zero) n
+    Δ TACTIC: intro n on goal: (n : nat) -> eq nat (plus n Zero) n
+    Δ TACTIC: reflexivity on goal: eq nat (plus Coq.nat.Zero Zero) Coq.nat.Zero
+    Δ EQUAL? L=plus Coq.nat.Zero Zero vs R=Coq.nat.Zero
+    Δ TACTIC: simpl on goal: eq nat (plus ((Coq.nat.Succ n)) Zero) ((Coq.nat.Succ n))
+    Δ TACTIC: rewrite IHn on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) ((Coq.nat.Succ n))
+    Δ REWRITE goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) ((Coq.nat.Succ n))
+    Δ REWRITE pattern: plus ((Coq.nat.Succ n)) Zero
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) ((Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) ((Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n Coq.nat.Zero))) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=n vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=n vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n Coq.nat.Zero))
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ n)) ((Coq.nat.Succ n))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=(Coq.nat.Succ n)
+⊢ Print: plus_0_r
+TYPE: (n : nat) -> eq nat (plus n Zero) n
+EVAL: (λ n : nat -> match n in (λ n : nat -> eq nat (plus n Zero) n) with eq_refl Any (plus Coq.nat.Zero Zero) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> eq nat (plus n Zero) n)) n -> rewrite_IHn (plus ((Coq.nat.Succ n)) Zero) (eq_refl Any ((Coq.nat.Succ n))))))
+⚙ Defining plus_S_r
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m))
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m))
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m))
+    Δ TACTIC: reflexivity on goal: (m : nat) -> eq nat (plus Coq.nat.Zero (Succ m)) (Succ (plus Coq.nat.Zero m))
+    Δ EQUAL? L=plus Coq.nat.Zero (Succ m) vs R=Succ (plus Coq.nat.Zero m)
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (plus ((Coq.nat.Succ n)) (Succ m)) (Succ (plus ((Coq.nat.Succ n)) m))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m)))))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m)))))
+    Δ REWRITE pattern: plus ((Coq.nat.Succ n)) (Succ m)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m))))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m))))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m))))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m))))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n m)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n m)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(Coq.nat.Succ ((Coq.nat.Succ (fix plus n m)))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ m)
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n m)) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(fix plus n m) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with m | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k m))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(fix plus n m) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with m | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k m))) vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n (Coq.nat.Succ m)))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (Succ (plus ((Coq.nat.Succ n)) m)) ((Coq.nat.Succ ((Coq.nat.Succ (fix plus n m)))))
+    Δ EQUAL? L=Succ (plus ((Coq.nat.Succ n)) m) vs R=(Coq.nat.Succ ((Coq.nat.Succ (fix plus n m))))
+⊢ Print: plus_S_r
+TYPE: (n : nat) -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m))
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m))) with (λ m : nat -> eq_refl Any (plus Coq.nat.Zero (Succ m))) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> eq nat (plus n (Succ m)) (Succ (plus n m)))) n -> rewrite_IHn (plus ((Coq.nat.Succ n)) (Succ m)) ((λ m : (inductive Coq.nat ) -> eq_refl Any (Succ (plus ((Coq.nat.Succ n)) m)))))))
+⚙ Defining plus_assoc
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p)
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p)
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p)
+    Δ TACTIC: reflexivity on goal: (m : nat) -> (p : nat) -> eq nat (plus Coq.nat.Zero (plus m p)) (plus (plus Coq.nat.Zero m) p)
+    Δ EQUAL? L=plus Coq.nat.Zero (plus m p) vs R=plus (plus Coq.nat.Zero m) p
+    Δ TACTIC: simpl on goal: (m : nat) -> (p : nat) -> eq nat (plus ((Coq.nat.Succ n)) (plus m p)) (plus (plus ((Coq.nat.Succ n)) m) p)
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p)
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p)
+    Δ REWRITE pattern: plus ((Coq.nat.Succ n)) (plus m p)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) (fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n (fix plus m p)))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with p | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k p))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(fix plus (Coq.nat.Succ (fix plus n m)) p) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with p | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k p))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=m vs R=(fix plus m p)
+    Δ EQUAL? L=m vs R=match p in (λ _ : (inductive nat ) -> Any) with p | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k p)))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n m)) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(fix plus n m) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with m | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k m))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=(fix plus n m) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with m | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k m))) vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=p vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ EQUAL? L=p vs R=(Coq.nat.Succ (fix plus n (fix plus m p)))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus (plus ((Coq.nat.Succ n)) m) p) (fix plus (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=plus (plus ((Coq.nat.Succ n)) m) p vs R=(fix plus (Coq.nat.Succ (fix plus n m)) p)
+⊢ Print: plus_assoc
+TYPE: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p)
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p)) with (λ m : nat -> (λ p : nat -> eq_refl Any (plus Coq.nat.Zero (plus m p)))) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> (p : nat) -> eq nat (plus n (plus m p)) (plus (plus n m) p))) n -> rewrite_IHn (plus ((Coq.nat.Succ n)) (plus m p)) ((λ m : (inductive Coq.nat ) -> (λ p : (inductive Coq.nat ) -> eq_refl Any (plus (plus ((Coq.nat.Succ n)) m) p)))))))
+⚙ Defining plus_comm
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> eq nat (plus n m) (plus m n)
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> eq nat (plus n m) (plus m n)
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> eq nat (plus n m) (plus m n)
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (plus Coq.nat.Zero m) (plus m Coq.nat.Zero)
+    Δ TACTIC: rewrite plus_0_r on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m (fix plus m Coq.nat.Zero) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=m vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=m vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=m vs R=(fix plus n Coq.nat.Zero)
+    Δ EQUAL? L=m vs R=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) m m
+    Δ EQUAL? L=m vs R=m
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (plus ((Coq.nat.Succ n)) m) (plus m ((Coq.nat.Succ n)))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n))
+    Δ REWRITE pattern: plus ((Coq.nat.Succ n)) m
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) (fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) ((Coq.nat.Succ (fix plus n m))) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=match (Coq.nat.Succ n) in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ n) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ n))))) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(fix plus m (Coq.nat.Succ n)) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=match (Coq.nat.Succ n) in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ n) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ n))))) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=n vs R=(fix plus n m)
+    Δ EQUAL? L=n vs R=match n in (λ _ : (inductive nat ) -> Any) with m | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k m)))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n m))
+    Δ TACTIC: rewrite plus_S_r on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus m ((Coq.nat.Succ n))) (fix plus m (Coq.nat.Succ n))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (Coq.nat.Succ n)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ m)))))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (Succ (plus m m)) (Succ (plus m m))
+    Δ EQUAL? L=Succ (plus m m) vs R=Succ (plus m m)
+⊢ Print: plus_comm
+TYPE: (n : nat) -> (m : nat) -> eq nat (plus n m) (plus m n)
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> eq nat (plus n m) (plus m n)) with rewrite_plus_0_r (plus n Zero) ((λ m : (inductive Coq.nat ) -> eq_refl Any m)) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> eq nat (plus n m) (plus m n))) n -> rewrite_IHn (plus ((Coq.nat.Succ n)) m) (rewrite_plus_S_r (plus n (Succ m)) ((λ m : (inductive Coq.nat ) -> eq_refl Any (Succ (plus m m))))))))
+⚙ Defining mult_0_r
+    Δ TACTIC: induction n on goal: (n : nat) -> eq nat (mult n Zero) Zero
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> eq nat (mult n Zero) Zero
+    Δ TACTIC: intro n on goal: (n : nat) -> eq nat (mult n Zero) Zero
+    Δ TACTIC: reflexivity on goal: eq nat (mult Coq.nat.Zero Zero) Zero
+    Δ EQUAL? L=mult Coq.nat.Zero Zero vs R=Zero
+    Δ TACTIC: simpl on goal: eq nat (mult ((Coq.nat.Succ n)) Zero) Zero
+    Δ TACTIC: rewrite IHn on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) Coq.nat.Zero
+    Δ REWRITE goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) Coq.nat.Zero
+    Δ REWRITE pattern: mult ((Coq.nat.Succ n)) Zero
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) Coq.nat.Zero vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) Coq.nat.Zero vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero)) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=Coq.nat.Zero vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=Coq.nat.Zero vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=Coq.nat.Zero vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=Coq.nat.Zero vs R=(fix plus Coq.nat.Zero (fix mult n Coq.nat.Zero))
+    Δ EQUAL? L=Coq.nat.Zero vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult n Coq.nat.Zero) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n Coq.nat.Zero))))
+    Δ EQUAL? L=Coq.nat.Zero vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Zero Coq.nat.Zero
+    Δ EQUAL? L=Zero vs R=Coq.nat.Zero
+⊢ Print: mult_0_r
+TYPE: (n : nat) -> eq nat (mult n Zero) Zero
+EVAL: (λ n : nat -> match n in (λ n : nat -> eq nat (mult n Zero) Zero) with eq_refl Any (mult Coq.nat.Zero Zero) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> eq nat (mult n Zero) Zero)) n -> rewrite_IHn (mult ((Coq.nat.Succ n)) Zero) (eq_refl Any Zero))))
+⚙ Defining mult_S_r
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m))
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m))
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m))
+    Δ TACTIC: reflexivity on goal: (m : nat) -> eq nat (mult Coq.nat.Zero (Succ m)) (plus Coq.nat.Zero (mult Coq.nat.Zero m))
+    Δ EQUAL? L=mult Coq.nat.Zero (Succ m) vs R=plus Coq.nat.Zero (mult Coq.nat.Zero m)
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (mult ((Coq.nat.Succ n)) (Succ m)) (plus ((Coq.nat.Succ n)) (mult ((Coq.nat.Succ n)) m))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))))
+    Δ REWRITE pattern: mult ((Coq.nat.Succ n)) (Succ m)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=m
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ m)
+    Δ EQUAL? L=(fix plus n (fix plus m (fix mult n m))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m (fix mult n m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m (fix mult n m))))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m (fix mult n m)) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix plus m (fix mult n m)))))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=n vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=n vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ m)
+    Δ EQUAL? L=(fix plus m (fix mult n m)) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m)))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n m))))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=n vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=n vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ EQUAL? L=m vs R=(fix plus (Coq.nat.Succ m) (fix mult n (Coq.nat.Succ m)))
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix mult n (Coq.nat.Succ m))) in (λ _ : (inductive nat ) -> Any) with (fix mult n (Coq.nat.Succ m)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (Coq.nat.Succ m)))))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus ((Coq.nat.Succ n)) (mult ((Coq.nat.Succ n)) m)) ((Coq.nat.Succ (fix plus n (fix plus m (fix mult n m)))))
+    Δ EQUAL? L=plus ((Coq.nat.Succ n)) (mult ((Coq.nat.Succ n)) m) vs R=(Coq.nat.Succ (fix plus n (fix plus m (fix mult n m))))
+⊢ Print: mult_S_r
+TYPE: (n : nat) -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m))
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m))) with (λ m : nat -> eq_refl Any (mult Coq.nat.Zero (Succ m))) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> eq nat (mult n (Succ m)) (plus n (mult n m)))) n -> rewrite_IHn (mult ((Coq.nat.Succ n)) (Succ m)) ((λ m : (inductive Coq.nat ) -> eq_refl Any (plus ((Coq.nat.Succ n)) (mult ((Coq.nat.Succ n)) m)))))))
+⚙ Defining mult_plus_distr_l
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p))
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p))
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p))
+    Δ TACTIC: reflexivity on goal: (m : nat) -> (p : nat) -> eq nat (mult Coq.nat.Zero (plus m p)) (plus (mult Coq.nat.Zero m) (mult Coq.nat.Zero p))
+    Δ EQUAL? L=mult Coq.nat.Zero (plus m p) vs R=plus (mult Coq.nat.Zero m) (mult Coq.nat.Zero p)
+    Δ EQUAL? L=Coq.nat.Zero vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k Coq.nat.Zero)))
+    Δ TACTIC: simpl on goal: (m : nat) -> (p : nat) -> eq nat (mult ((Coq.nat.Succ n)) (plus m p)) (plus (mult ((Coq.nat.Succ n)) m) (mult ((Coq.nat.Succ n)) p))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p)))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p)))
+    Δ REWRITE pattern: mult ((Coq.nat.Succ n)) (plus m p)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m p) (fix mult n (fix plus m p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=m
+    Δ EQUAL? L=p vs R=p
+    Δ EQUAL? L=(fix plus p (fix mult n p)) vs R=(fix mult n (fix plus m p))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n p)))) vs R=(fix mult n (fix plus m p))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus (fix plus m p) (ih_k (fix plus m p))))
+    Δ EQUAL? L=(fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match (fix plus (fix plus p (fix mult n p)) (fix mult n (fix plus p (fix mult n p)))) in (λ _ : (inductive nat ) -> Any) with (fix plus p (fix mult n p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus p (fix mult n p))))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match (fix plus (fix plus p (fix mult n p)) (fix mult n (fix plus p (fix mult n p)))) in (λ _ : (inductive nat ) -> Any) with (fix plus p (fix mult n p)) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix plus p (fix mult n p)))))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=(fix plus m p)
+    Δ EQUAL? L=m vs R=match p in (λ _ : (inductive nat ) -> Any) with p | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k p)))
+    Δ EQUAL? L=(fix plus m (fix mult n m)) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m)))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n m))))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=m vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=m vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=n vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=n vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=m vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=m vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=p vs R=(fix plus m p)
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with p | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k p)))
+    Δ EQUAL? L=(fix plus p (fix mult n p)) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n p)))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=p vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=p vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(fix mult n p) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=(fix mult n p) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=n vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=n vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=p vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix plus m p) (fix mult n (fix plus m p)))
+    Δ EQUAL? L=p vs R=match (fix plus (fix mult n (fix plus m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix plus m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix plus m p)))))
+    Δ TACTIC: rewrite plus_assoc on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus (mult ((Coq.nat.Succ n)) m) (mult ((Coq.nat.Succ n)) p)) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p)))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p)))
+    Δ REWRITE pattern: plus n (plus m p)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix plus m (fix mult n m)) (fix plus p (fix mult n p))) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus n (fix plus m p))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with (fix plus m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix plus m p))))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus (plus (fix plus m (fix mult n m)) (fix mult n p)) (fix mult n p)) (plus (plus (fix plus m (fix mult n m)) (fix mult n p)) (fix mult n p))
+    Δ EQUAL? L=plus (plus (fix plus m (fix mult n m)) (fix mult n p)) (fix mult n p) vs R=plus (plus (fix plus m (fix mult n m)) (fix mult n p)) (fix mult n p)
+⊢ Print: mult_plus_distr_l
+TYPE: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p))
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p))) with (λ m : nat -> (λ p : nat -> eq_refl Any (mult Coq.nat.Zero (plus m p)))) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> (p : nat) -> eq nat (mult n (plus m p)) (plus (mult n m) (mult n p)))) n -> rewrite_IHn (mult ((Coq.nat.Succ n)) (plus m p)) (rewrite_plus_assoc (plus n (plus m p)) ((λ m : (inductive Coq.nat ) -> (λ p : (inductive Coq.nat ) -> eq_refl Any (plus (plus (fix plus m (fix mult n m)) (fix mult n p)) (fix mult n p)))))))))
+⚙ Defining mult_plus_distr_r
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p))
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p))
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p))
+    Δ TACTIC: reflexivity on goal: (m : nat) -> (p : nat) -> eq nat (mult (plus Coq.nat.Zero m) p) (plus (mult Coq.nat.Zero p) (mult m p))
+    Δ EQUAL? L=mult (plus Coq.nat.Zero m) p vs R=plus (mult Coq.nat.Zero p) (mult m p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix plus Coq.nat.Zero (fix mult m p))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult m p))))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match p in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ TACTIC: simpl on goal: (m : nat) -> (p : nat) -> eq nat (mult (plus ((Coq.nat.Succ n)) m) p) (plus (mult ((Coq.nat.Succ n)) p) (mult m p))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p))
+    Δ REWRITE pattern: mult (plus ((Coq.nat.Succ n)) m) p
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) (fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (Coq.nat.Succ (fix plus n m)) p) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult m p)))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult m p))))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult m p))))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(fix plus (fix plus p (fix mult n p)) (fix mult m p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult m p)))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult m p))))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with (fix mult m p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult m p))))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(fix plus p (fix mult n p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n p)))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=(fix plus p (fix mult n p)) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n p)))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with (fix mult n p) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n p))))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=n vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(fix mult n p) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=n vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=n vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=n vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=n vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=n vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=m vs R=(Coq.nat.Succ (fix plus n m))
+    Δ EQUAL? L=(fix mult m p) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=match p in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=m vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=m vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=m vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=m vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=m vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ EQUAL? L=p vs R=(fix mult (Coq.nat.Succ (fix plus n m)) p)
+    Δ EQUAL? L=p vs R=match (Coq.nat.Succ (fix plus n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=p vs R=match p in (λ _ : (inductive nat ) -> Any) with match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p)))))))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> (p : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus (mult ((Coq.nat.Succ n)) p) (mult m p)) (fix plus (fix plus p (fix mult n p)) (fix mult m p))
+    Δ EQUAL? L=plus (mult ((Coq.nat.Succ n)) p) (mult m p) vs R=(fix plus (fix plus p (fix mult n p)) (fix mult m p))
+⊢ Print: mult_plus_distr_r
+TYPE: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p))
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p))) with (λ m : nat -> (λ p : nat -> eq_refl Any (mult (plus Coq.nat.Zero m) p))) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> (p : nat) -> eq nat (mult (plus n m) p) (plus (mult n p) (mult m p)))) n -> rewrite_IHn (mult (plus ((Coq.nat.Succ n)) m) p) ((λ m : (inductive Coq.nat ) -> (λ p : (inductive Coq.nat ) -> eq_refl Any (plus (mult ((Coq.nat.Succ n)) p) (mult m p))))))))
+⚙ Defining mult_assoc
+    Δ TACTIC: intros n m p on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: intro m on goal: (m : nat) -> (p : nat) -> eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: intro p on goal: (p : nat) -> eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: intro on goal: eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: induction n on goal: eq nat (mult n (mult m p)) (mult (mult n m) p)
+    Δ TACTIC: reflexivity on goal: eq nat (mult Coq.nat.Zero (mult m p)) (mult (mult Coq.nat.Zero m) p)
+    Δ EQUAL? L=mult Coq.nat.Zero (mult m p) vs R=mult (mult Coq.nat.Zero m) p
+    Δ EQUAL? L=Coq.nat.Zero vs R=match Coq.nat.Zero in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ TACTIC: simpl on goal: eq nat (mult ((Coq.nat.Succ n)) (mult m p)) (mult (mult ((Coq.nat.Succ n)) m) p)
+    Δ TACTIC: rewrite IHn on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) (fix mult (fix plus m (fix mult n m)) p)
+    Δ REWRITE goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) (fix mult (fix plus m (fix mult n m)) p)
+    Δ REWRITE pattern: mult ((Coq.nat.Succ n)) (mult m p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus (fix mult m p) (fix mult n (fix mult m p))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(fix mult (fix plus m (fix mult n m)) p) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(fix mult (fix plus m (fix mult n m)) p) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix plus p (fix mult n p)) in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus p ih_k p))) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=m vs R=(fix mult m p)
+    Δ EQUAL? L=m vs R=match p in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(fix plus m (fix mult n m)) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m)))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (ih_k (fix mult n m))))) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=m vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=m vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=(fix mult n m) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus m (ih_k m))) vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (fix plus m ih_k m))) vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=n vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=n vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=n vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=m vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=m vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=m vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=p vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ EQUAL? L=p vs R=(fix plus (fix mult m p) (fix mult n (fix mult m p)))
+    Δ EQUAL? L=p vs R=match (fix mult (fix mult n (fix mult m p)) p) in (λ _ : (inductive nat ) -> Any) with (fix mult n (fix mult m p)) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n (fix mult m p)))))
+    Δ TACTIC: rewrite mult_plus_distr_r on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (mult (mult ((Coq.nat.Succ n)) m) p) (fix mult (fix plus m (fix mult n m)) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (fix plus m (fix mult n m)) p) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (fix plus m (fix mult n m)) p) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult (fix plus m (fix mult n m)) p) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult (fix plus n m) p)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix plus n p) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus p (ih_k p)))
+    Δ TACTIC: reflexivity on goal: ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus (mult m p) (mult (fix mult m m) p)) (plus (mult m p) (mult (fix mult m m) p))
+    Δ EQUAL? L=plus (mult m p) (mult (fix mult m m) p) vs R=plus (mult m p) (mult (fix mult m m) p)
+⊢ Print: mult_assoc
+TYPE: (n : nat) -> (m : nat) -> (p : nat) -> eq nat (mult n (mult m p)) (mult (mult n m) p)
+EVAL: (λ n : nat -> (λ m : nat -> (λ p : nat -> match n in (λ n : nat -> eq nat (mult n (mult m p)) (mult (mult n m) p)) with eq_refl Any (mult Coq.nat.Zero (mult m p)) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> eq nat (mult n (mult m p)) (mult (mult n m) p))) n -> rewrite_IHn (mult ((Coq.nat.Succ n)) (mult m p)) (rewrite_mult_plus_distr_r (mult (plus n m) p) (eq_refl Any (plus (mult m p) (mult (fix mult m m) p)))))))))
+⚙ Defining mult_comm
+    Δ TACTIC: induction n on goal: (n : nat) -> (m : nat) -> eq nat (mult n m) (mult m n)
+    Δ INDUCTION: variable n not in ctx, checking goal: (n : nat) -> (m : nat) -> eq nat (mult n m) (mult m n)
+    Δ TACTIC: intro n on goal: (n : nat) -> (m : nat) -> eq nat (mult n m) (mult m n)
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (mult Coq.nat.Zero m) (mult m Coq.nat.Zero)
+    Δ TACTIC: rewrite mult_0_r on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero (fix mult m Coq.nat.Zero) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=Coq.nat.Zero vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=Coq.nat.Zero vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ EQUAL? L=Coq.nat.Zero vs R=(fix mult n Coq.nat.Zero)
+    Δ EQUAL? L=Coq.nat.Zero vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus Coq.nat.Zero (ih_k Coq.nat.Zero)))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) Coq.nat.Zero Zero
+    Δ EQUAL? L=Coq.nat.Zero vs R=Zero
+    Δ TACTIC: simpl on goal: (m : nat) -> eq nat (mult ((Coq.nat.Succ n)) m) (mult m ((Coq.nat.Succ n)))
+    Δ TACTIC: rewrite IHn on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n))
+    Δ REWRITE goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n))
+    Δ REWRITE pattern: mult ((Coq.nat.Succ n)) m
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) (fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix plus m (fix mult n m)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=m vs R=m
+    Δ EQUAL? L=(fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=match (Coq.nat.Succ n) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ n)) (ih_k ((Coq.nat.Succ n))))) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (fix plus n ih_k ((Coq.nat.Succ n)))))))) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(fix mult m (Coq.nat.Succ n)) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=match (Coq.nat.Succ n) in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ n)) (ih_k ((Coq.nat.Succ n))))) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(Coq.nat.Succ (fix plus n match n in (λ _ : (inductive nat ) -> Any) with Coq.nat.Zero | (λ k : Any -> (λ ih_k : Any -> (Coq.nat.Succ (fix plus n ih_k ((Coq.nat.Succ n)))))))) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=m vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=m vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=m vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=m vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=(Coq.nat.Succ n) vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=n vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=n vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ EQUAL? L=n vs R=(fix plus m (fix mult n m))
+    Δ EQUAL? L=n vs R=match (fix mult n m) in (λ _ : (inductive nat ) -> Any) with (fix mult n m) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k (fix mult n m))))
+    Δ TACTIC: rewrite mult_S_r on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (mult m ((Coq.nat.Succ n))) (fix mult m (Coq.nat.Succ n))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (fix mult m (Coq.nat.Succ n)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.eq (A : U0) (x : A)) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=(fix mult n (Coq.nat.Succ m))
+    Δ EQUAL? L=(inductive Coq.nat ) vs R=match n in (λ _ : (inductive nat ) -> Any) with Zero | (λ k : Any -> (λ ih_k : Any -> plus ((Coq.nat.Succ m)) (ih_k ((Coq.nat.Succ m)))))
+    Δ TACTIC: reflexivity on goal: (m : (inductive Coq.nat )) -> ((inductive Coq.eq (A : U0) (x : A))) (inductive Coq.nat ) (plus m (mult m m)) (plus m (mult m m))
+    Δ EQUAL? L=plus m (mult m m) vs R=plus m (mult m m)
+⊢ Print: mult_comm
+TYPE: (n : nat) -> (m : nat) -> eq nat (mult n m) (mult m n)
+EVAL: (λ n : nat -> match n in (λ n : nat -> (m : nat) -> eq nat (mult n m) (mult m n)) with rewrite_mult_0_r (mult n Zero) ((λ m : (inductive Coq.nat ) -> eq_refl Any Coq.nat.Zero)) | (λ n : (inductive Coq.nat ) -> (λ IHn : ((λ n : nat -> (m : nat) -> eq nat (mult n m) (mult m n))) n -> rewrite_IHn (mult ((Coq.nat.Succ n)) m) (rewrite_mult_S_r (mult n (Succ m)) ((λ m : (inductive Coq.nat ) -> eq_refl Any (plus m (mult m m))))))))
+⚙ Defining le_trans
+⊢ Print: le_trans
+TYPE: (n : Any) -> (m : Any) -> (p : Any) -> (_ : (le n m)) -> (_ : (le m p)) -> le n p
+✓ OK (Theorems)
+⚙ Testing test/christine/Samples.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining Inductive Bool
+⚙ Defining Inductive Nat
+⚙ Defining plus
+⚙ Defining Inductive Tree
+⚙ Defining Inductive Empty
+⚙ Defining Inductive Unit
+⚙ Defining Inductive W
+⚙ Defining B_nat
+⚙ Defining Inductive WNat
+⚙ Defining zero_w
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=Bool vs R=Bool
+    Δ EQUAL? L=(e : Empty) -> Any vs R=(y : (B_nat x)) -> W Bool B_nat
+⚙ Defining succ_w
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=Bool vs R=Bool
+    Δ EQUAL? L=(u : Unit) -> W Bool B_nat vs R=(y : (B_nat x)) -> W Bool B_nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=Bool vs R=Bool
+    Δ EQUAL? L=(e : Empty) -> Any vs R=(y : (B_nat x)) -> W Bool B_nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=Bool vs R=Bool
+    Δ EQUAL? L=(u : Unit) -> W Bool B_nat vs R=(y : (B_nat x)) -> W Bool B_nat
+✓ OK (Samples)
+⚙ Testing test/christine/Test/Bertot.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining Inductive Data.Eq.Eq
+⚙ Defining Data.Eq.J
+⚙ Defining Data.Eq.transport
+⚙ Defining Data.Eq.cong
+⚙ Defining Data.Eq.sym
+⚙ Defining Inductive Bool.Bool
+⚙ Defining Bool.negb
+⚙ Defining Bool.andb
+⚙ Defining Bool.orb
+⚙ Defining Bool.xor
+⚙ Defining Bool.not_not_id
+⚙ Defining Bool.andb_comm
+⊢ Check: True
+TYPE: Bool
+⊢ Check: False
+TYPE: Bool
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⊢ Check: Succ (Succ (Succ Zero))
+TYPE: nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⊢ Check: plus (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ Zero))))
+TYPE: nat
+⊢ Check: eq Any (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ (Succ Zero)))))
+TYPE: U0
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=U0
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=U0
+⊢ Check: pair (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ Zero))))
+TYPE: (_ : (Succ (Succ (Succ Zero)))) -> (_ : (Succ (Succ (Succ (Succ Zero))))) -> prod (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ Zero))))
+⊢ Check: and (eq Any (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ (Succ Zero)))))) True
+TYPE: U0
+⊢ Check: (_ : nat) -> U-1
+TYPE: U0
+⊢ Check: le (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ (Succ (Succ Zero))))))
+TYPE: U0
+⊢ Check: (λ x : nat -> eq Any x (Succ (Succ (Succ Zero))))
+TYPE: (x : nat) -> U0
+⊢ Check: (x : nat) -> or (lt x (Succ (Succ (Succ Zero)))) (Exists nat ((λ y : nat -> eq Any x (plus y (Succ (Succ (Succ Zero)))))))
+TYPE: U0
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=U0
+⊢ Check: let f = (λ x : Any -> pair (mult x (Succ (Succ (Succ Zero)))) x) in f (Succ (Succ (Succ Zero)))
+TYPE: (_ : (mult (Succ (Succ (Succ Zero))) (Succ (Succ (Succ Zero))))) -> (_ : (Succ (Succ (Succ Zero)))) -> prod (mult (Succ (Succ (Succ Zero))) (Succ (Succ (Succ Zero)))) (Succ (Succ (Succ Zero)))
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=U0
+⊢ Eval: let f = (λ x : Any -> pair (mult x (Succ (Succ (Succ Zero)))) x) in f (Succ (Succ (Succ Zero)))
+TYPE: (_ : (mult (Succ (Succ (Succ Zero))) (Succ (Succ (Succ Zero))))) -> (_ : (Succ (Succ (Succ Zero)))) -> prod (mult (Succ (Succ (Succ Zero))) (Succ (Succ (Succ Zero)))) (Succ (Succ (Succ Zero)))
+EVAL: (λ a2 : (fix mult (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))))) (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))) -> (λ a3 : (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))))) -> (Coq.prod.pair (fix mult (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))))) (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))) ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))) a2 a3)))
+⚙ Defining example1
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⚙ Defining example0
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⚙ Defining Inductive bin
+⊢ Eval: match true in (λ _ : (inductive Coq.bool ) -> Any) with Succ (Succ (Succ (Succ (Succ Zero)))) | Succ (Succ (Succ Zero))
+TYPE: Any
+EVAL: (Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))
+⚙ Defining head_evb
+⚙ Defining sum_n
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> nat
+⚙ Defining sum_list
+    Δ EQUAL? L=(l : (list nat)) -> Any vs R=(l : (list nat)) -> nat
+⚙ Defining insert
+    Δ EQUAL? L=(n : nat) -> (l : (list nat)) -> Any vs R=(n : nat) -> (l : (list nat)) -> list nat
+⚙ Defining sort
+    Δ EQUAL? L=(l : (list nat)) -> Any vs R=(l : (list nat)) -> list nat
+    Δ EQUAL? L=error(unbound: Nat) vs R=U0
+    Δ EQUAL? L=list Nat vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+    Δ EQUAL? L=list Any vs R=list nat
+⊢ Eval: sort (cons Any (Succ Zero) (cons Any (Succ (Succ (Succ (Succ Zero)))) (cons Any (Succ (Succ (Succ Zero))) (cons Any (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))))))))))))) (cons Any (Succ (Succ (Succ (Succ (Succ Zero))))) (cons Any (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))))))) (cons Any (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero))))))) (nil Nat))))))))
+TYPE: list nat
+EVAL: (fix sort (Coq.list.cons Any ((Coq.nat.Succ Coq.nat.Zero)) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))))) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))))))))))))))))))))))))))))))))))))))))) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))))))) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))))))))))))))))))))))))))))) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))))))))))) ((Coq.list.nil Nat))))))))))))))))
+⚙ Defining example2
+    Δ TACTIC: intros a b H on goal: (a : Any) -> (b : U-1) -> (_ : (and a b)) -> and b a
+    Δ TACTIC: intro a on goal: (a : Any) -> (b : U-1) -> (_ : (and a b)) -> and b a
+    Δ TACTIC: intro b on goal: (b : U-1) -> (_ : (and a b)) -> and b a
+    Δ TACTIC: intro H on goal: (_ : (and a b)) -> and b a
+    Δ TACTIC: intro on goal: and b a
+    Δ TACTIC: split on goal: and b a
+    Δ EQUAL? L=and vs R=(inductive Coq.and (A : U-1) (B : U-1))
+    Δ TACTIC: destruct H as  H1 H2 on goal: b
+    Δ TACTIC: exact H2 on goal: b
+    Δ EQUAL? L=b vs R=b
+    Δ TACTIC: intuition on goal: a
+⊢ Print: example2
+TYPE: (a : Any) -> (b : U-1) -> (_ : (and a b)) -> and b a
+EVAL: (λ a : Any -> (λ b : U-1 -> (λ H : and a b -> conj b a intuition_placeholder intuition_placeholder)))
+⚙ Defining example3
+    Δ TACTIC: intros A B H on goal: (A : Any) -> (B : Any) -> (_ : (or A B)) -> or B A
+    Δ TACTIC: intro A on goal: (A : Any) -> (B : Any) -> (_ : (or A B)) -> or B A
+    Δ TACTIC: intro B on goal: (B : Any) -> (_ : (or A B)) -> or B A
+    Δ TACTIC: intro H on goal: (_ : (or A B)) -> or B A
+    Δ TACTIC: intro on goal: or B A
+    Δ TACTIC: destruct H as  H1 | H1 on goal: or B A
+    Δ SEQUENCE: first = right , goals = [["H1", "H", "B", "A"], ["H1", "H", "B", "A"]]
+    Δ TACTIC: right  on goal: or B A
+    Δ EQUAL? L=or vs R=(inductive Coq.or (A : U-1) (B : U-1))
+    Δ TACTIC: assumption on goal: A
+    Δ EQUAL? L=A vs R=A
+    Δ SEQUENCE: first = left , goals = [["H1", "H", "B", "A"]]
+    Δ TACTIC: left  on goal: or B A
+    Δ EQUAL? L=or vs R=(inductive Coq.or (A : U-1) (B : U-1))
+    Δ TACTIC: assumption on goal: B
+    Δ EQUAL? L=B vs R=B
+⊢ Print: example3
+TYPE: (A : Any) -> (B : Any) -> (_ : (or A B)) -> or B A
+EVAL: (λ A : Any -> (λ B : Any -> (λ H : or A B -> match H in (λ H : or A B -> or B A) with (λ H1 : A -> or_intror B A H1) | (λ H1 : B -> or_introl B A H1))))
+⚙ Defining example4
+    Δ TACTIC: apply le_S on goal: le (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ (Succ Zero)))))
+    Δ EQUAL? L=le vs R=(inductive Coq.le )
+    Δ TACTIC: apply le_S on goal: le (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ Zero))))
+    Δ EQUAL? L=le vs R=(inductive Coq.le )
+    Δ TACTIC: apply le_n on goal: le (Succ (Succ (Succ Zero))) (Succ (Succ (Succ Zero)))
+    Δ EQUAL? L=le vs R=(inductive Coq.le )
+    Δ EQUAL? L=Succ (Succ (Succ Zero)) vs R=Succ (Succ (Succ Zero))
+⊢ Print: example4
+TYPE: le (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ (Succ Zero)))))
+⚙ Defining example5
+    Δ TACTIC: intros x y x10 y10 on goal: (x : Any) -> (y : Any) -> (_ : (le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))) -> (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+    Δ TACTIC: intro x on goal: (x : Any) -> (y : Any) -> (_ : (le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))) -> (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+    Δ TACTIC: intro y on goal: (y : Any) -> (_ : (le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))) -> (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+    Δ TACTIC: intro x10 on goal: (_ : (le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))) -> (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+    Δ TACTIC: intro y10 on goal: (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+    Δ TACTIC: intro on goal: le x y
+    Δ TACTIC: apply le_trans with ( m :=  10 ) on goal: le x y
+    Δ EQUAL? L=le vs R=(inductive Coq.le )
+    Δ TACTIC: exact x10 on goal: le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero))))))))))
+    Δ EQUAL? L=le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) vs R=le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero))))))))))
+    Δ TACTIC: exact y10 on goal: le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y
+    Δ EQUAL? L=le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y vs R=le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y
+⊢ Print: example5
+TYPE: (x : Any) -> (y : Any) -> (_ : (le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))))) -> (_ : (le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y)) -> le x y
+EVAL: (λ x : Any -> (λ y : Any -> (λ x10 : le x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) -> (λ y10 : le (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y -> Coq.le_trans x (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ (Succ Zero)))))))))) y y10 y10))))
+⚙ Defining count
+    Δ EQUAL? L=(n : Any) -> (l : Any) -> Any vs R=(n : Any) -> (l : Any) -> Any
+⚙ Defining flatten_aux
+    Δ EQUAL? L=(t1 : bin) -> (t2 : bin) -> Any vs R=(t1 : bin) -> (t2 : bin) -> bin
+⚙ Defining flatten
+    Δ EQUAL? L=(t : bin) -> Any vs R=(t : bin) -> bin
+⚙ Defining size
+    Δ EQUAL? L=(t : bin) -> Any vs R=(t : bin) -> nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> nat
+    Δ EQUAL? L=(l : (list nat)) -> Any vs R=(l : (list nat)) -> nat
+    Δ EQUAL? L=(n : nat) -> (l : (list nat)) -> Any vs R=(n : nat) -> (l : (list nat)) -> list nat
+    Δ EQUAL? L=(l : (list nat)) -> Any vs R=(l : (list nat)) -> list nat
+    Δ EQUAL? L=(n : Any) -> (l : Any) -> Any vs R=(n : Any) -> (l : Any) -> Any
+    Δ EQUAL? L=(t1 : bin) -> (t2 : bin) -> Any vs R=(t1 : bin) -> (t2 : bin) -> bin
+    Δ EQUAL? L=(t : bin) -> Any vs R=(t : bin) -> bin
+    Δ EQUAL? L=(t : bin) -> Any vs R=(t : bin) -> nat
+✓ OK (Math.Bertot)
+⚙ Testing test/christine/Test/Huet.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining distrand
+⚙ Defining n
+⊢ Check: gt
+TYPE: (n : nat) -> (m : nat) -> U0
+⚙ Defining NoMember
+✓ OK (Math.Tutorial)
+⚙ Testing test/christine/Test/List.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining Inductive Data.List.List
+⚙ Defining Data.List.head
+⚙ Defining Data.List.tail
+⚙ Defining Data.List.map
+⚙ Defining Data.List.filter
+⚙ Defining Data.List.length
+⚙ Defining Data.List.append
+⚙ Defining Data.List.foldr
+⚙ Defining Data.List.reverse
+⚙ Defining Data.List.zipWith
+⚙ Defining Inductive Data.Bool.Bool
+⚙ Defining Data.Bool.negb
+⚙ Defining Data.Bool.andb
+⚙ Defining Data.Bool.orb
+⚙ Defining Data.Bool.xor
+⚙ Defining Data.Bool.not_not_id
+⚙ Defining Data.Bool.andb_comm
+⚙ Defining Inductive Data.Nat.Nat
+⚙ Defining Data.Nat.plus
+⚙ Defining Data.Nat.minus
+⚙ Defining Data.Nat.mult
+⚙ Defining Data.Nat.isZero
+⚙ Defining Data.Nat.max
+⚙ Defining Data.Nat.plus_zero_n
+⚙ Defining Data.Nat.plus_n_zero
+⚙ Defining l1
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining l2
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining test_append
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining test_reverse
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining test_map
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=(x : Nat) -> Nat vs R=(x : Nat) -> Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining test_foldr
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(m : Nat) -> (n : Nat) -> Any vs R=(x : Nat) -> (y : Nat) -> Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining is_gt_one
+⚙ Defining test_filter
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(x : Nat) -> Any vs R=(x : Nat) -> Bool
+    Δ EQUAL? L=List Nat vs R=List Nat
+⚙ Defining test_zipWith
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(m : Nat) -> (n : Nat) -> Any vs R=(x : Nat) -> (y : Nat) -> Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=(x : Nat) -> Nat vs R=(x : Nat) -> Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(m : Nat) -> (n : Nat) -> Any vs R=(x : Nat) -> (y : Nat) -> Nat
+    Δ EQUAL? L=Nat vs R=Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(x : Nat) -> Any vs R=(x : Nat) -> Bool
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=U1 vs R=U0
+    Δ EQUAL? L=(m : Nat) -> (n : Nat) -> Any vs R=(x : Nat) -> (y : Nat) -> Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+    Δ EQUAL? L=List Nat vs R=List Nat
+✓ OK (Test.List)
+⚙ Testing test/christine/Test/LiteralTest.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⊢ Check: Succ (Succ (Succ Zero))
+TYPE: nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⊢ Check: plus (Succ (Succ (Succ Zero))) (Succ (Succ (Succ (Succ Zero))))
+TYPE: nat
+    Δ EQUAL? L=error(unbound: Nat) vs R=U0
+    Δ EQUAL? L=list Nat vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+⊢ Check: cons Any (Succ Zero) (cons Any (Succ (Succ Zero)) (nil Nat))
+TYPE: list Any
+⚙ Defining l1
+    Δ EQUAL? L=error(unbound: Nat) vs R=U0
+    Δ EQUAL? L=list Nat vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+⊢ Eval: l1
+TYPE: list Any
+EVAL: (Coq.list.cons Any ((Coq.nat.Succ Coq.nat.Zero)) ((Coq.list.cons Any ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))) ((Coq.list.nil Nat)))))
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+⊢ Eval: plus (Succ Zero) (Succ (Succ Zero))
+TYPE: nat
+EVAL: (fix plus (Coq.nat.Succ Coq.nat.Zero) (Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))))
+⚙ Defining test_plus
+    Δ TACTIC: reflexivity on goal: eq Any (plus (Succ Zero) (Succ (Succ Zero))) (Succ (Succ (Succ Zero)))
+    Δ EQUAL? L=plus (Succ Zero) (Succ (Succ Zero)) vs R=Succ (Succ (Succ Zero))
+    Δ EQUAL? L=match (Coq.nat.Succ Coq.nat.Zero) in (λ _ : (inductive nat ) -> Any) with (Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))) | (λ k : Any -> (λ ih_k : Any -> Succ (ih_k ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero))))))) vs R=(Coq.nat.Succ ((Coq.nat.Succ ((Coq.nat.Succ Coq.nat.Zero)))))
+    Δ EQUAL? L=error(unbound: Nat) vs R=U0
+    Δ EQUAL? L=list Nat vs R=list Any
+    Δ EQUAL? L=list Any vs R=list Any
+✓ OK (LiteralTest)
+⚙ Testing test/christine/Test/W.christine... 
+⚙ Defining Inductive Coq.bool
+⚙ Defining Inductive Coq.nat
+⚙ Defining Coq.O
+⚙ Defining Coq.S
+⚙ Defining Inductive Coq.unit
+⚙ Defining Inductive Coq.list
+⚙ Defining Inductive Coq.prod
+⚙ Defining Inductive Coq.sum
+⚙ Defining Inductive Coq.and
+⚙ Defining Inductive Coq.or
+⚙ Defining Inductive Coq.eq
+⚙ Defining Inductive Coq.le
+⚙ Defining Inductive Coq.ex
+⚙ Defining Coq.Exists
+⚙ Defining Inductive Coq.False
+⚙ Defining Inductive Coq.True
+⚙ Defining Coq.not
+⚙ Defining Coq.plus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.id
+⚙ Defining Coq.depth
+⚙ Defining Coq.max
+⚙ Defining Coq.mult
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.minus
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> nat
+⚙ Defining Coq.leb
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.ltb
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=nat vs R=nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> bool vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.beq_nat
+    Δ EQUAL? L=(n : nat) -> (m : nat) -> Any vs R=(n : nat) -> (m : nat) -> bool
+⚙ Defining Coq.evenb
+    Δ EQUAL? L=(n : nat) -> Any vs R=(n : nat) -> bool
+⚙ Defining Coq.andb
+⚙ Defining Coq.orb
+⚙ Defining Coq.negb
+⚙ Defining Coq.lt
+⚙ Defining Coq.gt
+⚙ Defining Coq.ge
+⚙ Defining Coq.le_trans
+⚙ Defining Inductive Data.W.W
+⚙ Defining Data.W.B_nat
+⚙ Defining Data.W.zero_w
+    Δ EQUAL? L=error(unbound: Bool) vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=U1 vs R=Bool
+    Δ EQUAL? L=(e : Empty) -> Any vs R=(y : (B_nat x)) -> W Bool B_nat
+⚙ Defining Data.W.succ_w
+    Δ EQUAL? L=error(unbound: Bool) vs R=U0
+    Δ EQUAL? L=(b : Bool) -> Any vs R=(x : Bool) -> U0
+    Δ EQUAL? L=U1 vs R=Bool
+    Δ EQUAL? L=(u : Unit) -> W Bool B_nat vs R=(y : (B_nat x)) -> W Bool B_nat
+⚙ Defining Data.W.wTwo
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+⚙ Defining Data.W.wOne
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+⚙ Defining Data.W.wplus
+    Δ EQUAL? L=(m : (W Bool B_nat)) -> (n : (W Bool B_nat)) -> Any vs R=(m : (W Bool B_nat)) -> (n : (W Bool B_nat)) -> W Bool B_nat
+⚙ Defining test_W
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+⊢ Check: test_W
+TYPE: W Bool B_nat
+⊢ Print: test_W
+TYPE: W Bool B_nat
+EVAL: wplus wTwo wOne
+⊢ Eval: test_W
+TYPE: W Bool B_nat
+EVAL: (fix wplus (Data.W.W.Sup Bool ((λ b : Bool -> match b in (λ _ : (inductive Unknown ) -> Any) with )) (inductive Coq.True ) ((λ u : Unit -> (Data.W.W.Sup Bool ((λ b : Bool -> match b in (λ _ : (inductive Unknown ) -> Any) with )) (inductive Coq.True ) ((λ u : Unit -> (Data.W.W.Sup Bool ((λ b : Bool -> match b in (λ _ : (inductive Unknown ) -> Any) with )) (inductive Coq.False ) ((λ e : Empty -> match e in (λ _ : (inductive Empty ) -> Any) with ))))))))) (Data.W.W.Sup Bool ((λ b : Bool -> match b in (λ _ : (inductive Unknown ) -> Any) with )) (inductive Coq.True ) ((λ u : Unit -> (Data.W.W.Sup Bool ((λ b : Bool -> match b in (λ _ : (inductive Unknown ) -> Any) with )) (inductive Coq.False ) ((λ e : Empty -> match e in (λ _ : (inductive Empty ) -> Any) with )))))))
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+    Δ EQUAL? L=W Bool B_nat vs R=W Bool B_nat
+✓ OK (Test.W)
+
+────────────────────────────────────────
+Test Summary:
+  Total:     8
+  Success:   8
+  Failures:  0
+  Duration:  0.06s
+────────────────────────────────────────
