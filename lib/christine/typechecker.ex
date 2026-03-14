@@ -121,6 +121,9 @@ defmodule Christine.Typechecker do
 
   def equal?(e, t1, t2) do
     if e.verbose do
+       IO.puts("      DEBUG EQUAL?:\n      L: #{inspect(t1, limit: :infinity)}\n      R: #{inspect(t2, limit: :infinity)}")
+    end
+    if e.verbose do
        # IO.puts("  DEBUG EQUAL?: t1=#{AST.to_string(t1)} vs t2=#{AST.to_string(t2)}")
     end
     deadline = e.deadline || System.monotonic_time(:millisecond) + 10_000
@@ -250,8 +253,7 @@ defmodule Christine.Typechecker do
       %AST.Pi{name: x, domain: a, codomain: b} ->
         %AST.Pi{name: x, domain: normalize(e, a), codomain: normalize(%{e | ctx: [{x, a} | e.ctx]}, b)}
       %AST.Ind{inductive: d, motive: p, cases: cases, term: t_val} ->
-        # Do NOT normalize cases deeply to avoid infinite loops with induction hypotheses
-        %AST.Ind{inductive: d, motive: normalize(e, p), cases: cases, term: normalize(e, t_val)}
+        %AST.Ind{inductive: d, motive: normalize(e, p), cases: Enum.map(cases, &normalize(e, &1)), term: normalize(e, t_val)}
       %AST.Fixpoint{name: n, domain: d, body: b, args: args} ->
         # Just normalize the accumulated args, don't normalize the body to avoid infinite recursion
         %AST.Fixpoint{name: n, domain: normalize(e, d), body: b, args: Enum.map(args, &normalize(e, &1))}
