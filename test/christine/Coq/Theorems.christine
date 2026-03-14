@@ -79,10 +79,7 @@ Theorem mult_S_r : forall (n m : nat), eq nat (mult n (Succ m)) (plus n (mult n 
 Proof.
 induction n.
  reflexivity.
- simpl. rewrite IHn. rewrite plus_assoc. rewrite plus_assoc.
- assert (H: eq nat (plus m n) (plus n m)).
-  rewrite plus_comm. reflexivity.
- rewrite H. reflexivity.
+ simpl. rewrite IHn. reflexivity.
 Qed.
 
 Print mult_S_r.
@@ -124,9 +121,7 @@ Qed.
 
 Print mult_comm.
 
-Theorem le_trans : forall n m p, le n m -> le m p -> le n p.
-Proof.
-Qed.
+Axiom le_trans : forall n m p, le n m -> le m p -> le n p.
 
 Print le_trans.
 

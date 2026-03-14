@@ -258,7 +258,7 @@ Qed.</pre>
                 <pre class="code-snippet">Theorem rewrite_demo : ∀ n : Nat, plus (plus O n) O = n.
 Proof.
   intro n.
-  rewrite plus_O_n.  -- assuming plus_O_n : ∀ n, plus O n = n is in scope
+  rewrite plus_O_n.
   reflexivity.
 Qed.</pre>
             </div>

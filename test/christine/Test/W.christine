@@ -3,32 +3,6 @@
 Module Test.W.
 
 import Coq.
-
-Inductive W (A: Type) (B: forall (x: A), Type) :=
-| Sup (x: A) (f: forall (y: B x), W A B).
-
-Definition B_nat (b: Bool) : Type :=
-  match b with
-  | False => Empty
-  | True => Unit
-  end.
-
-Definition zero_w : W Bool B_nat :=
-  Sup Bool B_nat False (fun (e: Empty) => match e with end).
-
-Definition succ_w (n: W Bool B_nat) : W Bool B_nat :=
-  Sup Bool B_nat True (fun (u: Unit) => n).
-
-Definition wTwo : W Bool B_nat := succ_w (succ_w zero_w).
-Definition wOne : W Bool B_nat := succ_w zero_w.
-
-Definition wplus (m: W Bool B_nat) (n: W Bool B_nat) : W Bool B_nat :=
-  match m with
-  | Sup b f =>
-    match b with
-    | False => n
-    | True  => succ_w (wplus (f tt) n)
-    end
-  end.
+import Data.W.
 
 Definition test_W : W Bool B_nat := wplus wTwo wOne.
