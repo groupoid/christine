@@ -1,6 +1,9 @@
 Christine: Calculus of Inductive Constructions
 ==============================================
 
+[![Actions Status](https://github.com/groupoid/christine/workflows/ci/badge.svg)](https://github.com/groupoid/christine/actions)
+[![Hex pm](http://img.shields.io/hexpm/v/christine.svg?style=flat)](https://hex.pm/packages/christine)
+
 <img src="https://christine.groupoid.space/img/christine.jpg" height=400>
 
 ## Abstract
